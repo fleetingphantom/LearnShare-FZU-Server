@@ -3,12 +3,15 @@
 package user
 
 import (
+	"LearnShare/biz/middleware"
+	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
 	"context"
 
 	"LearnShare/biz/model/user"
+	"LearnShare/pkg/errno"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Register .
@@ -18,13 +21,19 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	var req user.RegisterReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.RegisterResp)
 
-	c.JSON(consts.StatusOK, resp)
+	err = service.NewUserService(ctx, c).Register(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	pack.SendResponse(c, resp)
 }
 
 // LoginIn .
@@ -34,13 +43,22 @@ func LoginIn(ctx context.Context, c *app.RequestContext) {
 	var req user.LoginInReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	resp := new(user.LoginInResp)
+	userInfo, err := service.NewUserService(ctx, c).LoginIn(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	resp := &user.LoginInResp{
+		BaseResponse: pack.BuildBaseResp(errno.Success),
+		User:         userInfo,
+	}
+
+	pack.SendResponse(c, resp)
 }
 
 // LoginOut .
@@ -50,13 +68,13 @@ func LoginOut(ctx context.Context, c *app.RequestContext) {
 	var req user.LoginOutReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.LoginOutResp)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // SendVerifyEmail .
@@ -66,13 +84,13 @@ func SendVerifyEmail(ctx context.Context, c *app.RequestContext) {
 	var req user.SendVerifyEmailReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.SendVerifyEmailResp)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // VerifyEmail .
@@ -82,13 +100,13 @@ func VerifyEmail(ctx context.Context, c *app.RequestContext) {
 	var req user.VerifyEmailReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.VerifyEmailResp)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // UpdateEmail .
@@ -98,13 +116,13 @@ func UpdateEmail(ctx context.Context, c *app.RequestContext) {
 	var req user.UpdateEmailReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.UpdateEmailResp)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // UpdatePassword .
@@ -114,13 +132,18 @@ func UpdatePassword(ctx context.Context, c *app.RequestContext) {
 	var req user.UpdatePasswordReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.UpdatePasswordResp)
+	err = service.NewUserService(ctx, c).UpdatePassword(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // UpdateMajor .
@@ -130,13 +153,18 @@ func UpdateMajor(ctx context.Context, c *app.RequestContext) {
 	var req user.UpdateMajorReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.UpdateMajorResp)
+	err = service.NewUserService(ctx, c).UpdateMajor(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // UploadAvatar .
@@ -146,13 +174,13 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 	var req user.UploadAvatarReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.UploadAvatarResp)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // ResetPassword .
@@ -162,13 +190,13 @@ func ResetPassword(ctx context.Context, c *app.RequestContext) {
 	var req user.ResetPasswordReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.ResetPasswordResp)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // RefreshToken .
@@ -178,13 +206,14 @@ func RefreshToken(ctx context.Context, c *app.RequestContext) {
 	var req user.RefreshTokenReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.RefreshTokenResp)
-
-	c.JSON(consts.StatusOK, resp)
+	middleware.GenerateAccessToken(c)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
 }
 
 // GetUserInfo .
@@ -194,11 +223,18 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	var req user.GetUserInfoReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(user.GetUserInfoResp)
+	userInfo, err := service.NewUserService(ctx, c).GetUserInfo(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	resp.User = userInfo
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }

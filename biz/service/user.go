@@ -57,6 +57,8 @@ func (s *UserService) LoginIn(req *user.LoginInReq) (*module.User, error) {
 	if err := utils.ComparePassword(userInfo.PasswordHash, req.Password); err != nil {
 		return nil, err
 	}
+
+	userInfo.PasswordHash = ""
 	return userInfo.ToUserModule(), nil
 }
 
