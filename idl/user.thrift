@@ -23,7 +23,6 @@ struct LoginInResp {
 
 //用户登出
 struct LoginOutReq {
-  required i64 userId;
 }
 struct LoginOutResp {
   required model.BaseResp baseResponse;
@@ -40,7 +39,7 @@ struct SendVerifyEmailResp {
 //验证邮箱验证码
 struct VerifyEmailReq {
   required string email;
-  required i64 code;
+  required string code;
 }
 struct VerifyEmailResp {
   required model.BaseResp baseResponse;
@@ -49,7 +48,7 @@ struct VerifyEmailResp {
 //修改邮箱
 struct updateEmailReq {
   required string newEmail;
-  required i64 code;
+  required string code;
 }
 struct updateEmailResp {
   required model.BaseResp baseResponse;
@@ -87,7 +86,7 @@ struct uploadAvatarResp {
 struct ResetPasswordReq {
   required string email;
   required string newPassword;
-  required i64 code;
+  required string code;
 }
 struct ResetPasswordResp {
   required model.BaseResp baseResponse;

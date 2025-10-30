@@ -32,8 +32,6 @@ const (
 	InternalDatabaseErrorCode                // 数据库错误
 	InternalRedisErrorCode                   // Redis错误
 	InternalNetworkErrorCode                 // 网络错误
-	InternalESErrorCode                      // ES错误
-	InternalKafkaErrorCode                   // kafka 错误
 	OSOperateErrorCode
 	IOOperateErrorCode
 	InsufficientStockErrorCode
@@ -54,6 +52,7 @@ const (
 	ServiceInvalidUsername
 	ServiceInvalidPassword
 	ServiceInvalidEmail
+	ServiceInvalidCode
 
 	ErrRecordNotFound
 	UserLogOut

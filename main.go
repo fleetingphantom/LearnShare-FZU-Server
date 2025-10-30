@@ -3,10 +3,25 @@
 package main
 
 import (
+	"LearnShare/biz/dal"
+	"LearnShare/biz/middleware"
+	"LearnShare/config"
+	"log"
+
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
+func Init() {
+	config.Init()
+	err := dal.Init()
+	if err != nil {
+		log.Fatal(err)
+	}
+	middleware.Init()
+}
+
 func main() {
+	Init()
 	h := server.Default()
 
 	register(h)

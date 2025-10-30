@@ -3,6 +3,7 @@ package db
 import (
 	"LearnShare/pkg/constants"
 	"LearnShare/pkg/errno"
+	"LearnShare/pkg/utils"
 	"context"
 	"fmt"
 
@@ -14,9 +15,12 @@ import (
 var DB *gorm.DB
 
 func Init() error {
-	var err error
+	dsn, err := utils.GetMysqlDSN()
+	if err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL get mysql DSN error: %v", err))
+	}
 
-	DB, err = gorm.Open(mysql.Open("dsn"),
+	DB, err = gorm.Open(mysql.Open(dsn),
 		&gorm.Config{
 			PrepareStmt:            true,  // 在执行任何 SQL 时都会创建一个 prepared statement 并将其缓存，以提高后续的效率
 			SkipDefaultTransaction: false, // 不禁用默认事务(即单个创建、更新、删除时使用事务)

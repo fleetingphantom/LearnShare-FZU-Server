@@ -73,6 +73,11 @@ func LoginOut(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.LoginOutResp)
+	err = service.NewUserService(ctx, c).LoginOut()
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
 	pack.SendResponse(c, resp)
 }
@@ -89,6 +94,11 @@ func SendVerifyEmail(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.SendVerifyEmailResp)
+	err = service.NewUserService(ctx, c).SendVerifyEmail(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
 	pack.SendResponse(c, resp)
 }
@@ -105,6 +115,11 @@ func VerifyEmail(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.VerifyEmailResp)
+	err = service.NewUserService(ctx, c).VerifyEmail(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
 	pack.SendResponse(c, resp)
 }
@@ -121,6 +136,11 @@ func UpdateEmail(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.UpdateEmailResp)
+	err = service.NewUserService(ctx, c).UpdateEmail(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
 	pack.SendResponse(c, resp)
 }
@@ -195,6 +215,11 @@ func ResetPassword(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.ResetPasswordResp)
+	err = service.NewUserService(ctx, c).ResetPassword(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
 	pack.SendResponse(c, resp)
 }

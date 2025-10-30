@@ -1,0 +1,27 @@
+# 示例配置文件
+mysql:
+  addr: "127.0.0.1:3306"
+  database: "learnshare"
+  username: "root"
+  password: "password"
+  charset: "utf8mb4"
+redis:
+  addr: "127.0.0.1:6379"
+  password: ""
+oss:
+  endpoint: ""
+  accessKey-id: ""
+  accessKey-secret: ""
+  bucketName: ""
+  main-directory: ""
+smtp:
+  host: "smtp.example.com"
+  port: 465
+  user: "smtp_user@example.com"
+  password: "smtp_password"
+  from: "no-reply@example.com"
+  from_name: "LearnShare"
+verify:
+  code_length: 6
+  ttl_seconds: 600
+

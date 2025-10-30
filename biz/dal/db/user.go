@@ -21,7 +21,7 @@ func CreateUser(ctx context.Context, username, passwordHash, email string) error
 	return nil
 }
 
-func UpdateUserPassword(ctx context.Context, userID int, newPasswordHash string) error {
+func UpdateUserPassword(ctx context.Context, userID int64, newPasswordHash string) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("password_hash", newPasswordHash).Error
 	if err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户密码失败: "+err.Error())
@@ -37,6 +37,22 @@ func UpdateMajorID(ctx context.Context, userID int, majorID int) error {
 	return nil
 }
 
+func UpdateUserStatues(ctx context.Context, userID int64, newStatus string) error {
+	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("status", newStatus).Error
+	if err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户状态失败: "+err.Error())
+	}
+	return nil
+}
+
+func UpdateUserEmail(ctx context.Context, userID int, newEmail string) error {
+	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("email", newEmail).Error
+	if err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户邮箱失败: "+err.Error())
+	}
+	return nil
+}
+
 func GetUserByEmail(ctx context.Context, email string) (*User, error) {
 	var user User
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("email = ?", email).First(&user).Error
@@ -46,7 +62,7 @@ func GetUserByEmail(ctx context.Context, email string) (*User, error) {
 	return &user, nil
 }
 
-func GetUserByID(ctx context.Context, id int) (*User, error) {
+func GetUserByID(ctx context.Context, id int64) (*User, error) {
 	var user User
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", id).First(&user).Error
 	if err != nil {

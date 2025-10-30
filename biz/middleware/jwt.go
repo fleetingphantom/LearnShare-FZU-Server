@@ -27,10 +27,10 @@ func AccessTokenJwt() {
 	AccessTokenJwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
 		Realm:                       "LS",
 		Key:                         []byte("AccessToken_key"),
-		Timeout:                     time.Hour,
-		MaxRefresh:                  time.Hour,
+		Timeout:                     12 * time.Hour,
+		MaxRefresh:                  12 * time.Hour,
 		WithoutDefaultTokenHeadName: true,
-		TokenLookup:                 "header: Access-Token",
+		TokenLookup:                 "header: Authorization",
 		IdentityKey:                 IdentityKey,
 
 		PayloadFunc: func(data interface{}) jwt.MapClaims {

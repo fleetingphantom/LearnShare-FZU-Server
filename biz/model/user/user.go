@@ -822,7 +822,6 @@ func (p *LoginInResp) String() string {
 
 // 用户登出
 type LoginOutReq struct {
-	UserId int64 `thrift:"userId,1,required" form:"userId,required" json:"userId,required" query:"userId,required"`
 }
 
 func NewLoginOutReq() *LoginOutReq {
@@ -832,18 +831,11 @@ func NewLoginOutReq() *LoginOutReq {
 func (p *LoginOutReq) InitDefault() {
 }
 
-func (p *LoginOutReq) GetUserId() (v int64) {
-	return p.UserId
-}
-
-var fieldIDToName_LoginOutReq = map[int16]string{
-	1: "userId",
-}
+var fieldIDToName_LoginOutReq = map[int16]string{}
 
 func (p *LoginOutReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetUserId bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -857,21 +849,8 @@ func (p *LoginOutReq) Read(iprot thrift.TProtocol) (err error) {
 		if fieldTypeId == thrift.STOP {
 			break
 		}
-
-		switch fieldId {
-		case 1:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField1(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetUserId = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		default:
-			if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
+		if err = iprot.Skip(fieldTypeId); err != nil {
+			goto SkipFieldTypeError
 		}
 		if err = iprot.ReadFieldEnd(); err != nil {
 			goto ReadFieldEndError
@@ -881,50 +860,25 @@ func (p *LoginOutReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetUserId {
-		fieldId = 1
-		goto RequiredFieldNotSetError
-	}
 	return nil
 ReadStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
-ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_LoginOutReq[fieldId]), err)
-SkipFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+SkipFieldTypeError:
+	return thrift.PrependError(fmt.Sprintf("%T skip field type %d error", p, fieldTypeId), err)
 
 ReadFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
-RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_LoginOutReq[fieldId]))
-}
-
-func (p *LoginOutReq) ReadField1(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.UserId = _field
-	return nil
 }
 
 func (p *LoginOutReq) Write(oprot thrift.TProtocol) (err error) {
-	var fieldId int16
 	if err = oprot.WriteStructBegin("LoginOutReq"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
-		if err = p.writeField1(oprot); err != nil {
-			fieldId = 1
-			goto WriteFieldError
-		}
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
 		goto WriteFieldStopError
@@ -935,29 +889,10 @@ func (p *LoginOutReq) Write(oprot thrift.TProtocol) (err error) {
 	return nil
 WriteStructBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
-WriteFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
 WriteFieldStopError:
 	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
 WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
-}
-
-func (p *LoginOutReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("userId", thrift.I64, 1); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.UserId); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
 func (p *LoginOutReq) String() string {
@@ -1425,7 +1360,7 @@ func (p *SendVerifyEmailResp) String() string {
 // 验证邮箱验证码
 type VerifyEmailReq struct {
 	Email string `thrift:"email,1,required" form:"email,required" json:"email,required" query:"email,required"`
-	Code  int64  `thrift:"code,2,required" form:"code,required" json:"code,required" query:"code,required"`
+	Code  string `thrift:"code,2,required" form:"code,required" json:"code,required" query:"code,required"`
 }
 
 func NewVerifyEmailReq() *VerifyEmailReq {
@@ -1439,7 +1374,7 @@ func (p *VerifyEmailReq) GetEmail() (v string) {
 	return p.Email
 }
 
-func (p *VerifyEmailReq) GetCode() (v int64) {
+func (p *VerifyEmailReq) GetCode() (v string) {
 	return p.Code
 }
 
@@ -1478,7 +1413,7 @@ func (p *VerifyEmailReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1539,8 +1474,8 @@ func (p *VerifyEmailReq) ReadField1(iprot thrift.TProtocol) error {
 }
 func (p *VerifyEmailReq) ReadField2(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -1598,10 +1533,10 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 func (p *VerifyEmailReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("code", thrift.I64, 2); err != nil {
+	if err = oprot.WriteFieldBegin("code", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Code); err != nil {
+	if err := oprot.WriteString(p.Code); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1778,7 +1713,7 @@ func (p *VerifyEmailResp) String() string {
 // 修改邮箱
 type UpdateEmailReq struct {
 	NewEmail string `thrift:"newEmail,1,required" form:"newEmail,required" json:"newEmail,required" query:"newEmail,required"`
-	Code     int64  `thrift:"code,2,required" form:"code,required" json:"code,required" query:"code,required"`
+	Code     string `thrift:"code,2,required" form:"code,required" json:"code,required" query:"code,required"`
 }
 
 func NewUpdateEmailReq() *UpdateEmailReq {
@@ -1792,7 +1727,7 @@ func (p *UpdateEmailReq) GetNewEmail() (v string) {
 	return p.NewEmail
 }
 
-func (p *UpdateEmailReq) GetCode() (v int64) {
+func (p *UpdateEmailReq) GetCode() (v string) {
 	return p.Code
 }
 
@@ -1831,7 +1766,7 @@ func (p *UpdateEmailReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1892,8 +1827,8 @@ func (p *UpdateEmailReq) ReadField1(iprot thrift.TProtocol) error {
 }
 func (p *UpdateEmailReq) ReadField2(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -1951,10 +1886,10 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 func (p *UpdateEmailReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("code", thrift.I64, 2); err != nil {
+	if err = oprot.WriteFieldBegin("code", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Code); err != nil {
+	if err := oprot.WriteString(p.Code); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3139,7 +3074,7 @@ func (p *UploadAvatarResp) String() string {
 type ResetPasswordReq struct {
 	Email       string `thrift:"email,1,required" form:"email,required" json:"email,required" query:"email,required"`
 	NewPassword string `thrift:"newPassword,2,required" form:"newPassword,required" json:"newPassword,required" query:"newPassword,required"`
-	Code        int64  `thrift:"code,3,required" form:"code,required" json:"code,required" query:"code,required"`
+	Code        string `thrift:"code,3,required" form:"code,required" json:"code,required" query:"code,required"`
 }
 
 func NewResetPasswordReq() *ResetPasswordReq {
@@ -3157,7 +3092,7 @@ func (p *ResetPasswordReq) GetNewPassword() (v string) {
 	return p.NewPassword
 }
 
-func (p *ResetPasswordReq) GetCode() (v int64) {
+func (p *ResetPasswordReq) GetCode() (v string) {
 	return p.Code
 }
 
@@ -3207,7 +3142,7 @@ func (p *ResetPasswordReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 3:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -3284,8 +3219,8 @@ func (p *ResetPasswordReq) ReadField2(iprot thrift.TProtocol) error {
 }
 func (p *ResetPasswordReq) ReadField3(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -3363,10 +3298,10 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 func (p *ResetPasswordReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("code", thrift.I64, 3); err != nil {
+	if err = oprot.WriteFieldBegin("code", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Code); err != nil {
+	if err := oprot.WriteString(p.Code); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
