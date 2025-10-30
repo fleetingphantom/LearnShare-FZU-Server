@@ -57,7 +57,6 @@ struct updateEmailResp {
 
 //修改密码
 struct UpdatePasswordReq {
-  required i64 userId;
   required string oldPassword;
   required string newPassword;
 }
@@ -67,7 +66,6 @@ struct UpdatePasswordResp {
 
 //修改专业
 struct updateMajorReq {
-  required i64 userId;
   required i64 newMajorId;
 }
 struct updateMajorResp {

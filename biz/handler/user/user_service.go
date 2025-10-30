@@ -5,7 +5,7 @@ package user
 import (
 	"context"
 
-	user "LearnShare/biz/model/user"
+	"LearnShare/biz/model/user"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"

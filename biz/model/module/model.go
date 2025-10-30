@@ -208,7 +208,7 @@ func (p *BaseResp) String() string {
 
 type User struct {
 	UserId          int64   `thrift:"userId,1,required" form:"userId,required" json:"userId,required" query:"userId,required"`
-	UserName        string  `thrift:"userName,2,required" form:"userName,required" json:"userName,required" query:"userName,required"`
+	Username        string  `thrift:"username,2,required" form:"username,required" json:"username,required" query:"username,required"`
 	Password        *string `thrift:"password,3,optional" form:"password" json:"password,omitempty" query:"password"`
 	Email           string  `thrift:"email,4,required" form:"email,required" json:"email,required" query:"email,required"`
 	CollegeId       int64   `thrift:"collegeId,5,required" form:"collegeId,required" json:"collegeId,required" query:"collegeId,required"`
@@ -232,8 +232,8 @@ func (p *User) GetUserId() (v int64) {
 	return p.UserId
 }
 
-func (p *User) GetUserName() (v string) {
-	return p.UserName
+func (p *User) GetUsername() (v string) {
+	return p.Username
 }
 
 var User_Password_DEFAULT string
@@ -283,7 +283,7 @@ func (p *User) GetUpdatedAt() (v int64) {
 
 var fieldIDToName_User = map[int16]string{
 	1:  "userId",
-	2:  "userName",
+	2:  "username",
 	3:  "password",
 	4:  "email",
 	5:  "collegeId",
@@ -304,7 +304,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetUserId bool = false
-	var issetUserName bool = false
+	var issetUsername bool = false
 	var issetEmail bool = false
 	var issetCollegeId bool = false
 	var issetMajorId bool = false
@@ -343,7 +343,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetUserName = true
+				issetUsername = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -454,7 +454,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetUserName {
+	if !issetUsername {
 		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
@@ -540,7 +540,7 @@ func (p *User) ReadField2(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.UserName = _field
+	p.Username = _field
 	return nil
 }
 func (p *User) ReadField3(iprot thrift.TProtocol) error {
@@ -743,10 +743,10 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 func (p *User) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("userName", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("username", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.UserName); err != nil {
+	if err := oprot.WriteString(p.Username); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

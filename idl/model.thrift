@@ -7,7 +7,7 @@ struct BaseResp{
 
 struct User{
     required i64 userId,
-    required string userName,
+    required string username,
     optional string password,
     required string email,
     required i64 collegeId,
