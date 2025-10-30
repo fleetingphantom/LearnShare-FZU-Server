@@ -89,3 +89,83 @@ func GetResource(ctx context.Context, c *app.RequestContext) {
 
 	c.JSON(consts.StatusOK, resp)
 }
+
+// SubmitResourceRating .
+// @router /api/resource_ratings/{rating_id} [POST]
+func SubmitResourceRating(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req resource.SubmitResourceRatingReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(resource.SubmitResourceRatingResp)
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DeleteResourceRating .
+// @router /api/resource_ratings/{rating_id} [DELETE]
+func DeleteResourceRating(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req resource.DeleteResourceRatingReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(resource.DeleteResourceRatingResp)
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// SubmitResourceComment .
+// @router /api/resource_comments/{comment_id} [POST]
+func SubmitResourceComment(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req resource.SubmitResourceCommentReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(resource.SubmitResourceCommentResp)
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// DeleteResourceComment .
+// @router /api/resources_comments/{comment_id} [DELETE]
+func DeleteResourceComment(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req resource.DeleteResourceCommentReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(resource.DeleteResourceCommentResp)
+
+	c.JSON(consts.StatusOK, resp)
+}
+
+// GetResourceComments .
+// @router /api/resource/{resource_id}/comment [GET]
+func GetResourceComments(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req resource.GetResourceCommentsReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		c.String(consts.StatusBadRequest, err.Error())
+		return
+	}
+
+	resp := new(resource.GetResourceCommentsResp)
+
+	c.JSON(consts.StatusOK, resp)
+}

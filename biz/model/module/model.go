@@ -3,9 +3,58 @@
 package module
 
 import (
+	"database/sql"
+	"database/sql/driver"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
 )
+
+type ResourceCommentStatus int64
+
+const (
+	ResourceCommentStatus_NORMAL           ResourceCommentStatus = 0
+	ResourceCommentStatus_DELETED_BY_USER  ResourceCommentStatus = 1
+	ResourceCommentStatus_DELETED_BY_ADMIN ResourceCommentStatus = 2
+)
+
+func (p ResourceCommentStatus) String() string {
+	switch p {
+	case ResourceCommentStatus_NORMAL:
+		return "NORMAL"
+	case ResourceCommentStatus_DELETED_BY_USER:
+		return "DELETED_BY_USER"
+	case ResourceCommentStatus_DELETED_BY_ADMIN:
+		return "DELETED_BY_ADMIN"
+	}
+	return "<UNSET>"
+}
+
+func ResourceCommentStatusFromString(s string) (ResourceCommentStatus, error) {
+	switch s {
+	case "NORMAL":
+		return ResourceCommentStatus_NORMAL, nil
+	case "DELETED_BY_USER":
+		return ResourceCommentStatus_DELETED_BY_USER, nil
+	case "DELETED_BY_ADMIN":
+		return ResourceCommentStatus_DELETED_BY_ADMIN, nil
+	}
+	return ResourceCommentStatus(0), fmt.Errorf("not a valid ResourceCommentStatus string")
+}
+
+func ResourceCommentStatusPtr(v ResourceCommentStatus) *ResourceCommentStatus { return &v }
+func (p *ResourceCommentStatus) Scan(value interface{}) (err error) {
+	var result sql.NullInt64
+	err = result.Scan(value)
+	*p = ResourceCommentStatus(result.Int64)
+	return
+}
+
+func (p *ResourceCommentStatus) Value() (driver.Value, error) {
+	if p == nil {
+		return nil, nil
+	}
+	return int64(*p), nil
+}
 
 type BaseResp struct {
 	Code    int32  `thrift:"code,1,required" form:"code,required" json:"code,required" query:"code,required"`
@@ -2660,9 +2709,8 @@ func (p *CourseComment) String() string {
 }
 
 type ResourceTag struct {
-	TagId     int64  `thrift:"tagId,1,required" form:"tagId,required" json:"tagId,required" query:"tagId,required"`
-	TagName   string `thrift:"tagName,2,required" form:"tagName,required" json:"tagName,required" query:"tagName,required"`
-	CreatedAt int64  `thrift:"createdAt,3,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
+	TagId   int64  `thrift:"tagId,1,required" form:"tagId,required" json:"tagId,required" query:"tagId,required"`
+	TagName string `thrift:"tagName,2,required" form:"tagName,required" json:"tagName,required" query:"tagName,required"`
 }
 
 func NewResourceTag() *ResourceTag {
@@ -2680,14 +2728,9 @@ func (p *ResourceTag) GetTagName() (v string) {
 	return p.TagName
 }
 
-func (p *ResourceTag) GetCreatedAt() (v int64) {
-	return p.CreatedAt
-}
-
 var fieldIDToName_ResourceTag = map[int16]string{
 	1: "tagId",
 	2: "tagName",
-	3: "createdAt",
 }
 
 func (p *ResourceTag) Read(iprot thrift.TProtocol) (err error) {
@@ -2696,7 +2739,6 @@ func (p *ResourceTag) Read(iprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	var issetTagId bool = false
 	var issetTagName bool = false
-	var issetCreatedAt bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2730,15 +2772,6 @@ func (p *ResourceTag) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetCreatedAt = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -2759,11 +2792,6 @@ func (p *ResourceTag) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetTagName {
 		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetCreatedAt {
-		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -2806,17 +2834,6 @@ func (p *ResourceTag) ReadField2(iprot thrift.TProtocol) error {
 	p.TagName = _field
 	return nil
 }
-func (p *ResourceTag) ReadField3(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.CreatedAt = _field
-	return nil
-}
 
 func (p *ResourceTag) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
@@ -2830,10 +2847,6 @@ func (p *ResourceTag) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
 			goto WriteFieldError
 		}
 	}
@@ -2886,23 +2899,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *ResourceTag) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("createdAt", thrift.I64, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.CreatedAt); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
 func (p *ResourceTag) String() string {
@@ -4205,15 +4201,15 @@ func (p *ResourceRating) String() string {
 }
 
 type ResourceComment struct {
-	CommentId  int64  `thrift:"commentId,1,required" form:"commentId,required" json:"commentId,required" query:"commentId,required"`
-	UserId     int64  `thrift:"userId,2,required" form:"userId,required" json:"userId,required" query:"userId,required"`
-	ResourceId int64  `thrift:"resourceId,3,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
-	Content    string `thrift:"content,4,required" form:"content,required" json:"content,required" query:"content,required"`
-	ParentId   int64  `thrift:"parentId,5,required" form:"parentId,required" json:"parentId,required" query:"parentId,required"`
-	Likes      int64  `thrift:"likes,6,required" form:"likes,required" json:"likes,required" query:"likes,required"`
-	IsVisible  bool   `thrift:"isVisible,7,required" form:"isVisible,required" json:"isVisible,required" query:"isVisible,required"`
-	Status     int64  `thrift:"status,8,required" form:"status,required" json:"status,required" query:"status,required"`
-	CreatedAt  int64  `thrift:"createdAt,9,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
+	CommentId  int64                 `thrift:"commentId,1,required" form:"commentId,required" json:"commentId,required" query:"commentId,required"`
+	UserId     int64                 `thrift:"userId,2,required" form:"userId,required" json:"userId,required" query:"userId,required"`
+	ResourceId int64                 `thrift:"resourceId,3,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
+	Content    string                `thrift:"content,4,required" form:"content,required" json:"content,required" query:"content,required"`
+	ParentId   int64                 `thrift:"parentId,5,required" form:"parentId,required" json:"parentId,required" query:"parentId,required"`
+	Likes      int64                 `thrift:"likes,6,required" form:"likes,required" json:"likes,required" query:"likes,required"`
+	IsVisible  bool                  `thrift:"isVisible,7,required" form:"isVisible,required" json:"isVisible,required" query:"isVisible,required"`
+	Status     ResourceCommentStatus `thrift:"status,8,required,ResourceCommentStatus" form:"status,required" json:"status,required" query:"status,required"`
+	CreatedAt  int64                 `thrift:"createdAt,9,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
 }
 
 func NewResourceComment() *ResourceComment {
@@ -4251,7 +4247,7 @@ func (p *ResourceComment) GetIsVisible() (v bool) {
 	return p.IsVisible
 }
 
-func (p *ResourceComment) GetStatus() (v int64) {
+func (p *ResourceComment) GetStatus() (v ResourceCommentStatus) {
 	return p.Status
 }
 
@@ -4363,7 +4359,7 @@ func (p *ResourceComment) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 8:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -4534,11 +4530,11 @@ func (p *ResourceComment) ReadField7(iprot thrift.TProtocol) error {
 }
 func (p *ResourceComment) ReadField8(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field ResourceCommentStatus
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
-		_field = v
+		_field = ResourceCommentStatus(v)
 	}
 	p.Status = _field
 	return nil
@@ -4735,10 +4731,10 @@ WriteFieldEndError:
 }
 
 func (p *ResourceComment) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.I64, 8); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 8); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Status); err != nil {
+	if err := oprot.WriteI32(int32(p.Status)); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

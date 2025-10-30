@@ -55,3 +55,53 @@ func _searchresourcesMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _resourceMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func __7bresource_id_7d0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getresourcecommentsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_commentsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _submitresourcecommentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_ratingsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteresourceratingMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _submitresourceratingMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resources_commentsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _deleteresourcecommentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

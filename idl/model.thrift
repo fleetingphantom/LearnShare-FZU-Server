@@ -61,7 +61,6 @@ struct CourseComment{
 struct ResourceTag {
     required i64 tagId,
     required string tagName,
-    required i64 createdAt,
 }
 
 struct Resource {
@@ -79,6 +78,12 @@ struct Resource {
     required i32 status,               // 资源状态 (0:待审核, 1:已发布, 2:已拒绝)
     required i64 createdAt,            // 创建时间
     optional list<ResourceTag> tags,   // 资源标签
+}
+
+enum ResourceCommentStatus {
+    NORMAL = 0,
+    DELETED_BY_USER = 1,
+    DELETED_BY_ADMIN = 2,
 }
 
 struct ResourceRating{
@@ -99,7 +104,7 @@ struct ResourceComment{
     required i64 parentId,
     required i64 likes,
     required bool isVisible,
-    required i64 status,
+    required ResourceCommentStatus status,
     required i64 createdAt,
 }
 
