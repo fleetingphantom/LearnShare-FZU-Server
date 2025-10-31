@@ -112,3 +112,78 @@ func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, 
 
 	return comments, total, nil
 }
+
+// SubmitResourceRating 提交资源评分
+func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recommendation float64) (*ResourceRating, error) {
+	// 开始事务
+	tx := DB.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 检查是否已经评分过
+	var existingRating ResourceRating
+	err := tx.Where("user_id = ? AND resource_id = ?", userID, resourceID).First(&existingRating).Error
+	
+	var rating *ResourceRating
+	
+	if err == nil {
+		// 更新现有评分
+		existingRating.Recommendation = recommendation
+		err = tx.Save(&existingRating).Error
+		rating = &existingRating
+	} else {
+		// 创建新评分
+		rating = &ResourceRating{
+			UserID:         userID,
+			ResourceID:     resourceID,
+			Recommendation: recommendation,
+			IsVisible:      true,
+		}
+		err = tx.Create(rating).Error
+	}
+	
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 重新计算资源的平均评分
+	var avgResult struct {
+		AverageRating float64 `gorm:"column:average_rating"`
+		RatingCount   int64   `gorm:"column:rating_count"`
+	}
+	
+	err = tx.Model(&ResourceRating{}).
+		Select("AVG(recommendation) as average_rating, COUNT(*) as rating_count").
+		Where("resource_id = ? AND is_visible = ?", resourceID, true).
+		Scan(&avgResult).Error
+	
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 更新资源的评分信息
+	err = tx.Model(&Resource{}).
+		Where("resource_id = ?", resourceID).
+		Updates(map[string]interface{}{
+			"average_rating": avgResult.AverageRating,
+			"rating_count":   avgResult.RatingCount,
+		}).Error
+	
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return rating, nil
+}

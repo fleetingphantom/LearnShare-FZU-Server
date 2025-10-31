@@ -8,6 +8,7 @@ import (
 	"LearnShare/biz/service"
 	"LearnShare/pkg/errno"
 	"context"
+	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -121,13 +122,43 @@ func GetResource(ctx context.Context, c *app.RequestContext) {
 func SubmitResourceRating(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req resource.SubmitResourceRatingReq
-	err = c.BindAndValidate(&req)
+
+	// 从路径参数获取rating_id
+	ratingIDStr := c.Param("rating_id")
+	ratingID, err := strconv.ParseInt(ratingIDStr, 10, 64)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, errno.ParamVerifyError)
 		return
 	}
 
+	// 绑定请求体参数
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// 设置rating_id到请求结构体
+	req.RatingId = ratingID
+
 	resp := new(resource.SubmitResourceRatingResp)
+
+	// 获取当前用户ID
+	userID, exists := c.Get("user_id")
+	if !exists {
+		pack.BuildFailResponse(c, errno.AuthInvalid)
+		return
+	}
+
+	// Call service
+	_, err = service.NewSubmitResourceRatingService(ctx).SubmitResourceRating(&req, userID.(int64))
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 
 	c.JSON(consts.StatusOK, resp)
 }

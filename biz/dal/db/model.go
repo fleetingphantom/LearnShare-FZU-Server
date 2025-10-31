@@ -84,3 +84,18 @@ type ResourceComment struct {
 	// 关联用户信息
 	User User `gorm:"foreignKey:UserID;references:UserID"`
 }
+
+// ResourceRating 资源评分模型
+type ResourceRating struct {
+	RatingID       int64     `gorm:"primaryKey;autoIncrement"`
+	UserID         int64     `gorm:"not null"`
+	ResourceID     int64     `gorm:"not null"`
+	Recommendation float64   `gorm:"type:decimal(2,1);not null"`
+	IsVisible      bool      `gorm:"default:true"`
+	CreatedAt      time.Time `gorm:"autoCreateTime"`
+	
+	// 关联用户信息
+	User User `gorm:"foreignKey:UserID;references:UserID"`
+	// 关联资源信息
+	Resource Resource `gorm:"foreignKey:ResourceID;references:ResourceID"`
+}

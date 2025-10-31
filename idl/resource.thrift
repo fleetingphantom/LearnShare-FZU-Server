@@ -62,8 +62,9 @@ struct GetResourceResp {
 
 // 提交资源评分请求
 struct SubmitResourceRatingReq {
-    1: required i64 resourceId,
-    2: required i64 recommendation,
+    1: required i64 ratingId (api.path="rating_id"),
+    2: required i64 resourceId,
+    3: required i64 recommendation,
 }
 
 struct SubmitResourceRatingResp {

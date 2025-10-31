@@ -139,3 +139,32 @@ func (s *GetResourceCommentsService) GetResourceComments(req *resource.GetResour
 
 	return modelComments, total, nil
 }
+
+// SubmitResourceRatingService 封装了提交资源评分的服务
+type SubmitResourceRatingService struct {
+	ctx context.Context
+}
+
+// NewSubmitResourceRatingService 创建一个新的 SubmitResourceRatingService
+func NewSubmitResourceRatingService(ctx context.Context) *SubmitResourceRatingService {
+	return &SubmitResourceRatingService{ctx: ctx}
+}
+
+// SubmitResourceRating 执行提交资源评分
+func (s *SubmitResourceRatingService) SubmitResourceRating(req *resource.SubmitResourceRatingReq, userID int64) (*model.ResourceRating, error) {
+	// 调用数据库层提交评分
+	rating, err := db.SubmitResourceRating(s.ctx, userID, req.ResourceId, float64(req.Recommendation)/10.0)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将 db.ResourceRating 转换为 model.ResourceRating
+	return &model.ResourceRating{
+		RatingId:       rating.RatingID,
+		UserId:         rating.UserID,
+		ResourceId:     rating.ResourceID,
+		Recommendation: int64(rating.Recommendation * 10), // 转换为0-50的整数
+		IsVisible:      rating.IsVisible,
+		CreatedAt:      rating.CreatedAt.Unix(),
+	}, nil
+}
