@@ -12,6 +12,7 @@ func CreateUser(ctx context.Context, username, passwordHash, email string) error
 		PasswordHash: passwordHash,
 		Email:        email,
 		RoleID:       2, // 默认普通用户角色ID
+		Status:       "inactive",
 	}
 
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Create(user).Error

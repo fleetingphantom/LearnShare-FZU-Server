@@ -3778,7 +3778,7 @@ func (p *RefreshTokenResp) String() string {
 
 // 获取用户信息
 type GetUserInfoReq struct {
-	UserId int64 `thrift:"userId,1,required" form:"userId,required" json:"userId,required" query:"userId,required"`
+	UserId int64 `thrift:"userId,1,required" json:"userId,required" path:"user_id,required"`
 }
 
 func NewGetUserInfoReq() *GetUserInfoReq {

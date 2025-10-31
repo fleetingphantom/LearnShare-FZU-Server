@@ -29,7 +29,7 @@ func Register(r *server.Hertz) {
 		{
 			_users := _api.Group("/users", _usersMw()...)
 			_users.PUT("/avatar", append(_uploadavatarMw(), user.UploadAvatar)...)
-			_users.GET("/{user_id}", append(_getuserinfoMw(), user.GetUserInfo)...)
+			_users.GET("/:user_id", append(_getuserinfoMw(), user.GetUserInfo)...)
 			{
 				_me := _users.Group("/me", _meMw()...)
 				_me.PUT("/email", append(_updateemailMw(), user.UpdateEmail)...)
