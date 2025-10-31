@@ -83,7 +83,7 @@ CREATE TABLE `users` (
     `avatar_url` VARCHAR(255) COMMENT '头像URL',
     `reputation_score` INT NOT NULL DEFAULT 80 COMMENT '信誉分',
     `role_id` INT NOT NULL COMMENT '角色ID',
-    `status` ENUM('active','unactive', 'locked', 'banned') NOT NULL DEFAULT 'unactive' COMMENT '账户状态',
+    `status` ENUM('active','inactive', 'locked', 'banned') NOT NULL DEFAULT 'inactive' COMMENT '账户状态',
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`user_id`),

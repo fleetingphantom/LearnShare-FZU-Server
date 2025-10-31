@@ -103,7 +103,7 @@ struct RefreshTokenResp {
 
 //获取用户信息
 struct GetUserInfoReq {
-  required i64 userId;
+  required i64 userId (api.path="user_id");
 }
 struct GetUserInfoResp {
   required model.BaseResp baseResponse;
@@ -123,6 +123,6 @@ service UserService {
   uploadAvatarResp uploadAvatar(1: uploadAvatarReq req)(api.put="/api/users/avatar"),
   ResetPasswordResp resetPassword(1: ResetPasswordReq req)(api.post="/api/users/me/password/reset"),
   RefreshTokenResp refreshToken(1: RefreshTokenReq req)(api.post="/api/auth/refresh"),
-  GetUserInfoResp getUserInfo(1: GetUserInfoReq req)(api.get="/api/users/{user_id}"),
+  GetUserInfoResp getUserInfo(1: GetUserInfoReq req)(api.get="/api/users/:user_id"),
 }
 
