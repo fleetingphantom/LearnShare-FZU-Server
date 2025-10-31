@@ -8,6 +8,11 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 	var resources []*Resource
 	var total int64
 
+	// 参数验证
+	if pageNum <= 0 || pageSize <= 0 {
+		return []*Resource{}, 0, nil
+	}
+
 	db := DB.WithContext(ctx)
 
 	if keyword != nil && *keyword != "" {
@@ -19,8 +24,8 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 	}
 
 	if tagID != nil {
-		db = db.Joins("JOIN resource_tag_mappings ON resource_tag_mappings.resource_id = resources.resource_id").
-			Where("resource_tag_mappings.tag_id = ?", *tagID)
+		db = db.Joins("JOIN resource_tag_mapping ON resource_tag_mapping.resource_id = resource.resource_id").
+			Where("resource_tag_mapping.tag_id = ?", *tagID)
 	}
 
 	switch {
