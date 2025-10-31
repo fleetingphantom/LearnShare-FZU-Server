@@ -99,3 +99,43 @@ func (s *GetResourceService) GetResource(req *resource.GetResourceReq) (*model.R
 		Tags:          tags,
 	}, nil
 }
+
+// GetResourceCommentsService 封装了获取资源评论列表的服务
+type GetResourceCommentsService struct {
+	ctx context.Context
+}
+
+// NewGetResourceCommentsService 创建一个新的 GetResourceCommentsService
+func NewGetResourceCommentsService(ctx context.Context) *GetResourceCommentsService {
+	return &GetResourceCommentsService{ctx: ctx}
+}
+
+// GetResourceComments 执行获取资源评论列表
+func (s *GetResourceCommentsService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceComment, int64, error) {
+	// 调用数据库层获取评论数据
+	comments, total, err := db.GetResourceComments(s.ctx, req.ResourceId, req.SortBy, int(req.PageNum), int(req.PageSize))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 将 db.ResourceComment 转换为 model.ResourceComment
+	var modelComments []*model.ResourceComment
+	for _, comment := range comments {
+		modelComments = append(modelComments, &model.ResourceComment{
+			CommentId:  comment.CommentID,
+			UserId:     comment.UserID,
+			ResourceId: comment.ResourceID,
+			Content:    comment.Content,
+			ParentId:   func() int64 { if comment.ParentID != nil { return *comment.ParentID } else { return 0 } }(),
+			Likes:      comment.Likes,
+			IsVisible:  comment.IsVisible,
+			Status:     func() model.ResourceCommentStatus { 
+			status, _ := model.ResourceCommentStatusFromString(comment.Status)
+			return status
+		}(),
+			CreatedAt:  comment.CreatedAt.Unix(),
+		})
+	}
+
+	return modelComments, total, nil
+}

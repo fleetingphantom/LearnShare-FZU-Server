@@ -65,3 +65,50 @@ func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 
 	return &resource, nil
 }
+
+// GetResourceComments 获取资源评论列表
+func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, pageNum, pageSize int) ([]*ResourceComment, int64, error) {
+	var comments []*ResourceComment
+	var total int64
+
+	// 参数验证
+	if pageNum <= 0 || pageSize <= 0 {
+		return []*ResourceComment{}, 0, nil
+	}
+
+	db := DB.WithContext(ctx).
+		Preload("User").
+		Where("resource_id = ?", resourceID).
+		Where("is_visible = ?", true).
+		Where("status = ?", "normal")
+
+	// 根据排序参数进行排序
+	if sortBy != nil {
+		switch *sortBy {
+		case "latest":
+			db = db.Order("created_at DESC")
+		case "hottest":
+			db = db.Order("likes DESC, created_at DESC")
+		default:
+			db = db.Order("created_at DESC")
+		}
+	} else {
+		db = db.Order("created_at DESC")
+	}
+
+	// 获取总数
+	err := db.Model(&ResourceComment{}).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// 获取分页数据
+	err = db.Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
+		Find(&comments).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return comments, total, nil
+}

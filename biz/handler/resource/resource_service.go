@@ -187,11 +187,23 @@ func GetResourceComments(ctx context.Context, c *app.RequestContext) {
 	var req resource.GetResourceCommentsReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(resource.GetResourceCommentsResp)
+
+	// Call service
+	comments, total, err := service.NewGetResourceCommentsService(ctx).GetResourceComments(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Comments = comments
+	resp.Total = int32(total)
 
 	c.JSON(consts.StatusOK, resp)
 }

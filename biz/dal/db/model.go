@@ -68,3 +68,19 @@ type ResourceTagMapping struct {
 	ResourceID int64 `gorm:"primaryKey"`
 	TagID      int64 `gorm:"primaryKey"`
 }
+
+// ResourceComment 资源评论模型
+type ResourceComment struct {
+	CommentID  int64     `gorm:"primaryKey;autoIncrement"`
+	UserID     int64     `gorm:"not null"`
+	ResourceID int64     `gorm:"not null"`
+	Content    string    `gorm:"type:text;not null"`
+	ParentID   *int64    `gorm:"default:NULL"`
+	Likes      int64     `gorm:"default:0"`
+	IsVisible  bool      `gorm:"default:true"`
+	Status     string    `gorm:"type:enum('normal','deleted_by_user','deleted_by_admin');default:'normal'"`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
+	
+	// 关联用户信息
+	User User `gorm:"foreignKey:UserID;references:UserID"`
+}
