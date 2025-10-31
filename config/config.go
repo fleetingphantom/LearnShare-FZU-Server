@@ -17,7 +17,7 @@ var (
 
 // Init 目的是初始化并读入配置
 func Init() {
-	configPath := "./config.yaml"
+	configPath := "./config/config.yaml"
 
 	runtimeViper.SetConfigFile(configPath)
 	runtimeViper.SetConfigType("yaml")
