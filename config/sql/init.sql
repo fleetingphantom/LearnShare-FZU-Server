@@ -113,7 +113,7 @@ CREATE TABLE `courses` (
     PRIMARY KEY (`course_id`),
     KEY `fk_course_teacher` (`teacher_id`),
     KEY `fk_course_major` (`major_id`),
-    KEY `idx_course_name` (`name`),
+    KEY `idx_course_name` (`course_name`),
     CONSTRAINT `fk_course_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`teacher_id`),
     CONSTRAINT `fk_course_major` FOREIGN KEY (`major_id`) REFERENCES `majors` (`major_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT = '课程表';
