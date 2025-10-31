@@ -1,0 +1,30 @@
+mysql:
+  addr: "localhost:3306"
+  database: "learnshare_db"
+  username: "root"
+  password: "secret"
+  charset: "utf8mb4"
+
+redis:
+  addr: "localhost:6379"
+  password: ""
+  db: 1
+
+oss:
+  endpoint: "oss-cn-qingdao.aliyuncs.com"
+  accessKey-id: "your-access-key-id"
+  accessKey-secret: "your-access-key-secret"
+  BucketName: "learnshare-bucket"
+  main-directory: "files"
+
+smtp:
+  host: "smtp.mailtrap.io"
+  port: 2525
+  user: "smtp_user"
+  password: "smtp_pass"
+  from: "noreply@learnshare.local"
+  from_name: "LearnShare Service"
+
+verify:
+  code_length: 6
+  ttl_seconds: 600
