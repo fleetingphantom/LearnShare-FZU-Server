@@ -3,9 +3,11 @@
 package resource
 
 import (
-	"context"
-
 	resource "LearnShare/biz/model/resource"
+	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
+	"context"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -18,11 +20,23 @@ func SearchResources(ctx context.Context, c *app.RequestContext) {
 	var req resource.SearchResourceReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(resource.SearchResourceResp)
+
+	// Call service
+	moduleResources, total, err := service.NewSearchResourcesService(ctx).SearchResources(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Resources = moduleResources
+	resp.Total = int32(total)
 
 	c.JSON(consts.StatusOK, resp)
 }

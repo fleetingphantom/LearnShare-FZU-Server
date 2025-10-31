@@ -41,3 +41,30 @@ func (u User) ToUserModule() *module.User {
 	}
 	return user
 }
+
+type Resource struct {
+	ResourceID    int64     `gorm:"primaryKey;autoIncrement"`
+	Title         string    `gorm:"size:255;not null"`
+	Description   string    `gorm:"type:text"`
+	FilePath      string    `gorm:"size:255;not null"`
+	FileType      string    `gorm:"size:50;not null"`
+	FileSize      int64     `gorm:"not null"`
+	UploaderID    int64     `gorm:"not null"`
+	CourseID      int64     `gorm:"not null"`
+	DownloadCount int64     `gorm:"default:0"`
+	AverageRating float64   `gorm:"default:0.0"`
+	RatingCount   int64     `gorm:"default:0"`
+	Status        int32     `gorm:"not null;default:0"`
+	CreatedAt     time.Time `gorm:"autoCreateTime"`
+	Tags          []ResourceTag `gorm:"many2many:resource_tag_mappings;"`
+}
+
+type ResourceTag struct {
+	TagID   int64  `gorm:"primaryKey;autoIncrement"`
+	TagName string `gorm:"size:50;unique;not null"`
+}
+
+type ResourceTagMapping struct {
+	ResourceID int64 `gorm:"primaryKey"`
+	TagID      int64 `gorm:"primaryKey"`
+}
