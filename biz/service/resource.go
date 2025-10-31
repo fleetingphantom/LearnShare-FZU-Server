@@ -55,3 +55,47 @@ func (s *SearchResourcesService) SearchResources(req *resource.SearchResourceReq
 
 	return modelResources, total, nil
 }
+
+// GetResourceService 封装了获取单个资源信息的服务
+type GetResourceService struct {
+	ctx context.Context
+}
+
+// NewGetResourceService 创建一个新的 GetResourceService
+func NewGetResourceService(ctx context.Context) *GetResourceService {
+	return &GetResourceService{ctx: ctx}
+}
+
+// GetResource 执行获取单个资源信息
+func (s *GetResourceService) GetResource(req *resource.GetResourceReq) (*model.Resource, error) {
+	resource, err := db.GetResourceByID(s.ctx, req.ResourceId)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将 db.Resource 转换为 model.Resource
+	var tags []*model.ResourceTag
+	for _, t := range resource.Tags {
+		tags = append(tags, &model.ResourceTag{
+			TagId:   t.TagID,
+			TagName: t.TagName,
+		})
+	}
+
+	return &model.Resource{
+		ResourceId:    resource.ResourceID,
+		Title:         resource.Title,
+		Description:   &resource.Description,
+		FilePath:      resource.FilePath,
+		FileType:      resource.FileType,
+		FileSize:      resource.FileSize,
+		UploaderId:    resource.UploaderID,
+		CourseId:      resource.CourseID,
+		DownloadCount: resource.DownloadCount,
+		AverageRating: resource.AverageRating,
+		RatingCount:   resource.RatingCount,
+		Status:        resource.Status,
+		CreatedAt:     resource.CreatedAt.Unix(),
+		Tags:          tags,
+	}, nil
+}

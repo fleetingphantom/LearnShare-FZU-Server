@@ -96,11 +96,22 @@ func GetResource(ctx context.Context, c *app.RequestContext) {
 	var req resource.GetResourceReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(resource.GetResourceResp)
+
+	// Call service
+	resource, err := service.NewGetResourceService(ctx).GetResource(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Resource = resource
 
 	c.JSON(consts.StatusOK, resp)
 }

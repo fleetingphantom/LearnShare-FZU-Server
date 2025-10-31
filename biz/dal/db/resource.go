@@ -49,3 +49,19 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 
 	return resources, total, nil
 }
+
+// GetResourceByID 根据资源ID获取单个资源信息
+func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
+	var resource Resource
+
+	err := DB.WithContext(ctx).
+		Preload("Tags").
+		Where("resource_id = ?", resourceID).
+		First(&resource).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &resource, nil
+}
