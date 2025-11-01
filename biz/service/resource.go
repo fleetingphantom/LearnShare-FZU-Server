@@ -168,3 +168,44 @@ func (s *SubmitResourceRatingService) SubmitResourceRating(req *resource.SubmitR
 		CreatedAt:      rating.CreatedAt.Unix(),
 	}, nil
 }
+
+// SubmitResourceCommentService 封装了提交资源评论的服务
+type SubmitResourceCommentService struct {
+	ctx context.Context
+}
+
+// NewSubmitResourceCommentService 创建一个新的 SubmitResourceCommentService
+func NewSubmitResourceCommentService(ctx context.Context) *SubmitResourceCommentService {
+	return &SubmitResourceCommentService{ctx: ctx}
+}
+
+// SubmitResourceComment 执行提交资源评论
+func (s *SubmitResourceCommentService) SubmitResourceComment(req *resource.SubmitResourceCommentReq, userID int64) (*model.ResourceComment, error) {
+	// 处理父评论ID
+	var parentID *int64
+	if req.IsSetParentId() && req.ParentId != nil && *req.ParentId != 0 {
+		parentID = req.ParentId
+	}
+
+	// 调用数据库层提交评论
+	comment, err := db.SubmitResourceComment(s.ctx, userID, req.ResourceId, req.Content, parentID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将 db.ResourceComment 转换为 model.ResourceComment
+	return &model.ResourceComment{
+		CommentId:  comment.CommentID,
+		UserId:     comment.UserID,
+		ResourceId: comment.ResourceID,
+		Content:    comment.Content,
+		ParentId:   func() int64 { if comment.ParentID != nil { return *comment.ParentID } else { return 0 } }(),
+		Likes:      comment.Likes,
+		IsVisible:  comment.IsVisible,
+		Status:     func() model.ResourceCommentStatus { 
+			status, _ := model.ResourceCommentStatusFromString(comment.Status)
+			return status
+		}(),
+		CreatedAt:  comment.CreatedAt.Unix(),
+	}, nil
+}

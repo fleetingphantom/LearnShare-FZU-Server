@@ -180,17 +180,47 @@ func DeleteResourceRating(ctx context.Context, c *app.RequestContext) {
 }
 
 // SubmitResourceComment .
-// @router /api/resource_comments/{comment_id} [POST]
+// @router /api/resource_comments/{resource_id} [POST]
 func SubmitResourceComment(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req resource.SubmitResourceCommentReq
-	err = c.BindAndValidate(&req)
+
+	// 从路径参数获取resource_id
+	resourceIDStr := c.Param("resource_id")
+	resourceID, err := strconv.ParseInt(resourceIDStr, 10, 64)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, errno.ParamVerifyError)
 		return
 	}
 
+	// 绑定请求体参数
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// 设置resource_id到请求结构体
+	req.ResourceId = resourceID
+
 	resp := new(resource.SubmitResourceCommentResp)
+
+	// 获取当前用户ID
+	userID, exists := c.Get("user_id")
+	if !exists {
+		pack.BuildFailResponse(c, errno.AuthInvalid)
+		return
+	}
+
+	// Call service
+	_, err = service.NewSubmitResourceCommentService(ctx).SubmitResourceComment(&req, userID.(int64))
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 
 	c.JSON(consts.StatusOK, resp)
 }

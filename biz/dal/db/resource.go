@@ -187,3 +187,46 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 
 	return rating, nil
 }
+
+// SubmitResourceComment 提交资源评论
+func SubmitResourceComment(ctx context.Context, userID, resourceID int64, content string, parentID *int64) (*ResourceComment, error) {
+	// 开始事务
+	tx := DB.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 创建评论
+	comment := &ResourceComment{
+		UserID:     userID,
+		ResourceID: resourceID,
+		Content:    content,
+		ParentID:   parentID,
+		Likes:      0,
+		IsVisible:  true,
+		Status:     "normal",
+	}
+
+	// 保存评论
+	err := tx.Create(comment).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	// 预加载用户信息
+	err2 := DB.WithContext(ctx).Preload("User").First(comment, comment.CommentID).Error
+	if err2 != nil {
+		return nil, err2
+	}
+
+	return comment, nil
+}
