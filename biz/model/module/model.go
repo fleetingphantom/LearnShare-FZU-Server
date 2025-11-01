@@ -3788,12 +3788,12 @@ func (p *Resource) String() string {
 }
 
 type ResourceRating struct {
-	RatingId       int64 `thrift:"ratingId,1,required" form:"ratingId,required" json:"ratingId,required" query:"ratingId,required"`
-	UserId         int64 `thrift:"userId,2,required" form:"userId,required" json:"userId,required" query:"userId,required"`
-	ResourceId     int64 `thrift:"resourceId,3,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
-	Recommendation int64 `thrift:"recommendation,4,required" form:"recommendation,required" json:"recommendation,required" query:"recommendation,required"`
-	IsVisible      bool  `thrift:"isVisible,5,required" form:"isVisible,required" json:"isVisible,required" query:"isVisible,required"`
-	CreatedAt      int64 `thrift:"createdAt,6,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
+	RatingId       int64   `thrift:"ratingId,1,required" form:"ratingId,required" json:"ratingId,required" query:"ratingId,required"`
+	UserId         int64   `thrift:"userId,2,required" form:"userId,required" json:"userId,required" query:"userId,required"`
+	ResourceId     int64   `thrift:"resourceId,3,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
+	Recommendation float64 `thrift:"recommendation,4,required" form:"recommendation,required" json:"recommendation,required" query:"recommendation,required"`
+	IsVisible      bool    `thrift:"isVisible,5,required" form:"isVisible,required" json:"isVisible,required" query:"isVisible,required"`
+	CreatedAt      int64   `thrift:"createdAt,6,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
 }
 
 func NewResourceRating() *ResourceRating {
@@ -3815,7 +3815,7 @@ func (p *ResourceRating) GetResourceId() (v int64) {
 	return p.ResourceId
 }
 
-func (p *ResourceRating) GetRecommendation() (v int64) {
+func (p *ResourceRating) GetRecommendation() (v float64) {
 	return p.Recommendation
 }
 
@@ -3889,7 +3889,7 @@ func (p *ResourceRating) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 4:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.DOUBLE {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -4010,8 +4010,8 @@ func (p *ResourceRating) ReadField3(iprot thrift.TProtocol) error {
 }
 func (p *ResourceRating) ReadField4(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field float64
+	if v, err := iprot.ReadDouble(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -4142,10 +4142,10 @@ WriteFieldEndError:
 }
 
 func (p *ResourceRating) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("recommendation", thrift.I64, 4); err != nil {
+	if err = oprot.WriteFieldBegin("recommendation", thrift.DOUBLE, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Recommendation); err != nil {
+	if err := oprot.WriteDouble(p.Recommendation); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

@@ -2334,9 +2334,8 @@ func (p *GetResourceResp) String() string {
 
 // 提交资源评分请求
 type SubmitResourceRatingReq struct {
-	RatingId       int64 `thrift:"ratingId,1,required" json:"ratingId,required" path:"rating_id,required"`
-	ResourceId     int64 `thrift:"resourceId,2,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
-	Recommendation int64 `thrift:"recommendation,3,required" form:"recommendation,required" json:"recommendation,required" query:"recommendation,required"`
+	ResourceId int64   `thrift:"resourceId,1,required" json:"resourceId,required" path:"resource_id,required"`
+	Rating     float64 `thrift:"rating,2,required" form:"rating,required" json:"rating,required" query:"rating,required"`
 }
 
 func NewSubmitResourceRatingReq() *SubmitResourceRatingReq {
@@ -2346,31 +2345,25 @@ func NewSubmitResourceRatingReq() *SubmitResourceRatingReq {
 func (p *SubmitResourceRatingReq) InitDefault() {
 }
 
-func (p *SubmitResourceRatingReq) GetRatingId() (v int64) {
-	return p.RatingId
-}
-
 func (p *SubmitResourceRatingReq) GetResourceId() (v int64) {
 	return p.ResourceId
 }
 
-func (p *SubmitResourceRatingReq) GetRecommendation() (v int64) {
-	return p.Recommendation
+func (p *SubmitResourceRatingReq) GetRating() (v float64) {
+	return p.Rating
 }
 
 var fieldIDToName_SubmitResourceRatingReq = map[int16]string{
-	1: "ratingId",
-	2: "resourceId",
-	3: "recommendation",
+	1: "resourceId",
+	2: "rating",
 }
 
 func (p *SubmitResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetRatingId bool = false
 	var issetResourceId bool = false
-	var issetRecommendation bool = false
+	var issetRating bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2391,25 +2384,16 @@ func (p *SubmitResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetRatingId = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
 				issetResourceId = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField3(iprot); err != nil {
+		case 2:
+			if fieldTypeId == thrift.DOUBLE {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetRecommendation = true
+				issetRating = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2426,18 +2410,13 @@ func (p *SubmitResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetRatingId {
+	if !issetResourceId {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetResourceId {
+	if !issetRating {
 		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetRecommendation {
-		fieldId = 3
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -2466,29 +2445,18 @@ func (p *SubmitResourceRatingReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.RatingId = _field
+	p.ResourceId = _field
 	return nil
 }
 func (p *SubmitResourceRatingReq) ReadField2(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field float64
+	if v, err := iprot.ReadDouble(); err != nil {
 		return err
 	} else {
 		_field = v
 	}
-	p.ResourceId = _field
-	return nil
-}
-func (p *SubmitResourceRatingReq) ReadField3(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Recommendation = _field
+	p.Rating = _field
 	return nil
 }
 
@@ -2504,10 +2472,6 @@ func (p *SubmitResourceRatingReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
 			goto WriteFieldError
 		}
 	}
@@ -2529,10 +2493,10 @@ WriteStructEndError:
 }
 
 func (p *SubmitResourceRatingReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("ratingId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("resourceId", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RatingId); err != nil {
+	if err := oprot.WriteI64(p.ResourceId); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2546,10 +2510,10 @@ WriteFieldEndError:
 }
 
 func (p *SubmitResourceRatingReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("resourceId", thrift.I64, 2); err != nil {
+	if err = oprot.WriteFieldBegin("rating", thrift.DOUBLE, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ResourceId); err != nil {
+	if err := oprot.WriteDouble(p.Rating); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2560,23 +2524,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *SubmitResourceRatingReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("recommendation", thrift.I64, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.Recommendation); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
 func (p *SubmitResourceRatingReq) String() string {

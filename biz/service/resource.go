@@ -152,8 +152,8 @@ func NewSubmitResourceRatingService(ctx context.Context) *SubmitResourceRatingSe
 
 // SubmitResourceRating 执行提交资源评分
 func (s *SubmitResourceRatingService) SubmitResourceRating(req *resource.SubmitResourceRatingReq, userID int64) (*model.ResourceRating, error) {
-	// 调用数据库层提交评分
-	rating, err := db.SubmitResourceRating(s.ctx, userID, req.ResourceId, float64(req.Recommendation)/10.0)
+	// 调用数据库层提交评分，使用rating字段
+	rating, err := db.SubmitResourceRating(s.ctx, userID, req.ResourceId, req.Rating)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (s *SubmitResourceRatingService) SubmitResourceRating(req *resource.SubmitR
 		RatingId:       rating.RatingID,
 		UserId:         rating.UserID,
 		ResourceId:     rating.ResourceID,
-		Recommendation: int64(rating.Recommendation * 10), // 转换为0-50的整数
+		Recommendation: rating.Recommendation * 10, // 转换为0-50的浮点数
 		IsVisible:      rating.IsVisible,
 		CreatedAt:      rating.CreatedAt.Unix(),
 	}, nil

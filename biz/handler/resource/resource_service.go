@@ -118,14 +118,14 @@ func GetResource(ctx context.Context, c *app.RequestContext) {
 }
 
 // SubmitResourceRating .
-// @router /api/resource_ratings/{rating_id} [POST]
+// @router /api/resource_ratings/{resource_id} [POST]
 func SubmitResourceRating(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req resource.SubmitResourceRatingReq
 
-	// 从路径参数获取rating_id
-	ratingIDStr := c.Param("rating_id")
-	ratingID, err := strconv.ParseInt(ratingIDStr, 10, 64)
+	// 从路径参数获取resource_id
+	resourceIDStr := c.Param("resource_id")
+	resourceID, err := strconv.ParseInt(resourceIDStr, 10, 64)
 	if err != nil {
 		pack.BuildFailResponse(c, errno.ParamVerifyError)
 		return
@@ -138,8 +138,8 @@ func SubmitResourceRating(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// 设置rating_id到请求结构体
-	req.RatingId = ratingID
+	// 设置resource_id到请求结构体
+	req.ResourceId = resourceID
 
 	resp := new(resource.SubmitResourceRatingResp)
 
@@ -160,7 +160,7 @@ func SubmitResourceRating(ctx context.Context, c *app.RequestContext) {
 	// Build response
 	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	c.JSON(consts.StatusCreated, resp)
 }
 
 // DeleteResourceRating .
@@ -226,13 +226,13 @@ func SubmitResourceComment(ctx context.Context, c *app.RequestContext) {
 }
 
 // DeleteResourceComment .
-// @router /api/resources_comments/{comment_id} [DELETE]
+// @router /api/resource_comments/{comment_id} [DELETE]
 func DeleteResourceComment(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req resource.DeleteResourceCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
