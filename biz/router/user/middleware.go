@@ -3,6 +3,8 @@
 package user
 
 import (
+	"LearnShare/biz/router/auth"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -48,7 +50,7 @@ func _usersMw() []app.HandlerFunc {
 
 func _uploadavatarMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _getuserinfoMw() []app.HandlerFunc {
@@ -62,13 +64,12 @@ func _meMw() []app.HandlerFunc {
 }
 
 func _updateemailMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _updatemajorMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _passwordMw() []app.HandlerFunc {
@@ -78,7 +79,7 @@ func _passwordMw() []app.HandlerFunc {
 
 func _updatepasswordMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _resetpasswordMw() []app.HandlerFunc {

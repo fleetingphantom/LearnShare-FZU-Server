@@ -17,7 +17,6 @@ import (
 )
 
 var (
-	IdentityKey               = "userid"
 	AccessTokenJwtMiddleware  *jwt.HertzJWTMiddleware
 	RefreshTokenJwtMiddleware *jwt.HertzJWTMiddleware
 )
@@ -31,12 +30,13 @@ func AccessTokenJwt() {
 		MaxRefresh:                  12 * time.Hour,
 		WithoutDefaultTokenHeadName: true,
 		TokenLookup:                 "header: Authorization",
-		IdentityKey:                 IdentityKey,
+		IdentityKey:                 constants.IdentityKey,
 
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(int64); ok {
 				return jwt.MapClaims{
 					AccessTokenJwtMiddleware.IdentityKey: v,
+					constants.TokenType:                  "access",
 				}
 			}
 			return jwt.MapClaims{}
@@ -82,14 +82,13 @@ func RefreshTokenJwt() {
 		Timeout:                     time.Hour * 72,
 		WithoutDefaultTokenHeadName: true,
 		TokenLookup:                 "header: Refresh-Token",
-		IdentityKey:                 IdentityKey,
+		IdentityKey:                 constants.IdentityKey,
 
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-
 			return jwt.MapClaims{
 				RefreshTokenJwtMiddleware.IdentityKey: data,
+				constants.TokenType:                   "refresh",
 			}
-
 		},
 
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
@@ -133,6 +132,12 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 	if err != nil {
 		return false
 	}
+
+	// 验证token类型是否为access
+	if tokenType, ok := claims[constants.TokenType].(string); !ok || tokenType != "access" {
+		return false
+	}
+
 	switch v := claims["exp"].(type) {
 	case nil:
 		return false
@@ -165,9 +170,13 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 }
 
 func IsRefreshTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
-
 	claims, err := RefreshTokenJwtMiddleware.GetClaimsFromJWT(ctx, c)
 	if err != nil {
+		return false
+	}
+
+	// 验证token类型是否为refresh
+	if tokenType, ok := claims[constants.TokenType].(string); !ok || tokenType != "refresh" {
 		return false
 	}
 
