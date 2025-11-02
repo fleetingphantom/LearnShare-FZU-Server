@@ -1,6 +1,7 @@
 package db
 
 import (
+	"LearnShare/pkg/errno"
 	"context"
 )
 
@@ -34,12 +35,12 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 
 	err := db.Model(&Resource{}).Count(&total).Error
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源数量失败: "+err.Error())
 	}
 
 	err = db.Offset((pageNum - 1) * pageSize).Limit(pageSize).Preload("Tags").Find(&resources).Error
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源列表失败: "+err.Error())
 	}
 
 	return resources, total, nil
@@ -55,7 +56,7 @@ func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 		First(&resource).Error
 
 	if err != nil {
-		return nil, err
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "根据ID查询资源失败: "+err.Error())
 	}
 
 	return &resource, nil
@@ -89,7 +90,7 @@ func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, 
 	// 获取总数
 	err := db.Model(&ResourceComment{}).Count(&total).Error
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源评论数量失败: "+err.Error())
 	}
 
 	// 获取分页数据
@@ -97,7 +98,7 @@ func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, 
 		Limit(pageSize).
 		Find(&comments).Error
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评论列表失败: "+err.Error())
 	}
 
 	return comments, total, nil
@@ -137,7 +138,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交资源评分失败: "+err.Error())
 	}
 
 	// 重新计算资源的平均评分
@@ -153,7 +154,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "计算资源平均评分失败: "+err.Error())
 	}
 
 	// 更新资源的评分信息
@@ -166,13 +167,13 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新资源评分信息失败: "+err.Error())
 	}
 
 	// 提交事务
 	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分事务失败: "+err.Error())
 	}
 
 	return rating, nil
@@ -203,19 +204,19 @@ func SubmitResourceComment(ctx context.Context, userID, resourceID int64, conten
 	err := tx.Create(comment).Error
 	if err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "保存资源评论失败: "+err.Error())
 	}
 
 	// 提交事务
 	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
-		return nil, err
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评论事务失败: "+err.Error())
 	}
 
 	// 预加载用户信息
 	err2 := DB.WithContext(ctx).Preload("User").First(comment, comment.CommentID).Error
 	if err2 != nil {
-		return nil, err2
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "预加载评论用户信息失败: "+err2.Error())
 	}
 
 	return comment, nil
