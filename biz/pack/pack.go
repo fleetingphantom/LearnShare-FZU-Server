@@ -30,14 +30,12 @@ func BuildBaseResp(err errno.ErrNo) *module.BaseResp {
 func BuildFailResponse(c *app.RequestContext, err error) {
 	if err == nil {
 		SendFailResponse(c, BuildBaseResp(errno.Success))
-
 		return
 	}
 
 	e := errno.ErrNo{}
 	if errors.As(err, &e) {
 		SendFailResponse(c, BuildBaseResp(e))
-
 		return
 	}
 
