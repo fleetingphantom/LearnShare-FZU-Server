@@ -139,3 +139,21 @@ func (s *ResourceService) SubmitResourceComment(req *resource.SubmitResourceComm
 
 	return comment.ToResourceCommentModule(), nil
 }
+
+// DeleteResourceRating 执行删除资源评分
+func (s *ResourceService) DeleteResourceRating(req *resource.DeleteResourceRatingReq) error {
+	userID := GetUidFormContext(s.c)
+
+	// 验证评分ID
+	if req.RatingId <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "评分ID无效")
+	}
+
+	// 调用数据库层删除评分
+	err := db.DeleteResourceRating(s.ctx, req.RatingId, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

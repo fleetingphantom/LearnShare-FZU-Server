@@ -3,6 +3,9 @@ package db
 import (
 	"LearnShare/pkg/errno"
 	"context"
+	"errors"
+
+	"gorm.io/gorm"
 )
 
 func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int64, sortBy *string, pageNum, pageSize int) ([]*Resource, int64, error) {
@@ -123,6 +126,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 	if err == nil {
 		// 更新现有评分
 		existingRating.Recommendation = recommendation
+		existingRating.IsVisible = true // 确保在重新评分时，记录是可见的
 		err = tx.Save(&existingRating).Error
 		rating = &existingRating
 	} else {
@@ -220,4 +224,70 @@ func SubmitResourceComment(ctx context.Context, userID, resourceID int64, conten
 	}
 
 	return comment, nil
+}
+
+// DeleteResourceRating 删除资源评分
+func DeleteResourceRating(ctx context.Context, ratingID, userID int64) error {
+	// 开始事务
+	tx := DB.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 查询评分记录，确保用户只能删除自己的评分
+	var rating ResourceRating
+	err := tx.Where("rating_id = ? AND user_id = ?", ratingID, userID).First(&rating).Error
+	if err != nil {
+		tx.Rollback()
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return errno.NewErrNo(errno.InternalDatabaseErrorCode, "未找到评分记录或无权删除")
+		}
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询评分记录失败: "+err.Error())
+	}
+
+	// 直接从数据库中删除评分记录
+	err = tx.Delete(&rating).Error
+	if err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评分失败: "+err.Error())
+	}
+
+	// 重新计算资源的平均评分
+	var avgResult struct {
+		AverageRating float64 `gorm:"column:average_rating"`
+		RatingCount   int64   `gorm:"column:rating_count"`
+	}
+
+	err = tx.Model(&ResourceRating{}).
+		Select("AVG(recommendation) as average_rating, COUNT(*) as rating_count").
+		Where("resource_id = ?", rating.ResourceID).
+		Scan(&avgResult).Error
+
+	if err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "计算资源平均评分失败: "+err.Error())
+	}
+
+	// 更新资源的评分信息
+	err = tx.Model(&Resource{}).
+		Where("resource_id = ?", rating.ResourceID).
+		Updates(map[string]interface{}{
+			"average_rating": avgResult.AverageRating,
+			"rating_count":   avgResult.RatingCount,
+		}).Error
+
+	if err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新资源评分信息失败: "+err.Error())
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交删除评分事务失败: "+err.Error())
+	}
+
+	return nil
 }
