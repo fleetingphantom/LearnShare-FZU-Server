@@ -20,22 +20,25 @@ func Register(r *server.Hertz) {
 	{
 		_api := root.Group("/api", _apiMw()...)
 		{
+			_course_comments := _api.Group("/course_comments", _course_commentsMw()...)
+			_course_comments.POST("/:course_id", append(_submitcoursecommentMw(), course.SubmitCourseComment)...)
+		}
+		{
 			_course_ratings := _api.Group("/course_ratings", _course_ratingsMw()...)
-			_course_ratings.DELETE("/{rating_id}", append(_deletecourseratingMw(), course.DeleteCourseRating)...)
-			_course_ratings.POST("/{rating_id}", append(_submitcourseratingMw(), course.SubmitCourseRating)...)
+			_course_ratings.POST("/:course_id", append(_submitcourseratingMw(), course.SubmitCourseRating)...)
+			_course_ratings.DELETE("/:rating_id", append(_deletecourseratingMw(), course.DeleteCourseRating)...)
 		}
 		{
 			_courses := _api.Group("/courses", _coursesMw()...)
-			_courses.GET("/{course_id}", append(_getcoursedetailMw(), course.GetCourseDetail)...)
-			__7bcourse_id_7d := _courses.Group("/{course_id}", __7bcourse_id_7dMw()...)
-			__7bcourse_id_7d.GET("/comments", append(_getcoursecommentsMw(), course.GetCourseComments)...)
-			__7bcourse_id_7d.POST("/comments", append(_submitcoursecommentMw(), course.SubmitCourseComment)...)
-			__7bcourse_id_7d.GET("/resources", append(_getcourseresourcelistMw(), course.GetCourseResourceList)...)
+			_courses.GET("/:course_id", append(_getcoursedetailMw(), course.GetCourseDetail)...)
+			_course_id := _courses.Group("/:course_id", _course_idMw()...)
+			_course_id.GET("/comments", append(_getcoursecommentsMw(), course.GetCourseComments)...)
+			_course_id.GET("/resources", append(_getcourseresourcelistMw(), course.GetCourseResourceList)...)
 			_courses.GET("/search", append(_searchMw(), course.Search)...)
 		}
 		{
 			_courses_comments := _api.Group("/courses_comments", _courses_commentsMw()...)
-			_courses_comments.DELETE("/{comment_id}", append(_deletecoursecommentMw(), course.DeleteCourseComment)...)
+			_courses_comments.DELETE("/:comment_id", append(_deletecoursecommentMw(), course.DeleteCourseComment)...)
 		}
 	}
 }

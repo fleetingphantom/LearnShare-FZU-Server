@@ -672,7 +672,7 @@ func (p *SearchResp) String() string {
 
 // 获取课程详情
 type GetCourseDetailReq struct {
-	CourseID int64 `thrift:"course_id,1,required" form:"course_id,required" json:"course_id,required" query:"course_id,required"`
+	CourseID int64 `thrift:"course_id,1,required" json:"course_id,required" path:"course_id,required"`
 }
 
 func NewGetCourseDetailReq() *GetCourseDetailReq {
@@ -1029,7 +1029,7 @@ func (p *GetCourseDetailResp) String() string {
 
 // 获取课程资源列表
 type GetCourseResourceListReq struct {
-	CourseID int64   `thrift:"course_id,1,required" form:"course_id,required" json:"course_id,required" query:"course_id,required"`
+	CourseID int64   `thrift:"course_id,1,required" json:"course_id,required" path:"course_id,required"`
 	PageNum  int32   `thrift:"page_num,2,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
 	PageSize int32   `thrift:"page_size,3,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
 	Type     *string `thrift:"type,4,optional" form:"type" json:"type,omitempty" query:"type"`
@@ -1629,7 +1629,7 @@ func (p *GetCourseResourceListResp) String() string {
 
 // 获取课程评论列表
 type GetCourseCommentsReq struct {
-	CourseID int64  `thrift:"course_id,1,required" form:"course_id,required" json:"course_id,required" query:"course_id,required"`
+	CourseID int64  `thrift:"course_id,1,required" json:"course_id,required" path:"course_id,required"`
 	SortBy   string `thrift:"sort_by,2,optional" form:"sort_by" json:"sort_by,omitempty" query:"sort_by"`
 	PageSize int32  `thrift:"page_size,3,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
 	PageNum  int32  `thrift:"page_num,4,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
@@ -2175,89 +2175,36 @@ func (p *GetCourseCommentsResp) String() string {
 
 // 提交课程评分
 type SubmitCourseRatingReq struct {
-	RatingID       int64  `thrift:"rating_id,1,required" form:"rating_id,required" json:"rating_id,required" query:"rating_id,required"`
-	UserID         int64  `thrift:"user_id,2,required" form:"user_id,required" json:"user_id,required" query:"user_id,required"`
-	CourseID       int64  `thrift:"course_id,3,required" form:"course_id,required" json:"course_id,required" query:"course_id,required"`
-	Recommendation int64  `thrift:"recommendation,4,required" form:"recommendation,required" json:"recommendation,required" query:"recommendation,required"`
-	Difficulty     string `thrift:"difficulty,5,required" form:"difficulty,required" json:"difficulty,required" query:"difficulty,required"`
-	Workload       int64  `thrift:"workload,6,required" form:"workload,required" json:"workload,required" query:"workload,required"`
-	Usefulness     int64  `thrift:"usefulness,7,required" form:"usefulness,required" json:"usefulness,required" query:"usefulness,required"`
-	IsVisible      bool   `thrift:"is_visible,8,optional" form:"is_visible" json:"is_visible,omitempty" query:"is_visible"`
+	CourseID int64   `thrift:"course_id,1,required" json:"course_id,required" path:"course_id,required"`
+	Rating   float64 `thrift:"rating,2,required" form:"rating,required" json:"rating,required" query:"rating,required"`
 }
 
 func NewSubmitCourseRatingReq() *SubmitCourseRatingReq {
-	return &SubmitCourseRatingReq{
-		IsVisible: true,
-	}
+	return &SubmitCourseRatingReq{}
 }
 
 func (p *SubmitCourseRatingReq) InitDefault() {
-	p.IsVisible = true
-}
-
-func (p *SubmitCourseRatingReq) GetRatingID() (v int64) {
-	return p.RatingID
-}
-
-func (p *SubmitCourseRatingReq) GetUserID() (v int64) {
-	return p.UserID
 }
 
 func (p *SubmitCourseRatingReq) GetCourseID() (v int64) {
 	return p.CourseID
 }
 
-func (p *SubmitCourseRatingReq) GetRecommendation() (v int64) {
-	return p.Recommendation
-}
-
-func (p *SubmitCourseRatingReq) GetDifficulty() (v string) {
-	return p.Difficulty
-}
-
-func (p *SubmitCourseRatingReq) GetWorkload() (v int64) {
-	return p.Workload
-}
-
-func (p *SubmitCourseRatingReq) GetUsefulness() (v int64) {
-	return p.Usefulness
-}
-
-var SubmitCourseRatingReq_IsVisible_DEFAULT bool = true
-
-func (p *SubmitCourseRatingReq) GetIsVisible() (v bool) {
-	if !p.IsSetIsVisible() {
-		return SubmitCourseRatingReq_IsVisible_DEFAULT
-	}
-	return p.IsVisible
+func (p *SubmitCourseRatingReq) GetRating() (v float64) {
+	return p.Rating
 }
 
 var fieldIDToName_SubmitCourseRatingReq = map[int16]string{
-	1: "rating_id",
-	2: "user_id",
-	3: "course_id",
-	4: "recommendation",
-	5: "difficulty",
-	6: "workload",
-	7: "usefulness",
-	8: "is_visible",
-}
-
-func (p *SubmitCourseRatingReq) IsSetIsVisible() bool {
-	return p.IsVisible != SubmitCourseRatingReq_IsVisible_DEFAULT
+	1: "course_id",
+	2: "rating",
 }
 
 func (p *SubmitCourseRatingReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetRatingID bool = false
-	var issetUserID bool = false
 	var issetCourseID bool = false
-	var issetRecommendation bool = false
-	var issetDifficulty bool = false
-	var issetWorkload bool = false
-	var issetUsefulness bool = false
+	var issetRating bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2278,69 +2225,16 @@ func (p *SubmitCourseRatingReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetRatingID = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 2:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField2(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetUserID = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 3:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
 				issetCourseID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 4:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField4(iprot); err != nil {
+		case 2:
+			if fieldTypeId == thrift.DOUBLE {
+				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetRecommendation = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 5:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField5(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetDifficulty = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 6:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField6(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetWorkload = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 7:
-			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField7(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetUsefulness = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 8:
-			if fieldTypeId == thrift.BOOL {
-				if err = p.ReadField8(iprot); err != nil {
-					goto ReadFieldError
-				}
+				issetRating = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2357,38 +2251,13 @@ func (p *SubmitCourseRatingReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetRatingID {
+	if !issetCourseID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetUserID {
+	if !issetRating {
 		fieldId = 2
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetCourseID {
-		fieldId = 3
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetRecommendation {
-		fieldId = 4
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetDifficulty {
-		fieldId = 5
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetWorkload {
-		fieldId = 6
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetUsefulness {
-		fieldId = 7
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -2417,84 +2286,18 @@ func (p *SubmitCourseRatingReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.RatingID = _field
+	p.CourseID = _field
 	return nil
 }
 func (p *SubmitCourseRatingReq) ReadField2(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field float64
+	if v, err := iprot.ReadDouble(); err != nil {
 		return err
 	} else {
 		_field = v
 	}
-	p.UserID = _field
-	return nil
-}
-func (p *SubmitCourseRatingReq) ReadField3(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.CourseID = _field
-	return nil
-}
-func (p *SubmitCourseRatingReq) ReadField4(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Recommendation = _field
-	return nil
-}
-func (p *SubmitCourseRatingReq) ReadField5(iprot thrift.TProtocol) error {
-
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Difficulty = _field
-	return nil
-}
-func (p *SubmitCourseRatingReq) ReadField6(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Workload = _field
-	return nil
-}
-func (p *SubmitCourseRatingReq) ReadField7(iprot thrift.TProtocol) error {
-
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Usefulness = _field
-	return nil
-}
-func (p *SubmitCourseRatingReq) ReadField8(iprot thrift.TProtocol) error {
-
-	var _field bool
-	if v, err := iprot.ReadBool(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.IsVisible = _field
+	p.Rating = _field
 	return nil
 }
 
@@ -2510,30 +2313,6 @@ func (p *SubmitCourseRatingReq) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField2(oprot); err != nil {
 			fieldId = 2
-			goto WriteFieldError
-		}
-		if err = p.writeField3(oprot); err != nil {
-			fieldId = 3
-			goto WriteFieldError
-		}
-		if err = p.writeField4(oprot); err != nil {
-			fieldId = 4
-			goto WriteFieldError
-		}
-		if err = p.writeField5(oprot); err != nil {
-			fieldId = 5
-			goto WriteFieldError
-		}
-		if err = p.writeField6(oprot); err != nil {
-			fieldId = 6
-			goto WriteFieldError
-		}
-		if err = p.writeField7(oprot); err != nil {
-			fieldId = 7
-			goto WriteFieldError
-		}
-		if err = p.writeField8(oprot); err != nil {
-			fieldId = 8
 			goto WriteFieldError
 		}
 	}
@@ -2555,10 +2334,10 @@ WriteStructEndError:
 }
 
 func (p *SubmitCourseRatingReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("rating_id", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("course_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RatingID); err != nil {
+	if err := oprot.WriteI64(p.CourseID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2572,10 +2351,10 @@ WriteFieldEndError:
 }
 
 func (p *SubmitCourseRatingReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("user_id", thrift.I64, 2); err != nil {
+	if err = oprot.WriteFieldBegin("rating", thrift.DOUBLE, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.UserID); err != nil {
+	if err := oprot.WriteDouble(p.Rating); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2586,110 +2365,6 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
-}
-
-func (p *SubmitCourseRatingReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("course_id", thrift.I64, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.CourseID); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
-}
-
-func (p *SubmitCourseRatingReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("recommendation", thrift.I64, 4); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.Recommendation); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
-}
-
-func (p *SubmitCourseRatingReq) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("difficulty", thrift.STRING, 5); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.Difficulty); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
-}
-
-func (p *SubmitCourseRatingReq) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("workload", thrift.I64, 6); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.Workload); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
-}
-
-func (p *SubmitCourseRatingReq) writeField7(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("usefulness", thrift.I64, 7); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI64(p.Usefulness); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
-}
-
-func (p *SubmitCourseRatingReq) writeField8(oprot thrift.TProtocol) (err error) {
-	if p.IsSetIsVisible() {
-		if err = oprot.WriteFieldBegin("is_visible", thrift.BOOL, 8); err != nil {
-			goto WriteFieldBeginError
-		}
-		if err := oprot.WriteBool(p.IsVisible); err != nil {
-			return err
-		}
-		if err = oprot.WriteFieldEnd(); err != nil {
-			goto WriteFieldEndError
-		}
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 8 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 8 end error: ", p), err)
 }
 
 func (p *SubmitCourseRatingReq) String() string {
@@ -2910,8 +2585,8 @@ func (p *SubmitCourseRatingResp) String() string {
 
 // 提交课程评论
 type SubmitCourseCommentReq struct {
-	CourseID  int64  `thrift:"course_id,1,required" form:"course_id,required" json:"course_id,required" query:"course_id,required"`
-	Content   string `thrift:"content,2,required" form:"content,required" json:"content,required" query:"content,required"`
+	CourseID  int64  `thrift:"course_id,1,required" json:"course_id,required" path:"course_id,required"`
+	Contents  string `thrift:"contents,2,required" form:"contents,required" json:"contents,required" query:"contents,required"`
 	ParentID  int64  `thrift:"parent_id,3,optional" form:"parent_id" json:"parent_id,omitempty" query:"parent_id"`
 	IsVisible bool   `thrift:"is_visible,4,optional" form:"is_visible" json:"is_visible,omitempty" query:"is_visible"`
 }
@@ -2932,8 +2607,8 @@ func (p *SubmitCourseCommentReq) GetCourseID() (v int64) {
 	return p.CourseID
 }
 
-func (p *SubmitCourseCommentReq) GetContent() (v string) {
-	return p.Content
+func (p *SubmitCourseCommentReq) GetContents() (v string) {
+	return p.Contents
 }
 
 var SubmitCourseCommentReq_ParentID_DEFAULT int64 = 0
@@ -2956,7 +2631,7 @@ func (p *SubmitCourseCommentReq) GetIsVisible() (v bool) {
 
 var fieldIDToName_SubmitCourseCommentReq = map[int16]string{
 	1: "course_id",
-	2: "content",
+	2: "contents",
 	3: "parent_id",
 	4: "is_visible",
 }
@@ -2974,7 +2649,7 @@ func (p *SubmitCourseCommentReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetCourseID bool = false
-	var issetContent bool = false
+	var issetContents bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -3004,7 +2679,7 @@ func (p *SubmitCourseCommentReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetContent = true
+				issetContents = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -3042,7 +2717,7 @@ func (p *SubmitCourseCommentReq) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetContent {
+	if !issetContents {
 		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
@@ -3083,7 +2758,7 @@ func (p *SubmitCourseCommentReq) ReadField2(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.Content = _field
+	p.Contents = _field
 	return nil
 }
 func (p *SubmitCourseCommentReq) ReadField3(iprot thrift.TProtocol) error {
@@ -3167,10 +2842,10 @@ WriteFieldEndError:
 }
 
 func (p *SubmitCourseCommentReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("content", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("contents", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Content); err != nil {
+	if err := oprot.WriteString(p.Contents); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3439,7 +3114,7 @@ func (p *SubmitCourseCommentResp) String() string {
 
 // 删除课程评论
 type DeleteCourseCommentReq struct {
-	CommentID int64 `thrift:"comment_id,1,required" form:"comment_id,required" json:"comment_id,required" query:"comment_id,required"`
+	CommentID int64 `thrift:"comment_id,1,required" json:"comment_id,required" path:"comment_id,required"`
 }
 
 func NewDeleteCourseCommentReq() *DeleteCourseCommentReq {
@@ -3742,7 +3417,7 @@ func (p *DeleteCourseCommentResp) String() string {
 
 // 删除课程评分
 type DeleteCourseRatingReq struct {
-	RatingID int64 `thrift:"rating_id,1,required" form:"rating_id,required" json:"rating_id,required" query:"rating_id,required"`
+	RatingID int64 `thrift:"rating_id,1,required" json:"rating_id,required" path:"rating_id,required"`
 }
 
 func NewDeleteCourseRatingReq() *DeleteCourseRatingReq {

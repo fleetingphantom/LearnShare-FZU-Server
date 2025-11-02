@@ -59,13 +59,18 @@ func (c Course) ToCourseModule() *module.Course {
 		CourseId:   c.CourseID,
 		CourseName: c.CourseName,
 		TeacherId:  c.TeacherID,
-		Credit:     c.Credit, // 根据 Thrift 定义，Credit 应该是 float64
+		Credit:     c.Credit,
 		MajorId:    c.MajorID,
 		Grade:      c.Grade,
+		CreatedAt:  c.CreatedAt.Unix(),
+		UpdatedAt:  c.UpdatedAt.Unix(),
 	}
 
+	// 确保description有合理值
 	if c.Description != nil {
 		course.Description = *c.Description
+	} else {
+		course.Description = "暂无描述" // 提供默认值
 	}
 	return course
 }
@@ -112,11 +117,14 @@ type CourseComment struct {
 func (c CourseComment) ToCourseCommentModule() *module.CourseComment {
 	return &module.CourseComment{
 		CommentId: c.CommentID,
-		CourseId:  c.CourseID,
 		UserId:    c.UserID,
+		CourseId:  c.CourseID,
 		Content:   c.Content,
 		ParentId:  c.ParentID,
+		Likes:     0, // 必须：Thrift required字段
 		IsVisible: c.IsVisible,
+		Status:    0,                  // 必须：Thrift required字段
+		CreatedAt: c.CreatedAt.Unix(), // 必须：时间戳转换
 	}
 }
 
@@ -147,11 +155,32 @@ func (r Resource) ToResourceModule() *module.Resource {
 		DownloadCount: r.DownloadCount,
 		AverageRating: 0.0,
 		RatingCount:   0,
-		Status:        int32(0),
+		Status:        convertResourceStatus(r.Status),
 		CreatedAt:     r.CreatedAt.Unix(),
+		Tags:          []*module.ResourceTag{},
 	}
-	
-	resource.Description = r.Description
+
+	// 正确处理Description - 修复类型匹配问题
+	if r.Description != nil {
+		desc := *r.Description       // 先解引用得到string
+		resource.Description = &desc // 再取地址赋值给*string
+	} else {
+		resource.Description = nil // 明确设置为nil
+	}
 
 	return resource
+}
+
+// 状态转换函数
+func convertResourceStatus(status string) int32 {
+	switch status {
+	case "pending":
+		return 0
+	case "published":
+		return 1
+	case "rejected":
+		return 2
+	default:
+		return 0
+	}
 }

@@ -66,16 +66,13 @@ func GetCoursesByMajorID(ctx context.Context, majorID int64) ([]*Course, error) 
 	return courses, nil
 }
 
-func SearchCourses(ctx context.Context, keywords string, collegeID int64, grade string) ([]*Course, error) {
-	var courses []*Course
+func SearchCourses(ctx context.Context, keywords string, grade string) ([]*Course, error) {
+	var courses []*Course // 声明courses变量
 
 	query := DB.WithContext(ctx).Table(constants.CourseTableName)
 
 	if keywords != "" {
 		query = query.Where("course_name LIKE ?", "%"+keywords+"%")
-	}
-	if collegeID > 0 {
-		query = query.Where("college_id = ?", collegeID)
 	}
 	if grade != "" {
 		query = query.Where("grade = ?", grade)
@@ -85,7 +82,6 @@ func SearchCourses(ctx context.Context, keywords string, collegeID int64, grade 
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "搜索课程失败: "+err.Error())
 	}
-
 	return courses, nil
 }
 

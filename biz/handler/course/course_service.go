@@ -3,9 +3,9 @@
 package course
 
 import (
-	"context"
-
 	course "LearnShare/biz/model/course"
+	"LearnShare/biz/service"
+	"context"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
@@ -21,7 +21,16 @@ func Search(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(course.SearchResp)
+	// 创建 CourseService 实例并调用业务逻辑
+	service := service.NewCourseService(ctx, c)
+	resp, err := service.Search(&req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+			"code":    50000,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -37,7 +46,16 @@ func GetCourseDetail(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(course.GetCourseDetailResp)
+	// 创建 CourseService 实例并调用业务逻辑
+	service := service.NewCourseService(ctx, c)
+	resp, err := service.GetCourseDetail(&req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+			"code":    50000,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -53,7 +71,16 @@ func GetCourseResourceList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(course.GetCourseResourceListResp)
+	//业务逻辑调用
+	service := service.NewCourseService(ctx, c)
+	resp, err := service.GetCourseResourceList(&req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+			"code":    50000,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -69,14 +96,24 @@ func GetCourseComments(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(course.GetCourseCommentsResp)
+	//业务逻辑调用
+	service := service.NewCourseService(ctx, c)
+	resp, err := service.GetCourseComments(&req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+			"code":    50000,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
 
 // SubmitCourseRating .
-// @router /api/course_ratings/{rating_id} [POST]
+// @router /api/course_ratings/{course_id} [POST]
 func SubmitCourseRating(ctx context.Context, c *app.RequestContext) {
+	
 	var err error
 	var req course.SubmitCourseRatingReq
 	err = c.BindAndValidate(&req)
@@ -85,7 +122,16 @@ func SubmitCourseRating(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(course.SubmitCourseRatingResp)
+	//业务逻辑调用
+	service := service.NewCourseService(ctx, c)
+	resp, err := service.SubmitCourseRating(&req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+			"code":    50000,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -101,7 +147,16 @@ func SubmitCourseComment(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(course.SubmitCourseCommentResp)
+	//业务逻辑调用
+	service := service.NewCourseService(ctx, c)
+	resp, err := service.SubmitCourseComment(&req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+			"code":    50000,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -117,7 +172,16 @@ func DeleteCourseComment(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(course.DeleteCourseCommentResp)
+	//业务逻辑调用
+	service := service.NewCourseService(ctx, c)
+	resp, err := service.DeleteCourseComment(&req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+			"code":    50000,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }
@@ -133,7 +197,16 @@ func DeleteCourseRating(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(course.DeleteCourseRatingResp)
+	// 添加业务逻辑调用
+	service := service.NewCourseService(ctx, c)
+	resp, err := service.DeleteCourseRating(&req)
+	if err != nil {
+		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
+			"code":    50000,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	c.JSON(consts.StatusOK, resp)
 }

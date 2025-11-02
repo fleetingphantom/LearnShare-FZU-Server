@@ -6,9 +6,8 @@ import (
 	"LearnShare/biz/dal"
 	"LearnShare/biz/middleware"
 	"LearnShare/config"
-	"log"
-
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"log"
 )
 
 func Init() {
