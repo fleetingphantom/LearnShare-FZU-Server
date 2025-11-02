@@ -95,7 +95,6 @@ struct ResetPasswordResp {
 
 //刷新Token
 struct RefreshTokenReq {
-  required string refreshToken;
 }
 struct RefreshTokenResp {
   required model.BaseResp baseResponse;

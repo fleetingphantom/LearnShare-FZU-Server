@@ -81,7 +81,7 @@ func RefreshTokenJwt() {
 		Key:                         []byte("refresh_token_key"),
 		Timeout:                     time.Hour * 72,
 		WithoutDefaultTokenHeadName: true,
-		TokenLookup:                 "header: Refresh-Token",
+		TokenLookup:                 "form: refresh-token",
 		IdentityKey:                 constants.IdentityKey,
 
 		PayloadFunc: func(data interface{}) jwt.MapClaims {

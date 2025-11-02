@@ -6,6 +6,7 @@ import (
 	"LearnShare/biz/dal"
 	"LearnShare/biz/middleware"
 	"LearnShare/config"
+	"LearnShare/pkg/utils"
 	"log"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -22,7 +23,7 @@ func Init() {
 
 func main() {
 	Init()
-	h := server.Default()
+	h := server.Default(server.WithHostPorts(utils.GetServerAddress()))
 
 	register(h)
 	h.Spin()

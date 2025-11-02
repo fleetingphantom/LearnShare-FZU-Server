@@ -3,6 +3,7 @@ package utils
 import (
 	"LearnShare/config"
 	"errors"
+	"strconv"
 	"strings"
 )
 
@@ -18,4 +19,17 @@ func GetMysqlDSN() (string, error) {
 	}, "")
 
 	return dsn, nil
+}
+
+func GetServerAddress() string {
+	if config.Server == nil {
+		panic("config not found")
+		return ""
+	}
+
+	address := strings.Join([]string{
+		config.Server.Addr, ":", strconv.Itoa(config.Server.Port),
+	}, "")
+
+	return address
 }
