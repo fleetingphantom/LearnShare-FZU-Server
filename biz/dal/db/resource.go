@@ -1,6 +1,7 @@
 package db
 
 import (
+	"LearnShare/pkg/constants"
 	"LearnShare/pkg/errno"
 	"context"
 	"errors"
@@ -12,7 +13,7 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 	var resources []*Resource
 	var total int64
 
-	db := DB.WithContext(ctx)
+	db := DB.WithContext(ctx).Table(constants.ResourceTableName)
 
 	if keyword != nil && *keyword != "" {
 		db = db.Where("title LIKE ? OR description LIKE ?", "%"+*keyword+"%", "%"+*keyword+"%")
@@ -36,7 +37,7 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 		db = db.Order("created_at desc")
 	}
 
-	err := db.Model(&Resource{}).Count(&total).Error
+	err := db.Count(&total).Error
 	if err != nil {
 		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源数量失败: "+err.Error())
 	}
@@ -53,7 +54,7 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 	var resource Resource
 
-	err := DB.WithContext(ctx).
+	err := DB.WithContext(ctx).Table(constants.ResourceTableName).
 		Preload("Tags").
 		Where("resource_id = ?", resourceID).
 		First(&resource).Error
@@ -70,7 +71,7 @@ func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, 
 	var comments []*ResourceComment
 	var total int64
 
-	db := DB.WithContext(ctx).
+	db := DB.WithContext(ctx).Table(constants.ResourceCommentTableName).
 		Preload("User").
 		Where("resource_id = ?", resourceID).
 		Where("is_visible = ?", true).
@@ -91,7 +92,7 @@ func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, 
 	}
 
 	// 获取总数
-	err := db.Model(&ResourceComment{}).Count(&total).Error
+	err := db.Count(&total).Error
 	if err != nil {
 		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源评论数量失败: "+err.Error())
 	}
@@ -119,7 +120,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 
 	// 检查是否已经评分过
 	var existingRating ResourceRating
-	err := tx.Where("user_id = ? AND resource_id = ?", userID, resourceID).First(&existingRating).Error
+	err := tx.Table(constants.ResourceRatingTableName).Where("user_id = ? AND resource_id = ?", userID, resourceID).First(&existingRating).Error
 
 	var rating *ResourceRating
 
@@ -127,7 +128,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 		// 更新现有评分
 		existingRating.Recommendation = recommendation
 		existingRating.IsVisible = true // 确保在重新评分时，记录是可见的
-		err = tx.Save(&existingRating).Error
+		err = tx.Table(constants.ResourceRatingTableName).Save(&existingRating).Error
 		rating = &existingRating
 	} else {
 		// 创建新评分
@@ -137,7 +138,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 			Recommendation: recommendation,
 			IsVisible:      true,
 		}
-		err = tx.Create(rating).Error
+		err = tx.Table(constants.ResourceRatingTableName).Create(rating).Error
 	}
 
 	if err != nil {
@@ -151,7 +152,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 		RatingCount   int64   `gorm:"column:rating_count"`
 	}
 
-	err = tx.Model(&ResourceRating{}).
+	err = tx.Table(constants.ResourceRatingTableName).
 		Select("AVG(recommendation) as average_rating, COUNT(*) as rating_count").
 		Where("resource_id = ? AND is_visible = ?", resourceID, true).
 		Scan(&avgResult).Error
@@ -162,7 +163,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 	}
 
 	// 更新资源的评分信息
-	err = tx.Model(&Resource{}).
+	err = tx.Table(constants.ResourceTableName).
 		Where("resource_id = ?", resourceID).
 		Updates(map[string]interface{}{
 			"average_rating": avgResult.AverageRating,
@@ -205,7 +206,7 @@ func SubmitResourceComment(ctx context.Context, userID, resourceID int64, conten
 	}
 
 	// 保存评论
-	err := tx.Create(comment).Error
+	err := tx.Table(constants.ResourceCommentTableName).Create(comment).Error
 	if err != nil {
 		tx.Rollback()
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "保存资源评论失败: "+err.Error())
@@ -218,7 +219,7 @@ func SubmitResourceComment(ctx context.Context, userID, resourceID int64, conten
 	}
 
 	// 预加载用户信息
-	err2 := DB.WithContext(ctx).Preload("User").First(comment, comment.CommentID).Error
+	err2 := DB.WithContext(ctx).Table(constants.ResourceCommentTableName).Preload("User").First(comment, comment.CommentID).Error
 	if err2 != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "预加载评论用户信息失败: "+err2.Error())
 	}
@@ -238,7 +239,7 @@ func DeleteResourceRating(ctx context.Context, ratingID, userID int64) error {
 
 	// 查询评分记录，确保用户只能删除自己的评分
 	var rating ResourceRating
-	err := tx.Where("rating_id = ? AND user_id = ?", ratingID, userID).First(&rating).Error
+	err := tx.Table(constants.ResourceRatingTableName).Where("rating_id = ? AND user_id = ?", ratingID, userID).First(&rating).Error
 	if err != nil {
 		tx.Rollback()
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -248,7 +249,7 @@ func DeleteResourceRating(ctx context.Context, ratingID, userID int64) error {
 	}
 
 	// 直接从数据库中删除评分记录
-	err = tx.Delete(&rating).Error
+	err = tx.Table(constants.ResourceRatingTableName).Delete(&rating).Error
 	if err != nil {
 		tx.Rollback()
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评分失败: "+err.Error())
@@ -260,7 +261,7 @@ func DeleteResourceRating(ctx context.Context, ratingID, userID int64) error {
 		RatingCount   int64   `gorm:"column:rating_count"`
 	}
 
-	err = tx.Model(&ResourceRating{}).
+	err = tx.Table(constants.ResourceRatingTableName).
 		Select("AVG(recommendation) as average_rating, COUNT(*) as rating_count").
 		Where("resource_id = ?", rating.ResourceID).
 		Scan(&avgResult).Error
@@ -271,7 +272,7 @@ func DeleteResourceRating(ctx context.Context, ratingID, userID int64) error {
 	}
 
 	// 更新资源的评分信息
-	err = tx.Model(&Resource{}).
+	err = tx.Table(constants.ResourceTableName).
 		Where("resource_id = ?", rating.ResourceID).
 		Updates(map[string]interface{}{
 			"average_rating": avgResult.AverageRating,
@@ -303,7 +304,7 @@ func DeleteResourceComment(ctx context.Context, commentID, userID int64) error {
 	}()
 
 	// 直接删除评论，确保用户只能删除自己的评论
-	result := tx.Where("comment_id = ? AND user_id = ?", commentID, userID).Delete(&ResourceComment{})
+	result := tx.Table(constants.ResourceCommentTableName).Where("comment_id = ? AND user_id = ?", commentID, userID).Delete(&ResourceComment{})
 	if result.Error != nil {
 		tx.Rollback()
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评论失败: "+result.Error.Error())
@@ -332,7 +333,7 @@ func CreateReview(ctx context.Context, targetID int64, targetType, reason string
 		Status:     "pending", // 默认为待审核
 	}
 
-	err := DB.WithContext(ctx).Create(review).Error
+	err := DB.WithContext(ctx).Table(constants.ReviewTableName).Create(review).Error
 	if err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建举报失败: "+err.Error())
 	}
