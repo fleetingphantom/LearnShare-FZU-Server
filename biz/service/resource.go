@@ -139,3 +139,63 @@ func (s *ResourceService) SubmitResourceComment(req *resource.SubmitResourceComm
 
 	return comment.ToResourceCommentModule(), nil
 }
+
+// DeleteResourceRating 执行删除资源评分
+func (s *ResourceService) DeleteResourceRating(req *resource.DeleteResourceRatingReq) error {
+	userID := GetUidFormContext(s.c)
+
+	// 验证评分ID
+	if req.RatingId <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "评分ID无效")
+	}
+
+	// 调用数据库层删除评分
+	err := db.DeleteResourceRating(s.ctx, req.RatingId, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteResourceComment 删除资源评论
+func (s *ResourceService) DeleteResourceComment(req *resource.DeleteResourceCommentReq) error {
+	userID := GetUidFormContext(s.c)
+
+	// 验证评论ID
+	if req.CommentId <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "评论ID无效")
+	}
+
+	// 调用数据库层删除评论
+	err := db.DeleteResourceComment(s.ctx, req.CommentId, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ReportResource 举报一个资源
+func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error {
+	// 验证资源ID
+	if req.ResourceId <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+	}
+
+	// 验证举报原因
+	if req.Reason == "" {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "举报原因不能为空")
+	}
+	if len(req.Reason) > 500 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "举报原因不能超过500字符")
+	}
+
+	// 调用数据库层创建举报记录
+	err := db.CreateReview(s.ctx, req.ResourceId, "resource", req.Reason)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

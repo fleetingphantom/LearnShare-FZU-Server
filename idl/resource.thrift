@@ -43,7 +43,8 @@ struct DownloadResourceResp {
 
 // 举报资源请求
 struct ReportResourceReq {
-    1: required i64 resourceId,
+    1: required i64 resourceId (api.path="resource_id"),
+    2: required string reason (api.body="reason"),
 }
 
 struct ReportResourceResp {
