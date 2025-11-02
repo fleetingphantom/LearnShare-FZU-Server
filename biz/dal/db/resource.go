@@ -8,11 +8,6 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 	var resources []*Resource
 	var total int64
 
-	// 参数验证
-	if pageNum <= 0 || pageSize <= 0 {
-		return []*Resource{}, 0, nil
-	}
-
 	db := DB.WithContext(ctx)
 
 	if keyword != nil && *keyword != "" {
@@ -71,11 +66,6 @@ func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, 
 	var comments []*ResourceComment
 	var total int64
 
-	// 参数验证
-	if pageNum <= 0 || pageSize <= 0 {
-		return []*ResourceComment{}, 0, nil
-	}
-
 	db := DB.WithContext(ctx).
 		Preload("User").
 		Where("resource_id = ?", resourceID).
@@ -126,9 +116,9 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 	// 检查是否已经评分过
 	var existingRating ResourceRating
 	err := tx.Where("user_id = ? AND resource_id = ?", userID, resourceID).First(&existingRating).Error
-	
+
 	var rating *ResourceRating
-	
+
 	if err == nil {
 		// 更新现有评分
 		existingRating.Recommendation = recommendation
@@ -144,7 +134,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 		}
 		err = tx.Create(rating).Error
 	}
-	
+
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -155,12 +145,12 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 		AverageRating float64 `gorm:"column:average_rating"`
 		RatingCount   int64   `gorm:"column:rating_count"`
 	}
-	
+
 	err = tx.Model(&ResourceRating{}).
 		Select("AVG(recommendation) as average_rating, COUNT(*) as rating_count").
 		Where("resource_id = ? AND is_visible = ?", resourceID, true).
 		Scan(&avgResult).Error
-	
+
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -173,7 +163,7 @@ func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recomme
 			"average_rating": avgResult.AverageRating,
 			"rating_count":   avgResult.RatingCount,
 		}).Error
-	
+
 	if err != nil {
 		tx.Rollback()
 		return nil, err

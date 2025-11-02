@@ -42,6 +42,74 @@ func (u User) ToUserModule() *module.User {
 	return user
 }
 
+// ToResourceModule 将db.Resource转换为model.Resource
+func (r Resource) ToResourceModule() *module.Resource {
+	var tags []*module.ResourceTag
+	for _, t := range r.Tags {
+		tags = append(tags, t.ToResourceTagModule())
+	}
+
+	return &module.Resource{
+		ResourceId:    r.ResourceID,
+		Title:         r.Title,
+		Description:   &r.Description,
+		FilePath:      r.FilePath,
+		FileType:      r.FileType,
+		FileSize:      r.FileSize,
+		UploaderId:    r.UploaderID,
+		CourseId:      r.CourseID,
+		DownloadCount: r.DownloadCount,
+		AverageRating: r.AverageRating,
+		RatingCount:   r.RatingCount,
+		Status:        r.Status,
+		CreatedAt:     r.CreatedAt.Unix(),
+		Tags:          tags,
+	}
+}
+
+// ToResourceTagModule 将db.ResourceTag转换为model.ResourceTag
+func (t ResourceTag) ToResourceTagModule() *module.ResourceTag {
+	return &module.ResourceTag{
+		TagId:   t.TagID,
+		TagName: t.TagName,
+	}
+}
+
+// ToResourceCommentModule 将db.ResourceComment转换为model.ResourceComment
+func (c ResourceComment) ToResourceCommentModule() *module.ResourceComment {
+	var parentId int64
+	if c.ParentID != nil {
+		parentId = *c.ParentID
+	}
+
+	var status module.ResourceCommentStatus
+	status, _ = module.ResourceCommentStatusFromString(c.Status)
+
+	return &module.ResourceComment{
+		CommentId:  c.CommentID,
+		UserId:     c.UserID,
+		ResourceId: c.ResourceID,
+		Content:    c.Content,
+		ParentId:   parentId,
+		Likes:      c.Likes,
+		IsVisible:  c.IsVisible,
+		Status:     status,
+		CreatedAt:  c.CreatedAt.Unix(),
+	}
+}
+
+// ToResourceRatingModule 将db.ResourceRating转换为model.ResourceRating
+func (r ResourceRating) ToResourceRatingModule() *module.ResourceRating {
+	return &module.ResourceRating{
+		RatingId:       r.RatingID,
+		UserId:         r.UserID,
+		ResourceId:     r.ResourceID,
+		Recommendation: r.Recommendation * 10, // 转换为0-50的浮点数
+		IsVisible:      r.IsVisible,
+		CreatedAt:      r.CreatedAt.Unix(),
+	}
+}
+
 type Resource struct {
 	ResourceID    int64         `gorm:"primaryKey;autoIncrement"`
 	Title         string        `gorm:"size:255;not null"`
@@ -80,7 +148,7 @@ type ResourceComment struct {
 	IsVisible  bool      `gorm:"default:true"`
 	Status     string    `gorm:"type:enum('normal','deleted_by_user','deleted_by_admin');default:'normal'"`
 	CreatedAt  time.Time `gorm:"autoCreateTime"`
-	
+
 	// 关联用户信息
 	User User `gorm:"foreignKey:UserID;references:UserID"`
 }
@@ -93,7 +161,7 @@ type ResourceRating struct {
 	Recommendation float64   `gorm:"type:decimal(2,1);not null"`
 	IsVisible      bool      `gorm:"default:true"`
 	CreatedAt      time.Time `gorm:"autoCreateTime"`
-	
+
 	// 关联用户信息
 	User User `gorm:"foreignKey:UserID;references:UserID"`
 	// 关联资源信息

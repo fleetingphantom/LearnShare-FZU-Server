@@ -4,183 +4,127 @@ import (
 	"LearnShare/biz/dal/db"
 	model "LearnShare/biz/model/module"
 	"LearnShare/biz/model/resource"
+	"LearnShare/pkg/errno"
+
 	"context"
+
+	"github.com/cloudwego/hertz/pkg/app"
 )
 
-// SearchResourcesService 封装了搜索资源的服务
-type SearchResourcesService struct {
+// ResourceService 封装了资源相关的服务
+type ResourceService struct {
 	ctx context.Context
+	c   *app.RequestContext
 }
 
-// NewSearchResourcesService 创建一个新的 SearchResourcesService
-func NewSearchResourcesService(ctx context.Context) *SearchResourcesService {
-	return &SearchResourcesService{ctx: ctx}
+// NewResourceService 创建一个新的 ResourceService
+func NewResourceService(ctx context.Context, c *app.RequestContext) *ResourceService {
+	return &ResourceService{ctx: ctx, c: c}
 }
 
 // SearchResources 执行资源搜索
-func (s *SearchResourcesService) SearchResources(req *resource.SearchResourceReq) ([]*model.Resource, int64, error) {
+func (s *ResourceService) SearchResources(req *resource.SearchResourceReq) ([]*model.Resource, int64, error) {
+	// 验证搜索关键词长度
+	if req.Keyword != nil && *req.Keyword != "" && len(*req.Keyword) > 100 {
+		return nil, 0, errno.NewErrNo(errno.ServiceInvalidParameter, "搜索关键词过长")
+	}
+
+	// 验证分页参数
+	if req.PageNum <= 0 {
+		req.PageNum = 1
+	}
+	if req.PageSize <= 0 || req.PageSize > 100 {
+		req.PageSize = 20
+	}
+
 	resources, total, err := db.SearchResources(s.ctx, req.Keyword, req.TagId, req.CourseId, req.SortBy, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, 0, err
 	}
 
-	// 将 db.Resource 转换为 model.Resource
 	var modelResources []*model.Resource
 	for _, r := range resources {
-		var tags []*model.ResourceTag
-		for _, t := range r.Tags {
-			tags = append(tags, &model.ResourceTag{
-				TagId:   t.TagID,
-				TagName: t.TagName,
-			})
-		}
-
-		modelResources = append(modelResources, &model.Resource{
-			ResourceId:    r.ResourceID,
-			Title:         r.Title,
-			Description:   &r.Description,
-			FilePath:      r.FilePath,
-			FileType:      r.FileType,
-			FileSize:      r.FileSize,
-			UploaderId:    r.UploaderID,
-			CourseId:      r.CourseID,
-			DownloadCount: r.DownloadCount,
-			AverageRating: r.AverageRating,
-			RatingCount:   r.RatingCount,
-			Status:        r.Status,
-			CreatedAt:     r.CreatedAt.Unix(),
-			Tags:          tags,
-		})
+		modelResources = append(modelResources, r.ToResourceModule())
 	}
 
 	return modelResources, total, nil
 }
 
-// GetResourceService 封装了获取单个资源信息的服务
-type GetResourceService struct {
-	ctx context.Context
-}
-
-// NewGetResourceService 创建一个新的 GetResourceService
-func NewGetResourceService(ctx context.Context) *GetResourceService {
-	return &GetResourceService{ctx: ctx}
-}
-
 // GetResource 执行获取单个资源信息
-func (s *GetResourceService) GetResource(req *resource.GetResourceReq) (*model.Resource, error) {
+func (s *ResourceService) GetResource(req *resource.GetResourceReq) (*model.Resource, error) {
+	// 验证资源ID
+	if req.ResourceId <= 0 {
+		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+	}
+
 	resource, err := db.GetResourceByID(s.ctx, req.ResourceId)
 	if err != nil {
 		return nil, err
 	}
 
-	// 将 db.Resource 转换为 model.Resource
-	var tags []*model.ResourceTag
-	for _, t := range resource.Tags {
-		tags = append(tags, &model.ResourceTag{
-			TagId:   t.TagID,
-			TagName: t.TagName,
-		})
-	}
-
-	return &model.Resource{
-		ResourceId:    resource.ResourceID,
-		Title:         resource.Title,
-		Description:   &resource.Description,
-		FilePath:      resource.FilePath,
-		FileType:      resource.FileType,
-		FileSize:      resource.FileSize,
-		UploaderId:    resource.UploaderID,
-		CourseId:      resource.CourseID,
-		DownloadCount: resource.DownloadCount,
-		AverageRating: resource.AverageRating,
-		RatingCount:   resource.RatingCount,
-		Status:        resource.Status,
-		CreatedAt:     resource.CreatedAt.Unix(),
-		Tags:          tags,
-	}, nil
-}
-
-// GetResourceCommentsService 封装了获取资源评论列表的服务
-type GetResourceCommentsService struct {
-	ctx context.Context
-}
-
-// NewGetResourceCommentsService 创建一个新的 GetResourceCommentsService
-func NewGetResourceCommentsService(ctx context.Context) *GetResourceCommentsService {
-	return &GetResourceCommentsService{ctx: ctx}
+	return resource.ToResourceModule(), nil
 }
 
 // GetResourceComments 执行获取资源评论列表
-func (s *GetResourceCommentsService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceComment, int64, error) {
+func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceComment, int64, error) {
+	// 验证资源ID
+	if req.ResourceId <= 0 {
+		return nil, 0, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+	}
+
+	// 验证分页参数
+	if req.PageNum <= 0 {
+		req.PageNum = 1
+	}
+	if req.PageSize <= 0 || req.PageSize > 100 {
+		req.PageSize = 20
+	}
+
 	// 调用数据库层获取评论数据
 	comments, total, err := db.GetResourceComments(s.ctx, req.ResourceId, req.SortBy, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, 0, err
 	}
 
-	// 将 db.ResourceComment 转换为 model.ResourceComment
 	var modelComments []*model.ResourceComment
 	for _, comment := range comments {
-		modelComments = append(modelComments, &model.ResourceComment{
-			CommentId:  comment.CommentID,
-			UserId:     comment.UserID,
-			ResourceId: comment.ResourceID,
-			Content:    comment.Content,
-			ParentId:   func() int64 { if comment.ParentID != nil { return *comment.ParentID } else { return 0 } }(),
-			Likes:      comment.Likes,
-			IsVisible:  comment.IsVisible,
-			Status:     func() model.ResourceCommentStatus { 
-			status, _ := model.ResourceCommentStatusFromString(comment.Status)
-			return status
-		}(),
-			CreatedAt:  comment.CreatedAt.Unix(),
-		})
+		modelComments = append(modelComments, comment.ToResourceCommentModule())
 	}
 
 	return modelComments, total, nil
 }
 
-// SubmitResourceRatingService 封装了提交资源评分的服务
-type SubmitResourceRatingService struct {
-	ctx context.Context
-}
-
-// NewSubmitResourceRatingService 创建一个新的 SubmitResourceRatingService
-func NewSubmitResourceRatingService(ctx context.Context) *SubmitResourceRatingService {
-	return &SubmitResourceRatingService{ctx: ctx}
-}
-
 // SubmitResourceRating 执行提交资源评分
-func (s *SubmitResourceRatingService) SubmitResourceRating(req *resource.SubmitResourceRatingReq, userID int64) (*model.ResourceRating, error) {
+func (s *ResourceService) SubmitResourceRating(req *resource.SubmitResourceRatingReq) (*model.ResourceRating, error) {
+	userID := GetUidFormContext(s.c)
+
+	// 验证评分范围
+	if req.Rating < 0 || req.Rating > 5 {
+		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "评分必须在0-5之间")
+	}
+
 	// 调用数据库层提交评分，使用rating字段
 	rating, err := db.SubmitResourceRating(s.ctx, userID, req.ResourceId, req.Rating)
 	if err != nil {
 		return nil, err
 	}
 
-	// 将 db.ResourceRating 转换为 model.ResourceRating
-	return &model.ResourceRating{
-		RatingId:       rating.RatingID,
-		UserId:         rating.UserID,
-		ResourceId:     rating.ResourceID,
-		Recommendation: rating.Recommendation * 10, // 转换为0-50的浮点数
-		IsVisible:      rating.IsVisible,
-		CreatedAt:      rating.CreatedAt.Unix(),
-	}, nil
-}
-
-// SubmitResourceCommentService 封装了提交资源评论的服务
-type SubmitResourceCommentService struct {
-	ctx context.Context
-}
-
-// NewSubmitResourceCommentService 创建一个新的 SubmitResourceCommentService
-func NewSubmitResourceCommentService(ctx context.Context) *SubmitResourceCommentService {
-	return &SubmitResourceCommentService{ctx: ctx}
+	return rating.ToResourceRatingModule(), nil
 }
 
 // SubmitResourceComment 执行提交资源评论
-func (s *SubmitResourceCommentService) SubmitResourceComment(req *resource.SubmitResourceCommentReq, userID int64) (*model.ResourceComment, error) {
+func (s *ResourceService) SubmitResourceComment(req *resource.SubmitResourceCommentReq) (*model.ResourceComment, error) {
+	userID := GetUidFormContext(s.c)
+
+	// 验证评论内容
+	if req.Content == "" {
+		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "评论内容不能为空")
+	}
+
+	if len(req.Content) > 1000 {
+		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "评论内容不能超过1000字符")
+	}
+
 	// 处理父评论ID
 	var parentID *int64
 	if req.IsSetParentId() && req.ParentId != nil && *req.ParentId != 0 {
@@ -193,19 +137,5 @@ func (s *SubmitResourceCommentService) SubmitResourceComment(req *resource.Submi
 		return nil, err
 	}
 
-	// 将 db.ResourceComment 转换为 model.ResourceComment
-	return &model.ResourceComment{
-		CommentId:  comment.CommentID,
-		UserId:     comment.UserID,
-		ResourceId: comment.ResourceID,
-		Content:    comment.Content,
-		ParentId:   func() int64 { if comment.ParentID != nil { return *comment.ParentID } else { return 0 } }(),
-		Likes:      comment.Likes,
-		IsVisible:  comment.IsVisible,
-		Status:     func() model.ResourceCommentStatus { 
-			status, _ := model.ResourceCommentStatusFromString(comment.Status)
-			return status
-		}(),
-		CreatedAt:  comment.CreatedAt.Unix(),
-	}, nil
+	return comment.ToResourceCommentModule(), nil
 }
