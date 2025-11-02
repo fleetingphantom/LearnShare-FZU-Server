@@ -50,10 +50,10 @@ func MailSendCode(to string, code string) error {
 		return nil
 	}
 
-	if err := e.Send(addr, auth); err == nil {
-		return nil
+	if err := e.Send(addr, auth); err != nil {
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "MailSendCode: 无法发送邮件，请检查 SMTP 配置"+err.Error())
 	}
-	return errno.NewErrNo(errno.InternalServiceErrorCode, "MailSendCode: 无法发送邮件，请检查 SMTP 配置")
+	return nil
 }
 
 // GenerateCode 生成指定长度的数字验证码，使用 crypto/rand 保证安全性。

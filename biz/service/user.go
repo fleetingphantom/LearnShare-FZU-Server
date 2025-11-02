@@ -8,7 +8,6 @@ import (
 	"LearnShare/pkg/errno"
 	"LearnShare/pkg/utils"
 	"context"
-	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -65,32 +64,50 @@ func (s *UserService) LoginIn(req *user.LoginInReq) (*module.User, error) {
 }
 
 func (s *UserService) LoginOut() error {
-	auth := string(s.c.GetHeader("Authorization"))
-	if auth == "" {
-		return nil
-	}
+	// 获取当前用户ID用于日志记录
+	// 从context中获取JWT payload，提取token
+	accessToken, refreshToken := s.extractTokensFromContext()
 
-	parts := strings.Fields(auth)
-	if len(parts) == 0 {
-		return nil
-	}
+	var errors []error
 
-	var token string
-	if strings.EqualFold(parts[0], "Bearer") {
-		if len(parts) < 2 {
-			return nil
+	// 将access token加入黑名单
+	if accessToken != "" {
+		if err := redis.SetBlacklistToken(s.ctx, accessToken); err != nil {
+			errors = append(errors, err)
 		}
-		token = parts[1]
-	} else {
-		// 支持直接传 token 的情况
-		token = parts[0]
 	}
 
-	if err := redis.SetBlacklistToken(s.ctx, token); err != nil {
-		return err
+	// 将refresh token加入黑名单
+	if refreshToken != "" {
+		if err := redis.SetBlacklistToken(s.ctx, refreshToken); err != nil {
+			errors = append(errors, err)
+		}
+	}
+
+	// 如果有错误发生，记录日志但不阻止登出
+	if len(errors) > 0 {
+		// 这里可以添加日志记录
+		return errors[0] // 返回第一个错误
 	}
 
 	return nil
+}
+
+// extractTokensFromContext 从请求上下文中提取tokens
+func (s *UserService) extractTokensFromContext() (string, string) {
+	var accessToken, refreshToken string
+
+	// 获取access token
+	if auth := string(s.c.GetHeader("Authorization")); auth != "" {
+		accessToken = auth
+	}
+
+	// 获取refresh token
+	if refresh := string(s.c.GetHeader("Refresh-Token")); refresh != "" {
+		refreshToken = refresh
+	}
+
+	return accessToken, refreshToken
 }
 
 func (s *UserService) SendVerifyEmail(req *user.SendVerifyEmailReq) error {

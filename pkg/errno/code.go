@@ -53,6 +53,7 @@ const (
 	ServiceInvalidPassword
 	ServiceInvalidEmail
 	ServiceInvalidCode
+	ServiceInvalidParameter
 
 	ErrRecordNotFound
 	UserLogOut

@@ -4,6 +4,7 @@ import (
 	"LearnShare/pkg/errno"
 	"context"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -11,16 +12,17 @@ func IsKeyExist(ctx context.Context, key string) bool {
 	return RDB.Exists(ctx, key).Val() == 1
 }
 
-func GetCodeCache(ctx context.Context, key string) (string, error) {
+func GetCodeCache(ctx context.Context, key string) (code string, err error) {
 	value, err := RDB.Get(ctx, key).Result()
 	if err != nil {
 		return "", errno.NewErrNo(errno.InternalRedisErrorCode, "write code to cache error:"+err.Error())
 	}
-	var storedCode, timestampStr string
-	_, err = fmt.Sscanf(value, "%s_%s", &storedCode, &timestampStr)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse code: %v", err)
+	var storedCode string
+	parts := strings.Split(value, "_")
+	if len(parts) != 2 {
+		return "", fmt.Errorf("invalid code format, expected 2 parts, got %d", len(parts))
 	}
+	storedCode = parts[0]
 	return storedCode, nil
 }
 func PutCodeToCache(ctx context.Context, key, code string) error {
@@ -30,6 +32,14 @@ func PutCodeToCache(ctx context.Context, key, code string) error {
 	err := RDB.Set(ctx, key, value, expiration).Err()
 	if err != nil {
 		return errno.NewErrNo(errno.InternalRedisErrorCode, "write code to cache error:"+err.Error())
+	}
+	return nil
+}
+
+func DeleteCodeCache(ctx context.Context, key string) error {
+	err := RDB.Del(ctx, key).Err()
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "delete code from cache error:"+err.Error())
 	}
 	return nil
 }

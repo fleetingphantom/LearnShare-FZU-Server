@@ -42,6 +42,7 @@ func (u User) ToUserModule() *module.User {
 	return user
 }
 
+// 保留你的Course相关结构体
 type Course struct {
 	CourseID    int64     `json:"course_id" db:"course_id"`
 	CourseName  string    `json:"course_name" db:"course_name"`
@@ -128,59 +129,130 @@ func (c CourseComment) ToCourseCommentModule() *module.CourseComment {
 	}
 }
 
+// 添加上游的Resource相关结构体
 type Resource struct {
-	ResourceID    int64     `json:"resource_id" db:"resource_id"`
-	CourseID      int64     `json:"course_id" db:"course_id"`
-	UserID        int64     `json:"user_id" db:"user_id"`
-	Title         string    `json:"title" db:"title"`
-	Description   *string   `json:"description,omitempty" db:"description"`
-	Type          string    `json:"type" db:"type"`
-	FileURL       string    `json:"file_url" db:"file_url"`
-	FileSize      int64     `json:"file_size" db:"file_size"`
-	Status        string    `json:"status" db:"status"`
-	DownloadCount int64     `json:"download_count" db:"download_count"`
-	CreatedAt     time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt     time.Time `json:"updated_at" db:"updated_at"`
+	ResourceID    int64         `gorm:"primaryKey;autoIncrement"`
+	Title         string        `gorm:"size:255;not null"`
+	Description   string        `gorm:"type:text"`
+	FilePath      string        `gorm:"size:255;not null"`
+	FileType      string        `gorm:"size:50;not null"`
+	FileSize      int64         `gorm:"not null"`
+	UploaderID    int64         `gorm:"not null"`
+	CourseID      int64         `gorm:"not null"`
+	DownloadCount int64         `gorm:"default:0"`
+	AverageRating float64       `gorm:"default:0.0"`
+	RatingCount   int64         `gorm:"default:0"`
+	Status        int32         `gorm:"not null;default:0"`
+	CreatedAt     time.Time     `gorm:"autoCreateTime"`
+	Tags          []ResourceTag `gorm:"many2many:resource_tag_mappings;"`
 }
 
+type ResourceTag struct {
+	TagID   int64  `gorm:"primaryKey;autoIncrement"`
+	TagName string `gorm:"size:50;unique;not null"`
+}
+
+type ResourceTagMapping struct {
+	ResourceID int64 `gorm:"primaryKey"`
+	TagID      int64 `gorm:"primaryKey"`
+}
+
+// ResourceComment 资源评论模型
+type ResourceComment struct {
+	CommentID  int64     `gorm:"primaryKey;autoIncrement"`
+	UserID     int64     `gorm:"not null"`
+	ResourceID int64     `gorm:"not null"`
+	Content    string    `gorm:"type:text;not null"`
+	ParentID   *int64    `gorm:"default:NULL"`
+	Likes      int64     `gorm:"default:0"`
+	IsVisible  bool      `gorm:"default:true"`
+	Status     string    `gorm:"type:enum('normal','deleted_by_user','deleted_by_admin');default:'normal'"`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
+
+	// 关联用户信息
+	User User `gorm:"foreignKey:UserID;references:UserID"`
+}
+
+// ResourceRating 资源评分模型
+type ResourceRating struct {
+	RatingID       int64     `gorm:"primaryKey;autoIncrement"`
+	UserID         int64     `gorm:"not null"`
+	ResourceID     int64     `gorm:"not null"`
+	Recommendation float64   `gorm:"type:decimal(2,1);not null"`
+	IsVisible      bool      `gorm:"default:true"`
+	CreatedAt      time.Time `gorm:"autoCreateTime"`
+
+	// 关联用户信息
+	User User `gorm:"foreignKey:UserID;references:UserID"`
+	// 关联资源信息
+	Resource Resource `gorm:"foreignKey:ResourceID;references:ResourceID"`
+}
+
+// 添加上游的转换方法
+// ToResourceModule 将db.Resource转换为model.Resource
 func (r Resource) ToResourceModule() *module.Resource {
-	resource := &module.Resource{
+	var tags []*module.ResourceTag
+	for _, t := range r.Tags {
+		tags = append(tags, t.ToResourceTagModule())
+	}
+
+	return &module.Resource{
 		ResourceId:    r.ResourceID,
-		CourseId:      r.CourseID,
-		UploaderId:    r.UserID,
 		Title:         r.Title,
-		FilePath:      r.FileURL,
-		FileType:      r.Type,
+		Description:   &r.Description,
+		FilePath:      r.FilePath,
+		FileType:      r.FileType,
 		FileSize:      r.FileSize,
+		UploaderId:    r.UploaderID,
+		CourseId:      r.CourseID,
 		DownloadCount: r.DownloadCount,
-		AverageRating: 0.0,
-		RatingCount:   0,
-		Status:        convertResourceStatus(r.Status),
+		AverageRating: r.AverageRating,
+		RatingCount:   r.RatingCount,
+		Status:        r.Status,
 		CreatedAt:     r.CreatedAt.Unix(),
-		Tags:          []*module.ResourceTag{},
+		Tags:          tags,
 	}
-
-	// 正确处理Description - 修复类型匹配问题
-	if r.Description != nil {
-		desc := *r.Description       // 先解引用得到string
-		resource.Description = &desc // 再取地址赋值给*string
-	} else {
-		resource.Description = nil // 明确设置为nil
-	}
-
-	return resource
 }
 
-// 状态转换函数
-func convertResourceStatus(status string) int32 {
-	switch status {
-	case "pending":
-		return 0
-	case "published":
-		return 1
-	case "rejected":
-		return 2
-	default:
-		return 0
+// ToResourceTagModule 将db.ResourceTag转换为model.ResourceTag
+func (t ResourceTag) ToResourceTagModule() *module.ResourceTag {
+	return &module.ResourceTag{
+		TagId:   t.TagID,
+		TagName: t.TagName,
+	}
+}
+
+// ToResourceCommentModule 将db.ResourceComment转换为model.ResourceComment
+func (c ResourceComment) ToResourceCommentModule() *module.ResourceComment {
+	var parentId int64
+	if c.ParentID != nil {
+		parentId = *c.ParentID
+	}
+
+	var status module.ResourceCommentStatus
+	status, _ = module.ResourceCommentStatusFromString(c.Status)
+
+	return &module.ResourceComment{
+		CommentId:  c.CommentID,
+		UserId:     c.UserID,
+		ResourceId: c.ResourceID,
+		Content:    c.Content,
+		ParentId:   parentId,
+		Likes:      c.Likes,
+		IsVisible:  c.IsVisible,
+		Status:     status,
+		CreatedAt:  c.CreatedAt.Unix(),
+	}
+}
+
+// ToResourceRatingModule 将db.ResourceRating转换为model.ResourceRating
+func (r ResourceRating) ToResourceRatingModule() *module.ResourceRating {
+	return &module.ResourceRating{
+		RatingId:       r.RatingID,
+		UserId:         r.UserID,
+		ResourceId:     r.ResourceID,
+		Recommendation: r.Recommendation * 10, // 转换为0-50的浮点数
+		IsVisible:      r.IsVisible,
+		CreatedAt:      r.CreatedAt.Unix(),
 	}
 }

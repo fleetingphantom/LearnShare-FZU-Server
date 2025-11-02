@@ -12,12 +12,13 @@ var (
 	Oss          *oss
 	Smtp         *smtp
 	Verify       *verify
+	Server       *server
 	runtimeViper = viper.New()
 )
 
 // Init 目的是初始化并读入配置
 func Init() {
-	configPath := "./config.yaml"
+	configPath := "./config/config.yaml"
 
 	runtimeViper.SetConfigFile(configPath)
 	runtimeViper.SetConfigType("yaml")
@@ -49,4 +50,5 @@ func configMapping() {
 	Oss = &c.OSS
 	Smtp = &c.Smtp
 	Verify = &c.Verify
+	Server = &c.Server
 }

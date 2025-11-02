@@ -32,6 +32,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		pack.BuildFailResponse(c, err)
 		return
 	}
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
 	pack.SendResponse(c, resp)
 }
@@ -53,10 +54,16 @@ func LoginIn(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	middleware.AccessTokenJwtMiddleware.LoginHandler(ctx, c)
+	middleware.RefreshTokenJwtMiddleware.LoginHandler(ctx, c)
+
 	resp := &user.LoginInResp{
 		BaseResponse: pack.BuildBaseResp(errno.Success),
 		User:         userInfo,
 	}
+
+	c.Header("Access-Token", c.GetString("Access-Token"))
+	c.Header("Refresh-Token", c.GetString("Refresh-Token"))
 
 	pack.SendResponse(c, resp)
 }
@@ -79,6 +86,7 @@ func LoginOut(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -100,6 +108,7 @@ func SendVerifyEmail(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -121,6 +130,7 @@ func VerifyEmail(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -142,6 +152,7 @@ func UpdateEmail(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -163,6 +174,7 @@ func UpdatePassword(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -184,6 +196,7 @@ func UpdateMajor(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -200,6 +213,7 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(user.UploadAvatarResp)
 
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -221,6 +235,7 @@ func ResetPassword(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -236,6 +251,7 @@ func RefreshToken(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.RefreshTokenResp)
+	middleware.IsRefreshTokenAvailable(ctx, c)
 	middleware.GenerateAccessToken(c)
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)

@@ -38,10 +38,16 @@ type verify struct {
 	TTLSeconds int `mapstructure:"ttl_seconds"`
 }
 
+type server struct {
+	Addr string
+	Port int
+}
+
 type config struct {
 	MySQL  mySQL
 	Redis  redis
 	OSS    oss
 	Smtp   smtp   `mapstructure:"smtp"`
 	Verify verify `mapstructure:"verify"`
+	Server server
 }
