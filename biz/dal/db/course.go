@@ -206,16 +206,6 @@ func GetCourseResources(ctx context.Context, courseID int64, resourceType, statu
 	return resources, nil
 }
 
-// 获取资源详情
-func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
-	var resource Resource
-	err := DB.WithContext(ctx).Table(constants.ResourceTableName).Where("resource_id = ?", resourceID).First(&resource).Error
-	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源失败: "+err.Error())
-	}
-	return &resource, nil
-}
-
 // 创建资源
 func CreateResource(ctx context.Context, resource *Resource) error {
 	err := DB.WithContext(ctx).Table(constants.ResourceTableName).Create(resource).Error
