@@ -322,3 +322,20 @@ func DeleteResourceComment(ctx context.Context, commentID, userID int64) error {
 
 	return nil
 }
+
+// CreateReview 创建一个新的举报（审核）
+func CreateReview(ctx context.Context, targetID int64, targetType, reason string) error {
+	review := &Review{
+		TargetID:   targetID,
+		TargetType: targetType,
+		Reason:     reason,
+		Status:     "pending", // 默认为待审核
+	}
+
+	err := DB.WithContext(ctx).Create(review).Error
+	if err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建举报失败: "+err.Error())
+	}
+
+	return nil
+}

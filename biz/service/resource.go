@@ -175,3 +175,27 @@ func (s *ResourceService) DeleteResourceComment(req *resource.DeleteResourceComm
 
 	return nil
 }
+
+// ReportResource 举报一个资源
+func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error {
+	// 验证资源ID
+	if req.ResourceId <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+	}
+
+	// 验证举报原因
+	if req.Reason == "" {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "举报原因不能为空")
+	}
+	if len(req.Reason) > 500 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "举报原因不能超过500字符")
+	}
+
+	// 调用数据库层创建举报记录
+	err := db.CreateReview(s.ctx, req.ResourceId, "resource", req.Reason)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

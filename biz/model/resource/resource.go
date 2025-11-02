@@ -1674,7 +1674,8 @@ func (p *DownloadResourceResp) String() string {
 
 // 举报资源请求
 type ReportResourceReq struct {
-	ResourceId int64 `thrift:"resourceId,1,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
+	ResourceId int64  `thrift:"resourceId,1,required" json:"resourceId,required" path:"resource_id,required"`
+	Reason     string `thrift:"reason,2,required" form:"reason,required" json:"reason,required"`
 }
 
 func NewReportResourceReq() *ReportResourceReq {
@@ -1688,8 +1689,13 @@ func (p *ReportResourceReq) GetResourceId() (v int64) {
 	return p.ResourceId
 }
 
+func (p *ReportResourceReq) GetReason() (v string) {
+	return p.Reason
+}
+
 var fieldIDToName_ReportResourceReq = map[int16]string{
 	1: "resourceId",
+	2: "reason",
 }
 
 func (p *ReportResourceReq) Read(iprot thrift.TProtocol) (err error) {
@@ -1697,6 +1703,7 @@ func (p *ReportResourceReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
 	var issetResourceId bool = false
+	var issetReason bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1721,6 +1728,15 @@ func (p *ReportResourceReq) Read(iprot thrift.TProtocol) (err error) {
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetReason = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
 		default:
 			if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
@@ -1736,6 +1752,11 @@ func (p *ReportResourceReq) Read(iprot thrift.TProtocol) (err error) {
 
 	if !issetResourceId {
 		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetReason {
+		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -1767,6 +1788,17 @@ func (p *ReportResourceReq) ReadField1(iprot thrift.TProtocol) error {
 	p.ResourceId = _field
 	return nil
 }
+func (p *ReportResourceReq) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Reason = _field
+	return nil
+}
 
 func (p *ReportResourceReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
@@ -1776,6 +1808,10 @@ func (p *ReportResourceReq) Write(oprot thrift.TProtocol) (err error) {
 	if p != nil {
 		if err = p.writeField1(oprot); err != nil {
 			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
 			goto WriteFieldError
 		}
 	}
@@ -1811,6 +1847,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *ReportResourceReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("reason", thrift.STRING, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Reason); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
 func (p *ReportResourceReq) String() string {

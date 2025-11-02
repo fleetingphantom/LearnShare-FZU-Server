@@ -80,11 +80,21 @@ func ReportResource(ctx context.Context, c *app.RequestContext) {
 	var req resource.ReportResourceReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(resource.ReportResourceResp)
+
+	// 调用服务
+	err = service.NewResourceService(ctx, c).ReportResource(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 
 	pack.SendResponse(c, resp)
 }

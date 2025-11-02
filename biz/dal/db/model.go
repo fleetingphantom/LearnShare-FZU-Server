@@ -167,3 +167,15 @@ type ResourceRating struct {
 	// 关联资源信息
 	Resource Resource `gorm:"foreignKey:ResourceID;references:ResourceID"`
 }
+
+// Review 审核模型
+type Review struct {
+	ReviewID   int64     `gorm:"primaryKey;autoIncrement"`
+	UserID     int64     `gorm:"not null"`
+	TargetID   int64     `gorm:"not null"`
+	TargetType string    `gorm:"size:50;not null"`
+	Reason     string    `gorm:"type:text;not null"`
+	Status     string    `gorm:"type:enum('pending','approved','rejected');default:'pending'"`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
+	UpdatedAt  time.Time `gorm:"autoUpdateTime"`
+}
