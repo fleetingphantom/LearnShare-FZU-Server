@@ -99,5 +99,5 @@ func _sendverifyemailMw() []app.HandlerFunc {
 
 func _verifyemailMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }

@@ -9,6 +9,7 @@ require (
 	github.com/bytedance/gopkg v0.1.1
 	github.com/cloudwego/hertz v0.10.3
 	github.com/fsnotify/fsnotify v1.9.0
+	github.com/golang/mock v1.6.0
 	github.com/hertz-contrib/jwt v1.0.4
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/redis/go-redis/v9 v9.16.0
