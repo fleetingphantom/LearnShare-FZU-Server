@@ -54,10 +54,16 @@ func LoginIn(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	middleware.AccessTokenJwtMiddleware.LoginHandler(ctx, c)
+	middleware.RefreshTokenJwtMiddleware.LoginHandler(ctx, c)
+
 	resp := &user.LoginInResp{
 		BaseResponse: pack.BuildBaseResp(errno.Success),
 		User:         userInfo,
 	}
+
+	c.Header("Access-Token", c.GetString("Access-Token"))
+	c.Header("Refresh-Token", c.GetString("Refresh-Token"))
 
 	pack.SendResponse(c, resp)
 }
@@ -245,6 +251,7 @@ func RefreshToken(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.RefreshTokenResp)
+	middleware.IsRefreshTokenAvailable(ctx, c)
 	middleware.GenerateAccessToken(c)
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)

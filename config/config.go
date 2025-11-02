@@ -12,6 +12,7 @@ var (
 	Oss          *oss
 	Smtp         *smtp
 	Verify       *verify
+	Server       *server
 	runtimeViper = viper.New()
 )
 
@@ -49,4 +50,5 @@ func configMapping() {
 	Oss = &c.OSS
 	Smtp = &c.Smtp
 	Verify = &c.Verify
+	Server = &c.Server
 }
