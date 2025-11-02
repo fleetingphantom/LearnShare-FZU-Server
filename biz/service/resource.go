@@ -157,3 +157,21 @@ func (s *ResourceService) DeleteResourceRating(req *resource.DeleteResourceRatin
 
 	return nil
 }
+
+// DeleteResourceComment 删除资源评论
+func (s *ResourceService) DeleteResourceComment(req *resource.DeleteResourceCommentReq) error {
+	userID := GetUidFormContext(s.c)
+
+	// 验证评论ID
+	if req.CommentId <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "评论ID无效")
+	}
+
+	// 调用数据库层删除评论
+	err := db.DeleteResourceComment(s.ctx, req.CommentId, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

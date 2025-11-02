@@ -291,3 +291,34 @@ func DeleteResourceRating(ctx context.Context, ratingID, userID int64) error {
 
 	return nil
 }
+
+// DeleteResourceComment 删除资源评论
+func DeleteResourceComment(ctx context.Context, commentID, userID int64) error {
+	// 开始事务
+	tx := DB.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 直接删除评论，确保用户只能删除自己的评论
+	result := tx.Where("comment_id = ? AND user_id = ?", commentID, userID).Delete(&ResourceComment{})
+	if result.Error != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评论失败: "+result.Error.Error())
+	}
+
+	if result.RowsAffected == 0 {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "未找到评论或无权删除")
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交删除评论事务失败: "+err.Error())
+	}
+
+	return nil
+}

@@ -208,6 +208,16 @@ func DeleteResourceComment(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(resource.DeleteResourceCommentResp)
 
+	// 调用服务
+	err = service.NewResourceService(ctx, c).DeleteResourceComment(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	// Build response
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+
 	pack.SendResponse(c, resp)
 }
 
