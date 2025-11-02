@@ -3,7 +3,7 @@
 package course
 
 import (
-	"LearnShare/biz/middleware"
+	"LearnShare/biz/router/auth"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -23,15 +23,11 @@ func _course_ratingsMw() []app.HandlerFunc {
 }
 
 func _deletecourseratingMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		middleware.AccessTokenJwtMiddleware.MiddlewareFunc(), // 删除课程评分需要认证
-	}
+	return auth.Auth() // 删除课程评分需要认证
 }
 
 func _submitcourseratingMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		middleware.AccessTokenJwtMiddleware.MiddlewareFunc(), // 提交课程评分需要认证
-	}
+	return auth.Auth() // 提交课程评分需要认证
 }
 
 func _coursesMw() []app.HandlerFunc {
@@ -55,9 +51,7 @@ func _getcoursecommentsMw() []app.HandlerFunc {
 }
 
 func _submitcoursecommentMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		middleware.AccessTokenJwtMiddleware.MiddlewareFunc(), // 提交课程评论需要认证
-	}
+	return auth.Auth() // 提交课程评论需要认证
 }
 
 func _getcourseresourcelistMw() []app.HandlerFunc {
@@ -76,9 +70,7 @@ func _courses_commentsMw() []app.HandlerFunc {
 }
 
 func _deletecoursecommentMw() []app.HandlerFunc {
-	return []app.HandlerFunc{
-		middleware.AccessTokenJwtMiddleware.MiddlewareFunc(), // 删除课程评论需要认证
-	}
+	return auth.Auth() // 删除课程评论需要认证
 }
 
 func _course_commentsMw() []app.HandlerFunc {

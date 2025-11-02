@@ -4,10 +4,12 @@ package course
 
 import (
 	course "LearnShare/biz/model/course"
+	"LearnShare/biz/pack"
 	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
 	"context"
+
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Search .
@@ -17,22 +19,23 @@ func Search(ctx context.Context, c *app.RequestContext) {
 	var req course.SearchReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	// 创建 CourseService 实例并调用业务逻辑
-	service := service.NewCourseService(ctx, c)
-	resp, err := service.Search(&req)
+	resp := new(course.SearchResp)
+
+	// Call service
+	resp, err = service.NewCourseService(ctx, c).Search(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
-			"code":    50000,
-			"message": err.Error(),
-		})
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Build response
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
 }
 
 // GetCourseDetail .
@@ -42,22 +45,23 @@ func GetCourseDetail(ctx context.Context, c *app.RequestContext) {
 	var req course.GetCourseDetailReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	// 创建 CourseService 实例并调用业务逻辑
-	service := service.NewCourseService(ctx, c)
-	resp, err := service.GetCourseDetail(&req)
+	resp := new(course.GetCourseDetailResp)
+
+	// Call service
+	resp, err = service.NewCourseService(ctx, c).GetCourseDetail(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
-			"code":    50000,
-			"message": err.Error(),
-		})
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Build response
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
 }
 
 // GetCourseResourceList .
@@ -67,22 +71,23 @@ func GetCourseResourceList(ctx context.Context, c *app.RequestContext) {
 	var req course.GetCourseResourceListReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	//业务逻辑调用
-	service := service.NewCourseService(ctx, c)
-	resp, err := service.GetCourseResourceList(&req)
+	resp := new(course.GetCourseResourceListResp)
+
+	// Call service
+	resp, err = service.NewCourseService(ctx, c).GetCourseResourceList(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
-			"code":    50000,
-			"message": err.Error(),
-		})
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Build response
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
 }
 
 // GetCourseComments .
@@ -92,48 +97,49 @@ func GetCourseComments(ctx context.Context, c *app.RequestContext) {
 	var req course.GetCourseCommentsReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	//业务逻辑调用
-	service := service.NewCourseService(ctx, c)
-	resp, err := service.GetCourseComments(&req)
+	resp := new(course.GetCourseCommentsResp)
+
+	// Call service
+	resp, err = service.NewCourseService(ctx, c).GetCourseComments(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
-			"code":    50000,
-			"message": err.Error(),
-		})
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Build response
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
 }
 
 // SubmitCourseRating .
 // @router /api/course_ratings/{course_id} [POST]
 func SubmitCourseRating(ctx context.Context, c *app.RequestContext) {
-	
 	var err error
 	var req course.SubmitCourseRatingReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	//业务逻辑调用
-	service := service.NewCourseService(ctx, c)
-	resp, err := service.SubmitCourseRating(&req)
+	resp := new(course.SubmitCourseRatingResp)
+
+	// Call service
+	resp, err = service.NewCourseService(ctx, c).SubmitCourseRating(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
-			"code":    50000,
-			"message": err.Error(),
-		})
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Build response
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
 }
 
 // SubmitCourseComment .
@@ -143,22 +149,23 @@ func SubmitCourseComment(ctx context.Context, c *app.RequestContext) {
 	var req course.SubmitCourseCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	//业务逻辑调用
-	service := service.NewCourseService(ctx, c)
-	resp, err := service.SubmitCourseComment(&req)
+	resp := new(course.SubmitCourseCommentResp)
+
+	// Call service
+	resp, err = service.NewCourseService(ctx, c).SubmitCourseComment(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
-			"code":    50000,
-			"message": err.Error(),
-		})
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Build response
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
 }
 
 // DeleteCourseComment .
@@ -168,22 +175,23 @@ func DeleteCourseComment(ctx context.Context, c *app.RequestContext) {
 	var req course.DeleteCourseCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	//业务逻辑调用
-	service := service.NewCourseService(ctx, c)
-	resp, err := service.DeleteCourseComment(&req)
+	resp := new(course.DeleteCourseCommentResp)
+
+	// Call service
+	resp, err = service.NewCourseService(ctx, c).DeleteCourseComment(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
-			"code":    50000,
-			"message": err.Error(),
-		})
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Build response
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
 }
 
 // DeleteCourseRating .
@@ -193,20 +201,21 @@ func DeleteCourseRating(ctx context.Context, c *app.RequestContext) {
 	var req course.DeleteCourseRatingReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	// 添加业务逻辑调用
-	service := service.NewCourseService(ctx, c)
-	resp, err := service.DeleteCourseRating(&req)
+	resp := new(course.DeleteCourseRatingResp)
+
+	// Call service
+	resp, err = service.NewCourseService(ctx, c).DeleteCourseRating(&req)
 	if err != nil {
-		c.JSON(consts.StatusInternalServerError, map[string]interface{}{
-			"code":    50000,
-			"message": err.Error(),
-		})
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	c.JSON(consts.StatusOK, resp)
+	// Build response
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+
+	pack.SendResponse(c, resp)
 }
