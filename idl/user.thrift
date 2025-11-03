@@ -74,8 +74,7 @@ struct updateMajorResp {
 
 //上传头像
 struct uploadAvatarReq {
-  required i64 userId;
-  required binary avatarData;
+//  required binary avatar;
 }
 struct uploadAvatarResp {
   required model.BaseResp baseResponse;

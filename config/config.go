@@ -24,7 +24,7 @@ func Init() {
 	runtimeViper.SetConfigType("yaml")
 
 	if err := runtimeViper.ReadInConfig(); err != nil {
-		logger.Fatal("config.Init: could not find config files")
+		logger.Fatal("config.Init: 未找到配置文件")
 	}
 
 	configMapping()
@@ -43,7 +43,7 @@ func configMapping() {
 	c := new(config)
 	if err := runtimeViper.Unmarshal(&c); err != nil {
 		// 由于这个函数会在配置重载时被再次触发，所以需要判断日志记录方式
-		logger.Fatalf("config.configMapping: config: unmarshal error: %v", err)
+		logger.Fatalf("config.configMapping: 配置反序列化失败: %v", err)
 	}
 	Mysql = &c.MySQL
 	Redis = &c.Redis
