@@ -2743,7 +2743,7 @@ func (p *SubmitResourceRatingResp) String() string {
 
 // 删除资源评分请求
 type DeleteResourceRatingReq struct {
-	RatingID int64 `thrift:"rating_id,1,required" form:"rating_id,required" json:"rating_id,required" query:"rating_id,required"`
+	RatingID int64 `thrift:"rating_id,1,required" json:"rating_id,required" path:"rating_id,required"`
 }
 
 func NewDeleteResourceRatingReq() *DeleteResourceRatingReq {
@@ -3046,7 +3046,7 @@ func (p *DeleteResourceRatingResp) String() string {
 
 // 提交资源评价请求
 type SubmitResourceCommentReq struct {
-	ResourceID int64  `thrift:"resource_id,1,required" form:"resource_id,required" json:"resource_id,required" query:"resource_id,required"`
+	ResourceID int64  `thrift:"resource_id,1,required" json:"resource_id,required" path:"resource_id,required"`
 	Content    string `thrift:"content,2,required" form:"content,required" json:"content,required" query:"content,required"`
 	ParentId   *int64 `thrift:"parentId,3,optional" form:"parentId" json:"parentId,omitempty" query:"parentId"`
 }
@@ -3459,7 +3459,7 @@ func (p *SubmitResourceCommentResp) String() string {
 
 // 删除资源评价请求
 type DeleteResourceCommentReq struct {
-	CommentID int64 `thrift:"comment_id,1,required" form:"comment_id,required" json:"comment_id,required" query:"comment_id,required"`
+	CommentID int64 `thrift:"comment_id,1,required" json:"comment_id,required" path:"comment_id,required"`
 }
 
 func NewDeleteResourceCommentReq() *DeleteResourceCommentReq {
@@ -3762,7 +3762,7 @@ func (p *DeleteResourceCommentResp) String() string {
 
 // 获取资源评论列表请求
 type GetResourceCommentsReq struct {
-	ResourceID int64 `thrift:"resource_id,1,required" form:"resource_id,required" json:"resource_id,required" query:"resource_id,required"`
+	ResourceID int64 `thrift:"resource_id,1,required" json:"resource_id,required" path:"resource_id,required"`
 	PageSize   int32 `thrift:"page_size,2,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
 	PageNum    int32 `thrift:"page_num,3,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
 	// latest, hottest

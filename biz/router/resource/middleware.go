@@ -89,7 +89,7 @@ func _resource_ratingsMw() []app.HandlerFunc {
 
 func _deleteresourceratingMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _submitresourceratingMw() []app.HandlerFunc {
@@ -123,6 +123,11 @@ func _resources1Mw() []app.HandlerFunc {
 }
 
 func _resource_idMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_id0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

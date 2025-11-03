@@ -28,9 +28,15 @@ func Register(r *server.Hertz) {
 			_resource_id.POST("/report", append(_reportresourceMw(), resource.ReportResource)...)
 		}
 		{
+			_resource := _api.Group("/resource", _resourceMw()...)
+			{
+				_resource_id0 := _resource.Group("/:resource_id", _resource_id0Mw()...)
+				_resource_id0.GET("/comment", append(_getresourcecommentsMw(), resource.GetResourceComments)...)
+			}
+		}
+		{
 			_resource_comments := _api.Group("/resource_comments", _resource_commentsMw()...)
 			_resource_comments.DELETE("/:comment_id", append(_deleteresourcecommentMw(), resource.DeleteResourceComment)...)
-			_resource_comments.GET("/:resource_id", append(_getresourcecommentsMw(), resource.GetResourceComments)...)
 			_resource_comments.POST("/:resource_id", append(_submitresourcecommentMw(), resource.SubmitResourceComment)...)
 		}
 		{
