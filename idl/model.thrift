@@ -10,14 +10,14 @@ struct User{
     required string username,
     optional string password,
     required string email,
-    required i64 collegeId,
-    required i64 majorId,
-    required string avatarUrl,
-    required i64 reputationScore,
+    required i64 college_id,
+    required i64 major_id,
+    required string avatar_url,
+    required i64 reputation_score,
     required i64 roleId,
     required string status,
-    required i64 createdAt,
-    required i64 updatedAt,
+    required i64 created_at,
+    required i64 updated_at,
 }
 
 struct Course{

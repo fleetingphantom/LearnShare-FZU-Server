@@ -209,7 +209,7 @@ func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
 }
 
 func (s *UserService) GetUserInfo(req *user.GetUserInfoReq) (*module.User, error) {
-	userInfo, err := db.GetUserByID(s.ctx, req.UserId)
+	userInfo, err := db.GetUserByID(s.ctx, req.UserID)
 	if err != nil {
 		return nil, err
 	}

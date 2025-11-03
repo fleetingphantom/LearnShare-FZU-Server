@@ -1712,7 +1712,7 @@ func (p *VerifyEmailResp) String() string {
 
 // 修改邮箱
 type UpdateEmailReq struct {
-	NewEmail string `thrift:"newEmail,1,required" form:"newEmail,required" json:"newEmail,required" query:"newEmail,required"`
+	NewEmail string `thrift:"new_email,1,required" form:"new_email,required" json:"new_email,required" query:"new_email,required"`
 	Code     string `thrift:"code,2,required" form:"code,required" json:"code,required" query:"code,required"`
 }
 
@@ -1732,7 +1732,7 @@ func (p *UpdateEmailReq) GetCode() (v string) {
 }
 
 var fieldIDToName_UpdateEmailReq = map[int16]string{
-	1: "newEmail",
+	1: "new_email",
 	2: "code",
 }
 
@@ -1870,7 +1870,7 @@ WriteStructEndError:
 }
 
 func (p *UpdateEmailReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("newEmail", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("new_email", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.NewEmail); err != nil {
@@ -2065,8 +2065,8 @@ func (p *UpdateEmailResp) String() string {
 
 // 修改密码
 type UpdatePasswordReq struct {
-	OldPassword string `thrift:"oldPassword,1,required" form:"oldPassword,required" json:"oldPassword,required" query:"oldPassword,required"`
-	NewPassword string `thrift:"newPassword,2,required" form:"newPassword,required" json:"newPassword,required" query:"newPassword,required"`
+	OldPassword string `thrift:"old_password,1,required" form:"old_password,required" json:"old_password,required" query:"old_password,required"`
+	NewPassword string `thrift:"new_password,2,required" form:"new_password,required" json:"new_password,required" query:"new_password,required"`
 }
 
 func NewUpdatePasswordReq() *UpdatePasswordReq {
@@ -2085,8 +2085,8 @@ func (p *UpdatePasswordReq) GetNewPassword() (v string) {
 }
 
 var fieldIDToName_UpdatePasswordReq = map[int16]string{
-	1: "oldPassword",
-	2: "newPassword",
+	1: "old_password",
+	2: "new_password",
 }
 
 func (p *UpdatePasswordReq) Read(iprot thrift.TProtocol) (err error) {
@@ -2223,7 +2223,7 @@ WriteStructEndError:
 }
 
 func (p *UpdatePasswordReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("oldPassword", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("old_password", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.OldPassword); err != nil {
@@ -2239,7 +2239,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 func (p *UpdatePasswordReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("newPassword", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("new_password", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteString(p.NewPassword); err != nil {
@@ -2418,7 +2418,7 @@ func (p *UpdatePasswordResp) String() string {
 
 // 修改专业
 type UpdateMajorReq struct {
-	NewMajorId int64 `thrift:"newMajorId,1,required" form:"newMajorId,required" json:"newMajorId,required" query:"newMajorId,required"`
+	NewMajorId int64 `thrift:"new_majorId,1,required" form:"new_majorId,required" json:"new_majorId,required" query:"new_majorId,required"`
 }
 
 func NewUpdateMajorReq() *UpdateMajorReq {
@@ -2433,7 +2433,7 @@ func (p *UpdateMajorReq) GetNewMajorId() (v int64) {
 }
 
 var fieldIDToName_UpdateMajorReq = map[int16]string{
-	1: "newMajorId",
+	1: "new_majorId",
 }
 
 func (p *UpdateMajorReq) Read(iprot thrift.TProtocol) (err error) {
@@ -2540,7 +2540,7 @@ WriteStructEndError:
 }
 
 func (p *UpdateMajorReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("newMajorId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("new_majorId", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI64(p.NewMajorId); err != nil {
@@ -3713,7 +3713,7 @@ func (p *RefreshTokenResp) String() string {
 
 // 获取用户信息
 type GetUserInfoReq struct {
-	UserId int64 `thrift:"userId,1,required" json:"userId,required" path:"user_id,required"`
+	UserID int64 `thrift:"user_id,1,required" json:"user_id,required" path:"user_id,required"`
 }
 
 func NewGetUserInfoReq() *GetUserInfoReq {
@@ -3723,18 +3723,18 @@ func NewGetUserInfoReq() *GetUserInfoReq {
 func (p *GetUserInfoReq) InitDefault() {
 }
 
-func (p *GetUserInfoReq) GetUserId() (v int64) {
-	return p.UserId
+func (p *GetUserInfoReq) GetUserID() (v int64) {
+	return p.UserID
 }
 
 var fieldIDToName_GetUserInfoReq = map[int16]string{
-	1: "userId",
+	1: "user_id",
 }
 
 func (p *GetUserInfoReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetUserId bool = false
+	var issetUserID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -3755,7 +3755,7 @@ func (p *GetUserInfoReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetUserId = true
+				issetUserID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -3772,7 +3772,7 @@ func (p *GetUserInfoReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetUserId {
+	if !issetUserID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -3802,7 +3802,7 @@ func (p *GetUserInfoReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.UserId = _field
+	p.UserID = _field
 	return nil
 }
 
@@ -3835,10 +3835,10 @@ WriteStructEndError:
 }
 
 func (p *GetUserInfoReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("userId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("user_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.UserId); err != nil {
+	if err := oprot.WriteI64(p.UserID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
