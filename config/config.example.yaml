@@ -28,3 +28,7 @@ smtp:
 verify:
   code_length: 6
   ttl_seconds: 600
+  
+server:
+  addr: "0.0.0.0"
+  port: 8888

@@ -12,6 +12,7 @@ require (
 	github.com/hertz-contrib/jwt v1.0.4
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/redis/go-redis/v9 v9.16.0
+	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.21.0
 	golang.org/x/crypto v0.35.0
 	gorm.io/driver/mysql v1.6.0

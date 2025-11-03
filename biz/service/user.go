@@ -65,23 +65,12 @@ func (s *UserService) LoginIn(req *user.LoginInReq) (*module.User, error) {
 
 func (s *UserService) LoginOut() error {
 	// 获取当前用户ID用于日志记录
-	// 从context中获取JWT payload，提取token
-	accessToken, refreshToken := s.extractTokensFromContext()
 
 	var errors []error
 
-	// 将access token加入黑名单
-	if accessToken != "" {
-		if err := redis.SetBlacklistToken(s.ctx, accessToken); err != nil {
-			errors = append(errors, err)
-		}
-	}
-
-	// 将refresh token加入黑名单
-	if refreshToken != "" {
-		if err := redis.SetBlacklistToken(s.ctx, refreshToken); err != nil {
-			errors = append(errors, err)
-		}
+	uuidStr := GetUuidFormContext(s.c)
+	if err := redis.SetBlacklistToken(s.ctx, uuidStr); err != nil {
+		errors = append(errors, err)
 	}
 
 	// 如果有错误发生，记录日志但不阻止登出
@@ -91,23 +80,6 @@ func (s *UserService) LoginOut() error {
 	}
 
 	return nil
-}
-
-// extractTokensFromContext 从请求上下文中提取tokens
-func (s *UserService) extractTokensFromContext() (string, string) {
-	var accessToken, refreshToken string
-
-	// 获取access token
-	if auth := string(s.c.GetHeader("Authorization")); auth != "" {
-		accessToken = auth
-	}
-
-	// 获取refresh token
-	if refresh := string(s.c.GetHeader("Refresh-Token")); refresh != "" {
-		refreshToken = refresh
-	}
-
-	return accessToken, refreshToken
 }
 
 func (s *UserService) SendVerifyEmail(req *user.SendVerifyEmailReq) error {

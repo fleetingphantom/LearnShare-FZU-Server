@@ -16,7 +16,7 @@ func SendResponse(c *app.RequestContext, data interface{}) {
 
 func SendFailResponse(c *app.RequestContext, data *module.BaseResp) {
 	c.JSON(consts.StatusBadRequest, utils.H{
-		"base": data,
+		"baseResponse": data,
 	})
 }
 
