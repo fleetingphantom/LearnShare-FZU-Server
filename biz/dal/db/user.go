@@ -4,8 +4,12 @@ import (
 	"LearnShare/pkg/constants"
 	"LearnShare/pkg/errno"
 	"context"
+	"errors"
+
+	"gorm.io/gorm"
 )
 
+// CreateUser 创建新用户
 func CreateUser(ctx context.Context, username, passwordHash, email string) error {
 	user := &User{
 		Username:     username,
@@ -17,11 +21,15 @@ func CreateUser(ctx context.Context, username, passwordHash, email string) error
 
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Create(user).Error
 	if err != nil {
+		if errors.As(err, &gorm.ErrDuplicatedKey) {
+			return errno.NewErrNo(errno.ServiceUserExist, "用户已存在")
+		}
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建用户失败: "+err.Error())
 	}
 	return nil
 }
 
+// UpdateUserPassword 更新用户密码
 func UpdateUserPassword(ctx context.Context, userID int64, newPasswordHash string) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("password_hash", newPasswordHash).Error
 	if err != nil {
@@ -30,6 +38,7 @@ func UpdateUserPassword(ctx context.Context, userID int64, newPasswordHash strin
 	return nil
 }
 
+// UpdateMajorID 更新用户专业ID
 func UpdateMajorID(ctx context.Context, userID int, majorID int) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("major_id", majorID).Error
 	if err != nil {
@@ -38,6 +47,15 @@ func UpdateMajorID(ctx context.Context, userID int, majorID int) error {
 	return nil
 }
 
+func UpdateAvatarURL(ctx context.Context, userID int64, avatarURL string) error {
+	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("avatar_url", avatarURL).Error
+	if err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户头像失败: "+err.Error())
+	}
+	return nil
+}
+
+// UpdateUserStatues 更新用户状态
 func UpdateUserStatues(ctx context.Context, userID int64, newStatus string) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("status", newStatus).Error
 	if err != nil {
@@ -46,6 +64,7 @@ func UpdateUserStatues(ctx context.Context, userID int64, newStatus string) erro
 	return nil
 }
 
+// UpdateUserEmail 更新用户邮箱
 func UpdateUserEmail(ctx context.Context, userID int, newEmail string) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("email", newEmail).Error
 	if err != nil {
@@ -54,20 +73,22 @@ func UpdateUserEmail(ctx context.Context, userID int, newEmail string) error {
 	return nil
 }
 
+// GetUserByEmail 根据邮箱查询用户
 func GetUserByEmail(ctx context.Context, email string) (*User, error) {
 	var user User
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("email = ?", email).First(&user).Error
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询用户失败: "+err.Error())
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询用户失败")
 	}
 	return &user, nil
 }
 
+// GetUserByID 根据用户ID查询用户
 func GetUserByID(ctx context.Context, id int64) (*User, error) {
 	var user User
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", id).First(&user).Error
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询用户失败: "+err.Error())
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询用户失败")
 	}
 	return &user, nil
 }

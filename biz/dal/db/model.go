@@ -31,13 +31,13 @@ func (u User) ToUserModule() *module.User {
 	}
 
 	if u.AvatarURL != nil {
-		user.AvatarUrl = *u.AvatarURL
+		user.AvatarURL = *u.AvatarURL
 	}
 	if u.CollegeID != nil {
-		user.CollegeId = *u.CollegeID
+		user.CollegeID = *u.CollegeID
 	}
 	if u.MajorID != nil {
-		user.MajorId = *u.MajorID
+		user.MajorID = *u.MajorID
 	}
 	return user
 }
@@ -255,4 +255,14 @@ func (r ResourceRating) ToResourceRatingModule() *module.ResourceRating {
 		IsVisible:      r.IsVisible,
 		CreatedAt:      r.CreatedAt.Unix(),
 	}
+// Review 审核模型
+type Review struct {
+	ReviewID   int64     `gorm:"primaryKey;autoIncrement"`
+	UserID     int64     `gorm:"not null"`
+	TargetID   int64     `gorm:"not null"`
+	TargetType string    `gorm:"size:50;not null"`
+	Reason     string    `gorm:"type:text;not null"`
+	Status     string    `gorm:"type:enum('pending','approved','rejected');default:'pending'"`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
+	UpdatedAt  time.Time `gorm:"autoUpdateTime"`
 }

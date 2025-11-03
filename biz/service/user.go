@@ -5,9 +5,15 @@ import (
 	"LearnShare/biz/dal/redis"
 	"LearnShare/biz/model/module"
 	"LearnShare/biz/model/user"
+	oss "LearnShare/pkg"
 	"LearnShare/pkg/errno"
 	"LearnShare/pkg/utils"
 	"context"
+	"mime/multipart"
+	"path"
+	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -65,23 +71,12 @@ func (s *UserService) LoginIn(req *user.LoginInReq) (*module.User, error) {
 
 func (s *UserService) LoginOut() error {
 	// 获取当前用户ID用于日志记录
-	// 从context中获取JWT payload，提取token
-	accessToken, refreshToken := s.extractTokensFromContext()
 
 	var errors []error
 
-	// 将access token加入黑名单
-	if accessToken != "" {
-		if err := redis.SetBlacklistToken(s.ctx, accessToken); err != nil {
-			errors = append(errors, err)
-		}
-	}
-
-	// 将refresh token加入黑名单
-	if refreshToken != "" {
-		if err := redis.SetBlacklistToken(s.ctx, refreshToken); err != nil {
-			errors = append(errors, err)
-		}
+	uuidStr := GetUuidFormContext(s.c)
+	if err := redis.SetBlacklistToken(s.ctx, uuidStr); err != nil {
+		errors = append(errors, err)
 	}
 
 	// 如果有错误发生，记录日志但不阻止登出
@@ -91,23 +86,6 @@ func (s *UserService) LoginOut() error {
 	}
 
 	return nil
-}
-
-// extractTokensFromContext 从请求上下文中提取tokens
-func (s *UserService) extractTokensFromContext() (string, string) {
-	var accessToken, refreshToken string
-
-	// 获取access token
-	if auth := string(s.c.GetHeader("Authorization")); auth != "" {
-		accessToken = auth
-	}
-
-	// 获取refresh token
-	if refresh := string(s.c.GetHeader("Refresh-Token")); refresh != "" {
-		refreshToken = refresh
-	}
-
-	return accessToken, refreshToken
 }
 
 func (s *UserService) SendVerifyEmail(req *user.SendVerifyEmailReq) error {
@@ -133,13 +111,17 @@ func (s *UserService) VerifyEmail(req *user.VerifyEmailReq) error {
 
 	userId := GetUidFormContext(s.c)
 
+	if !redis.IsKeyExist(s.ctx, req.Email) {
+		return errno.UserVerificationCodeExpiredError
+	}
+
 	storeCode, err := redis.GetCodeCache(s.ctx, req.Email)
 	if err != nil {
 		return err
 	}
 
 	if storeCode != req.Code {
-		return errno.NewErrNo(errno.ServiceInvalidCode, "验证码不正确")
+		return errno.UserVerificationCodeInvalidError
 	}
 
 	err = db.UpdateUserStatues(s.ctx, userId, "active")
@@ -159,7 +141,7 @@ func (s *UserService) UpdateEmail(req *user.UpdateEmailReq) error {
 	}
 
 	if storeCode != req.Code {
-		return errno.NewErrNo(errno.ServiceInvalidCode, "验证码不正确")
+		return errno.UserVerificationCodeInvalidError
 	}
 
 	err = db.UpdateUserEmail(s.ctx, int(userId), req.NewEmail)
@@ -177,7 +159,7 @@ func (s *UserService) UpdatePassword(req *user.UpdatePasswordReq) error {
 	}
 
 	if err := utils.ComparePassword(userInfo.PasswordHash, req.OldPassword); err != nil {
-		return errno.NewErrNo(errno.ServiceInvalidPassword, "旧密码不正确")
+		return errno.UserPasswordIncorrectError
 	}
 	newPasswordHash, err := utils.EncryptPassword(req.NewPassword)
 	if err != nil {
@@ -205,8 +187,33 @@ func (s *UserService) UpdateMajor(req *user.UpdateMajorReq) error {
 	return nil
 }
 
-func (s *UserService) uploadAvatarReq(req *user.UploadAvatarReq) (string, error) {
-	return "", nil
+func (s *UserService) UploadAvatar(data *multipart.FileHeader) error {
+	userId := GetUidFormContext(s.c)
+
+	err := oss.IsImage(data)
+	if err != nil {
+		return err
+	}
+
+	ext := strings.ToLower(path.Ext(data.Filename))
+
+	fileName := strconv.FormatInt(userId, 10) + ext
+	storePath := filepath.Join("static", strconv.FormatInt(userId, 10), "avatar")
+
+	if err = oss.SaveFile(data, storePath, fileName); err != nil {
+		return err
+	}
+
+	url, err := oss.Upload(filepath.Join(storePath, fileName), fileName, "avatar", userId)
+	if err != nil {
+		return err
+	}
+
+	err = db.UpdateAvatarURL(s.ctx, userId, url)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
@@ -216,7 +223,7 @@ func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
 	}
 
 	if storeCode != req.Code {
-		return errno.NewErrNo(errno.ServiceInvalidCode, "验证码不正确")
+		return errno.UserVerificationCodeInvalidError
 	}
 
 	newPasswordHash, err := utils.EncryptPassword(req.NewPassword)
@@ -237,7 +244,7 @@ func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
 }
 
 func (s *UserService) GetUserInfo(req *user.GetUserInfoReq) (*module.User, error) {
-	userInfo, err := db.GetUserByID(s.ctx, req.UserId)
+	userInfo, err := db.GetUserByID(s.ctx, req.UserID)
 	if err != nil {
 		return nil, err
 	}

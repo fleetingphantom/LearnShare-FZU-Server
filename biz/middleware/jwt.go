@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/hertz-contrib/jwt"
+	"github.com/satori/go.uuid"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -20,6 +21,11 @@ var (
 	AccessTokenJwtMiddleware  *jwt.HertzJWTMiddleware
 	RefreshTokenJwtMiddleware *jwt.HertzJWTMiddleware
 )
+
+type JwtCustomClaims struct {
+	UserId int64  `json:"userid"`
+	UUID   string `json:"uuid"`
+}
 
 func AccessTokenJwt() {
 	var err error
@@ -33,10 +39,11 @@ func AccessTokenJwt() {
 		IdentityKey:                 constants.IdentityKey,
 
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(int64); ok {
+			if v, ok := data.(*JwtCustomClaims); ok {
 				return jwt.MapClaims{
-					AccessTokenJwtMiddleware.IdentityKey: v,
+					AccessTokenJwtMiddleware.IdentityKey: v.UserId,
 					constants.TokenType:                  "access",
+					constants.UUID:                       v.UUID,
 				}
 			}
 			return jwt.MapClaims{}
@@ -44,7 +51,11 @@ func AccessTokenJwt() {
 
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
-			return claims[AccessTokenJwtMiddleware.IdentityKey]
+			resp := &JwtCustomClaims{
+				UserId: int64(claims[RefreshTokenJwtMiddleware.IdentityKey].(float64)),
+				UUID:   claims[constants.UUID].(string),
+			}
+			return resp
 		},
 
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
@@ -64,13 +75,16 @@ func AccessTokenJwt() {
 			if err != nil {
 				return nil, err
 			}
-
 			c.Set(constants.ContextUid, users.UserId)
-			return users.UserId, nil
+			claims := &JwtCustomClaims{
+				UserId: users.UserId,
+				UUID:   uuid.NewV1().String(),
+			}
+			return claims, nil
 		},
 	})
 	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
+		log.Fatal("JWT 错误：" + err.Error())
 	}
 }
 
@@ -85,16 +99,23 @@ func RefreshTokenJwt() {
 		IdentityKey:                 constants.IdentityKey,
 
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			return jwt.MapClaims{
-				RefreshTokenJwtMiddleware.IdentityKey: data,
-				constants.TokenType:                   "refresh",
+			if v, ok := data.(*JwtCustomClaims); ok {
+				return jwt.MapClaims{
+					AccessTokenJwtMiddleware.IdentityKey: v.UserId,
+					constants.TokenType:                  "refresh",
+					constants.UUID:                       v.UUID,
+				}
 			}
+			return jwt.MapClaims{}
 		},
 
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
-
-			return claims[RefreshTokenJwtMiddleware.IdentityKey]
+			resp := &JwtCustomClaims{
+				UserId: int64(claims[RefreshTokenJwtMiddleware.IdentityKey].(float64)),
+				UUID:   claims[constants.UUID].(string),
+			}
+			return resp
 		},
 
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
@@ -106,22 +127,32 @@ func RefreshTokenJwt() {
 		},
 
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
-			uid, exist := c.Get("userid")
-			if !exist {
-				return nil, err
+			userId := service.GetUidFormContext(c)
+			uuidStr := service.GetUuidFormContext(c)
+
+			claims := &JwtCustomClaims{
+				UserId: userId,
+				UUID:   uuidStr,
 			}
 
-			return uid, nil
+			return claims, nil
 
 		},
 	})
 	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
+		log.Fatal("JWT 错误：" + err.Error())
 	}
 }
 
 func GenerateAccessToken(c *app.RequestContext) {
-	data := service.GetUidFormContext(c)
+
+	userId := service.GetUidFormContext(c)
+	uuidStr := service.GetUuidFormContext(c)
+	data := &JwtCustomClaims{
+		UserId: userId,
+		UUID:   uuidStr,
+	}
+
 	tokenString, _, _ := AccessTokenJwtMiddleware.TokenGenerator(data)
 	c.Header("New-Access-Token", tokenString)
 
@@ -132,7 +163,6 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 	if err != nil {
 		return false
 	}
-
 	// 验证token类型是否为access
 	if tokenType, ok := claims[constants.TokenType].(string); !ok || tokenType != "access" {
 		return false
@@ -159,7 +189,8 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 	c.Set("JWT_PAYLOAD", claims)
 	identity := AccessTokenJwtMiddleware.IdentityHandler(ctx, c)
 	if identity != nil {
-		c.Set(AccessTokenJwtMiddleware.IdentityKey, identity)
+		c.Set(constants.IdentityKey, identity.(*JwtCustomClaims).UserId)
+		c.Set(constants.UUID, identity.(*JwtCustomClaims).UUID)
 	}
 	if !AccessTokenJwtMiddleware.Authorizator(identity, ctx, c) {
 		return false
@@ -202,7 +233,8 @@ func IsRefreshTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 	c.Set("JWT_PAYLOAD", claims)
 	identity := RefreshTokenJwtMiddleware.IdentityHandler(ctx, c)
 	if identity != nil {
-		c.Set(RefreshTokenJwtMiddleware.IdentityKey, identity)
+		c.Set(constants.IdentityKey, identity.(*JwtCustomClaims).UserId)
+		c.Set(constants.UUID, identity.(*JwtCustomClaims).UUID)
 	}
 	if !RefreshTokenJwtMiddleware.Authorizator(identity, ctx, c) {
 		return false
@@ -217,11 +249,11 @@ func Init() {
 	errInit := AccessTokenJwtMiddleware.MiddlewareInit()
 
 	if errInit != nil {
-		log.Fatal("AccessTokenJwtMiddleware.MiddlewareInit() Error:" + errInit.Error())
+		log.Fatal("AccessTokenJwtMiddleware.MiddlewareInit() 错误：" + errInit.Error())
 	}
 
 	errInit = RefreshTokenJwtMiddleware.MiddlewareInit()
 	if errInit != nil {
-		log.Fatal("RefreshTokenJwtMiddleware.MiddlewareInit() Error:" + errInit.Error())
+		log.Fatal("RefreshTokenJwtMiddleware.MiddlewareInit() 错误：" + errInit.Error())
 	}
 }

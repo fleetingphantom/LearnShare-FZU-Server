@@ -15,7 +15,7 @@ oss:
   accessKey-id: "your-access-key-id"
   accessKey-secret: "your-access-key-secret"
   BucketName: "learnshare-bucket"
-  main-directory: "files"
+  zone: "files"
 
 smtp:
   host: "smtp.mailtrap.io"
@@ -28,3 +28,7 @@ smtp:
 verify:
   code_length: 6
   ttl_seconds: 600
+  
+server:
+  addr: "0.0.0.0"
+  port: 8888

@@ -15,4 +15,13 @@ const (
 	CourseRatingTableName  = "course_ratings"
 	CourseCommentTableName = "course_comments"
 	ResourceTableName      = "resources"
+	UserTableName               = "users"
+	ResourceTableName           = "resource"
+	ResourceTagMappingTableName = "resource_tag_mapping"
+	ResourceCommentTableName    = "resource_comment"
+	ResourceRatingTableName     = "resource_rating"
+	ReviewTableName             = "review"
+	PermissionTableName         = "permissions"
+	RolePermissionTableName     = "role_permissions"
+	RoleTableName               = "roles"
 )

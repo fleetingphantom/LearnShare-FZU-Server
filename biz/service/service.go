@@ -7,6 +7,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
+// GetUidFormContext 从请求上下文中获取用户ID
 func GetUidFormContext(c *app.RequestContext) int64 {
 	uid, _ := c.Get(constants.ContextUid)
 	userid, err := convertToInt64(uid)
@@ -17,6 +18,7 @@ func GetUidFormContext(c *app.RequestContext) int64 {
 	return userid
 }
 
+// convertToInt64 将各种数值类型转换为int64
 func convertToInt64(value interface{}) (int64, error) {
 	switch v := value.(type) {
 	case int:
@@ -32,4 +34,14 @@ func convertToInt64(value interface{}) (int64, error) {
 	default:
 		return 0, errno.NewErrNo(errno.InternalServiceErrorCode, "无法转换为int64类型")
 	}
+}
+
+// GetUuidFormContext 从请求上下文中获取UUID
+func GetUuidFormContext(c *app.RequestContext) string {
+	uuid, _ := c.Get(constants.UUID)
+	uuidStr, ok := uuid.(string)
+	if !ok {
+		panic(errno.NewErrNo(errno.InternalServiceErrorCode, "无法转换为string类型"))
+	}
+	return uuidStr
 }

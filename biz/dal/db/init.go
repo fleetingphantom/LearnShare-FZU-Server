@@ -14,10 +14,11 @@ import (
 
 var DB *gorm.DB
 
+// Init 初始化数据库连接
 func Init() error {
 	dsn, err := utils.GetMysqlDSN()
 	if err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL get mysql DSN error: %v", err))
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("数据库初始化获取DSN失败: %v", err))
 	}
 
 	DB, err = gorm.Open(mysql.Open(dsn),
@@ -30,12 +31,12 @@ func Init() error {
 			},
 		})
 	if err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL mysql connect error: %v", err))
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL 连接数据库失败: %v", err))
 	}
 
 	sqlDB, err := DB.DB()
 	if err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL mysql get db error: %v", err))
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL 获取数据库句柄失败: %v", err))
 	}
 
 	sqlDB.SetMaxIdleConns(constants.MaxIdleConns)       // 最大闲置连接数
@@ -45,7 +46,7 @@ func Init() error {
 	DB = DB.WithContext(context.Background())
 
 	if err = sqlDB.Ping(); err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("ping database error: %v", err))
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("数据库连通性检查失败: %v", err))
 	}
 
 	return nil

@@ -47,7 +47,7 @@ struct VerifyEmailResp {
 
 //修改邮箱
 struct updateEmailReq {
-  required string newEmail;
+  required string new_email;
   required string code;
 }
 struct updateEmailResp {
@@ -56,8 +56,8 @@ struct updateEmailResp {
 
 //修改密码
 struct UpdatePasswordReq {
-  required string oldPassword;
-  required string newPassword;
+  required string old_password;
+  required string new_password;
 }
 struct UpdatePasswordResp {
   required model.BaseResp baseResponse;
@@ -65,7 +65,7 @@ struct UpdatePasswordResp {
 
 //修改专业
 struct updateMajorReq {
-  required i64 newMajorId;
+  required i64 new_majorId;
 }
 struct updateMajorResp {
   required model.BaseResp baseResponse;
@@ -74,8 +74,7 @@ struct updateMajorResp {
 
 //上传头像
 struct uploadAvatarReq {
-  required i64 userId;
-  required binary avatarData;
+//  required binary avatar;
 }
 struct uploadAvatarResp {
   required model.BaseResp baseResponse;
@@ -102,7 +101,7 @@ struct RefreshTokenResp {
 
 //获取用户信息
 struct GetUserInfoReq {
-  required i64 userId (api.path="user_id");
+  required i64 user_id (api.path="user_id");
 }
 struct GetUserInfoResp {
   required model.BaseResp baseResponse;

@@ -26,7 +26,7 @@ func NewResourceService(ctx context.Context, c *app.RequestContext) *ResourceSer
 func (s *ResourceService) SearchResources(req *resource.SearchResourceReq) ([]*model.Resource, int64, error) {
 	// 验证搜索关键词长度
 	if req.Keyword != nil && *req.Keyword != "" && len(*req.Keyword) > 100 {
-		return nil, 0, errno.NewErrNo(errno.ServiceInvalidParameter, "搜索关键词过长")
+		return nil, 0, errno.ValidationKeywordTooLongError
 	}
 
 	// 验证分页参数
@@ -54,7 +54,7 @@ func (s *ResourceService) SearchResources(req *resource.SearchResourceReq) ([]*m
 func (s *ResourceService) GetResource(req *resource.GetResourceReq) (*model.Resource, error) {
 	// 验证资源ID
 	if req.ResourceId <= 0 {
-		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+		return nil, errno.ResourceInvalidIDError
 	}
 
 	resource, err := db.GetResourceByID(s.ctx, req.ResourceId)
@@ -69,7 +69,7 @@ func (s *ResourceService) GetResource(req *resource.GetResourceReq) (*model.Reso
 func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceComment, int64, error) {
 	// 验证资源ID
 	if req.ResourceId <= 0 {
-		return nil, 0, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+		return nil, 0, errno.ResourceInvalidIDError
 	}
 
 	// 验证分页参数
@@ -100,7 +100,7 @@ func (s *ResourceService) SubmitResourceRating(req *resource.SubmitResourceRatin
 
 	// 验证评分范围
 	if req.Rating < 0 || req.Rating > 5 {
-		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "评分必须在0-5之间")
+		return nil, errno.ValidationRatingRangeInvalidError
 	}
 
 	// 调用数据库层提交评分，使用rating字段
@@ -118,11 +118,11 @@ func (s *ResourceService) SubmitResourceComment(req *resource.SubmitResourceComm
 
 	// 验证评论内容
 	if req.Content == "" {
-		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "评论内容不能为空")
+		return nil, errno.ResourceInvalidCommentError
 	}
 
 	if len(req.Content) > 1000 {
-		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "评论内容不能超过1000字符")
+		return nil, errno.ValidationCommentTooLongError
 	}
 
 	// 处理父评论ID
@@ -138,4 +138,64 @@ func (s *ResourceService) SubmitResourceComment(req *resource.SubmitResourceComm
 	}
 
 	return comment.ToResourceCommentModule(), nil
+}
+
+// DeleteResourceRating 执行删除资源评分
+func (s *ResourceService) DeleteResourceRating(req *resource.DeleteResourceRatingReq) error {
+	userID := GetUidFormContext(s.c)
+
+	// 验证评分ID
+	if req.RatingId <= 0 {
+		return errno.ValidationResourceIDInvalidError
+	}
+
+	// 调用数据库层删除评分
+	err := db.DeleteResourceRating(s.ctx, req.RatingId, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteResourceComment 删除资源评论
+func (s *ResourceService) DeleteResourceComment(req *resource.DeleteResourceCommentReq) error {
+	userID := GetUidFormContext(s.c)
+
+	// 验证评论ID
+	if req.CommentId <= 0 {
+		return errno.ValidationResourceIDInvalidError
+	}
+
+	// 调用数据库层删除评论
+	err := db.DeleteResourceComment(s.ctx, req.CommentId, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ReportResource 举报一个资源
+func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error {
+	// 验证资源ID
+	if req.ResourceId <= 0 {
+		return errno.ResourceInvalidIDError
+	}
+
+	// 验证举报原因
+	if req.Reason == "" {
+		return errno.ResourceReportInvalidReasonError
+	}
+	if len(req.Reason) > 500 {
+		return errno.ValidationReportReasonTooLongError
+	}
+
+	// 调用数据库层创建举报记录
+	err := db.CreateReview(s.ctx, req.ResourceId, "resource", req.Reason)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

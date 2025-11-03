@@ -9,7 +9,7 @@ import (
 
 func GetMysqlDSN() (string, error) {
 	if config.Mysql == nil {
-		return "", errors.New("config not found")
+		return "", errors.New("未找到配置")
 	}
 
 	dsn := strings.Join([]string{
@@ -23,7 +23,7 @@ func GetMysqlDSN() (string, error) {
 
 func GetServerAddress() string {
 	if config.Server == nil {
-		panic("config not found")
+		panic("未找到配置")
 		return ""
 	}
 

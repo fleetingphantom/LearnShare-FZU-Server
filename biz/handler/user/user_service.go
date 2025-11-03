@@ -6,12 +6,14 @@ import (
 	"LearnShare/biz/middleware"
 	"LearnShare/biz/pack"
 	"LearnShare/biz/service"
+	"LearnShare/pkg/constants"
 	"context"
 
 	"LearnShare/biz/model/user"
 	"LearnShare/pkg/errno"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Register .
@@ -53,6 +55,9 @@ func LoginIn(ctx context.Context, c *app.RequestContext) {
 		pack.BuildFailResponse(c, err)
 		return
 	}
+
+	key := uuid.NewV1()
+	c.Set(constants.UUID, key.String())
 
 	middleware.AccessTokenJwtMiddleware.LoginHandler(ctx, c)
 	middleware.RefreshTokenJwtMiddleware.LoginHandler(ctx, c)
@@ -211,7 +216,18 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		pack.BuildFailResponse(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
 	resp := new(user.UploadAvatarResp)
+	err = service.NewUserService(ctx, c).UploadAvatar(file)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
