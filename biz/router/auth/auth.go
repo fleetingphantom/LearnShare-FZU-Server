@@ -21,14 +21,14 @@ func DoubleTokenAuth() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		// 1. 验证 access-token 是否有效
 		if !middleware.IsAccessTokenAvailable(ctx, c) {
-			fail(c, errno.NewErrNo(errno.AuthInvalidCode, "access token is invalid"))
+			fail(c, errno.NewErrNo(errno.AuthInvalidCode, "访问令牌无效"))
 			return
 		}
 
 		// 2. 取出 UUID
 		Uuid := service.GetUuidFormContext(c)
 		if Uuid == "" {
-			fail(c, errno.NewErrNo(errno.AuthInvalidCode, " uuid not found in context"))
+			fail(c, errno.NewErrNo(errno.AuthInvalidCode, "上下文中未找到 UUID"))
 			return
 		}
 
@@ -39,7 +39,7 @@ func DoubleTokenAuth() app.HandlerFunc {
 			return
 		}
 		if ok {
-			fail(c, errno.NewErrNo(errno.AuthInvalidCode, " token has been logged out"))
+			fail(c, errno.NewErrNo(errno.AuthInvalidCode, "令牌已被注销"))
 			return
 		}
 

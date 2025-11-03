@@ -19,7 +19,7 @@ type oss struct {
 	AccessKeyID     string `mapstructure:"accessKey-id"`
 	AccessKeySecret string `mapstructure:"accessKey-secret"`
 	BucketName      string
-	MainDirectory   string `mapstructure:"main-directory"`
+	Zone            string `mapstructure:"zone"`
 }
 
 // SMTP 配置

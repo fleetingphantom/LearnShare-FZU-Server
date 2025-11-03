@@ -84,7 +84,7 @@ func AccessTokenJwt() {
 		},
 	})
 	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
+		log.Fatal("JWT 错误：" + err.Error())
 	}
 }
 
@@ -140,7 +140,7 @@ func RefreshTokenJwt() {
 		},
 	})
 	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
+		log.Fatal("JWT 错误：" + err.Error())
 	}
 }
 
@@ -249,11 +249,11 @@ func Init() {
 	errInit := AccessTokenJwtMiddleware.MiddlewareInit()
 
 	if errInit != nil {
-		log.Fatal("AccessTokenJwtMiddleware.MiddlewareInit() Error:" + errInit.Error())
+		log.Fatal("AccessTokenJwtMiddleware.MiddlewareInit() 错误：" + errInit.Error())
 	}
 
 	errInit = RefreshTokenJwtMiddleware.MiddlewareInit()
 	if errInit != nil {
-		log.Fatal("RefreshTokenJwtMiddleware.MiddlewareInit() Error:" + errInit.Error())
+		log.Fatal("RefreshTokenJwtMiddleware.MiddlewareInit() 错误：" + errInit.Error())
 	}
 }

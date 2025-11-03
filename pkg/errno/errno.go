@@ -11,25 +11,25 @@ type ErrNo struct {
 }
 
 func (e ErrNo) Error() string {
-	return fmt.Sprintf("[%d] %s", e.ErrorCode, e.ErrorMsg)
+	return fmt.Sprintf("[%d] %s", e.ErrorCode, e.ErrorMsg) // 错误信息
 }
 
 func NewErrNo(code int64, msg string) ErrNo {
 	return ErrNo{
 		ErrorCode: code,
-		ErrorMsg:  msg,
+		ErrorMsg:  msg, // 错误消息
 	}
 }
 
 // WithMessage 将替换默认消息为新消息
 func (e ErrNo) WithMessage(msg string) ErrNo {
-	e.ErrorMsg = msg
+	e.ErrorMsg = msg // 替换为中文消息
 	return e
 }
 
 // WithError 将在消息后添加错误信息
 func (e ErrNo) WithError(err error) ErrNo {
-	e.ErrorMsg = e.ErrorMsg + ", " + err.Error()
+	e.ErrorMsg = e.ErrorMsg + ", " + err.Error() // 添加中文错误信息
 	return e
 }
 
@@ -45,6 +45,6 @@ func ConvertErr(err error) ErrNo {
 	}
 
 	s := InternalServiceError
-	s.ErrorMsg = err.Error()
+	s.ErrorMsg = err.Error() // 转换为中文错误消息
 	return s
 }
