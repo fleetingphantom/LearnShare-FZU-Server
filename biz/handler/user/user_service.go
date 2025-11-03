@@ -267,7 +267,10 @@ func RefreshToken(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.RefreshTokenResp)
-	middleware.IsRefreshTokenAvailable(ctx, c)
+	if !middleware.IsRefreshTokenAvailable(ctx, c) {
+		pack.BuildFailResponse(c, errno.AuthInvalid)
+		return
+	}
 	middleware.GenerateAccessToken(c)
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)

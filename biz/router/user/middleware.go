@@ -30,7 +30,7 @@ func _logininMw() []app.HandlerFunc {
 
 func _loginoutMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _refreshtokenMw() []app.HandlerFunc {
