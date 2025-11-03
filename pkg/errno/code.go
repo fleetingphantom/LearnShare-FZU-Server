@@ -45,7 +45,7 @@ const (
 	RepeatedOperation
 )
 
-// User
+// User Module (1000-1099)
 const (
 	ServiceUserExist = 1000 + iota
 	ServiceUserNotExist
@@ -58,4 +58,49 @@ const (
 	ErrRecordNotFound
 	UserLogOut
 	UserAlreadyLogin
+)
+
+// User Specific Errors (1100-1199)
+const (
+	UserPasswordIncorrect = 1100 + iota
+	UserPasswordFormatInvalid
+	UserUsernameFormatInvalid
+	UserEmailFormatInvalid
+	UserVerificationCodeInvalid
+	UserVerificationCodeExpired
+	UserAccountInactive
+	UserAccountSuspended
+)
+
+// Resource Module (2000-2099)
+const (
+	ResourceNotFound = 2000 + iota
+	ResourceAccessDenied
+	ResourceUploadFailed
+	ResourceDownloadFailed
+	ResourceInvalidID
+	ResourceInvalidRating
+	ResourceInvalidComment
+	ResourceDuplicateOperation
+	ResourceReportInvalidReason
+)
+
+// Course Module (3000-3099)
+const (
+	CourseNotFound = 3000 + iota
+	CourseAccessDenied
+	CourseInvalidID
+	CourseCommentNotFound
+	CourseRatingNotFound
+	CourseCommentDeleteDenied
+	CourseRatingDeleteDenied
+)
+
+// Validation Module (4000-4099)
+const (
+	ValidationKeywordTooLong = 4000 + iota
+	ValidationResourceIDInvalid
+	ValidationCommentTooLong
+	ValidationReportReasonTooLong
+	ValidationRatingRangeInvalid
 )

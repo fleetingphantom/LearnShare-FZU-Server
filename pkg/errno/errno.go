@@ -21,20 +21,20 @@ func NewErrNo(code int64, msg string) ErrNo {
 	}
 }
 
-// WithMessage will replace default msg to new
+// WithMessage 将替换默认消息为新消息
 func (e ErrNo) WithMessage(msg string) ErrNo {
 	e.ErrorMsg = msg
 	return e
 }
 
-// WithError will add error msg after Message
+// WithError 将在消息后添加错误信息
 func (e ErrNo) WithError(err error) ErrNo {
 	e.ErrorMsg = e.ErrorMsg + ", " + err.Error()
 	return e
 }
 
-// ConvertErr convert error to ErrNo
-// in Default user ServiceErrorCode
+// ConvertErr 将错误转换为ErrNo类型
+// 默认使用用户服务错误码
 func ConvertErr(err error) ErrNo {
 	if err == nil {
 		return Success

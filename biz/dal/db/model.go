@@ -31,13 +31,13 @@ func (u User) ToUserModule() *module.User {
 	}
 
 	if u.AvatarURL != nil {
-		user.AvatarUrl = *u.AvatarURL
+		user.AvatarURL = *u.AvatarURL
 	}
 	if u.CollegeID != nil {
-		user.CollegeId = *u.CollegeID
+		user.CollegeID = *u.CollegeID
 	}
 	if u.MajorID != nil {
-		user.MajorId = *u.MajorID
+		user.MajorID = *u.MajorID
 	}
 	return user
 }
