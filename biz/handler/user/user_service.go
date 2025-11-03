@@ -6,12 +6,14 @@ import (
 	"LearnShare/biz/middleware"
 	"LearnShare/biz/pack"
 	"LearnShare/biz/service"
+	"LearnShare/pkg/constants"
 	"context"
 
 	"LearnShare/biz/model/user"
 	"LearnShare/pkg/errno"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	uuid "github.com/satori/go.uuid"
 )
 
 // Register .
@@ -53,6 +55,9 @@ func LoginIn(ctx context.Context, c *app.RequestContext) {
 		pack.BuildFailResponse(c, err)
 		return
 	}
+
+	key := uuid.NewV1()
+	c.Set(constants.UUID, key.String())
 
 	middleware.AccessTokenJwtMiddleware.LoginHandler(ctx, c)
 	middleware.RefreshTokenJwtMiddleware.LoginHandler(ctx, c)

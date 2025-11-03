@@ -51,3 +51,16 @@ func SetBlacklistToken(ctx context.Context, token string) error {
 	}
 	return nil
 }
+func IsBlacklistToken(ctx context.Context, token string) (bool, error) {
+	result, err := RDB.Get(ctx, token).Result()
+	if err != nil {
+		if err.Error() == "redis: nil" {
+			return false, nil
+		}
+		return false, errno.NewErrNo(errno.InternalRedisErrorCode, "get blacklist token error:"+err.Error())
+	}
+	if result == "blacklisted" {
+		return true, nil
+	}
+	return false, nil
+}

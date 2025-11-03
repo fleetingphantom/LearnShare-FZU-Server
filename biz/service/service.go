@@ -33,3 +33,12 @@ func convertToInt64(value interface{}) (int64, error) {
 		return 0, errno.NewErrNo(errno.InternalServiceErrorCode, "无法转换为int64类型")
 	}
 }
+
+func GetUuidFormContext(c *app.RequestContext) string {
+	uuid, _ := c.Get(constants.UUID)
+	uuidStr, ok := uuid.(string)
+	if !ok {
+		panic(errno.NewErrNo(errno.InternalServiceErrorCode, "无法转换为string类型"))
+	}
+	return uuidStr
+}
