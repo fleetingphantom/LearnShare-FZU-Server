@@ -3,6 +3,7 @@
 package resource
 
 import (
+	"LearnShare/biz/router/auth"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -43,7 +44,7 @@ func _downloadresourceMw() []app.HandlerFunc {
 
 func _reportresourceMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _resources0Mw() []app.HandlerFunc {
@@ -78,7 +79,7 @@ func _resource_commentsMw() []app.HandlerFunc {
 
 func _submitresourcecommentMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _resource_ratingsMw() []app.HandlerFunc {
@@ -88,12 +89,12 @@ func _resource_ratingsMw() []app.HandlerFunc {
 
 func _deleteresourceratingMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _submitresourceratingMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _resources_commentsMw() []app.HandlerFunc {
@@ -103,10 +104,30 @@ func _resources_commentsMw() []app.HandlerFunc {
 
 func _deleteresourcecommentMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func __7bresource_id_7d1Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _reportMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resources1Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_idMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_id0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

@@ -51,7 +51,7 @@ func (r Resource) ToResourceModule() *module.Resource {
 
 	return &module.Resource{
 		ResourceId:    r.ResourceID,
-		Title:         r.Title,
+		Title:         r.ResourceName,
 		Description:   &r.Description,
 		FilePath:      r.FilePath,
 		FileType:      r.FileType,
@@ -61,9 +61,22 @@ func (r Resource) ToResourceModule() *module.Resource {
 		DownloadCount: r.DownloadCount,
 		AverageRating: r.AverageRating,
 		RatingCount:   r.RatingCount,
-		Status:        r.Status,
+		Status:        convertStatus(r.Status),
 		CreatedAt:     r.CreatedAt.Unix(),
 		Tags:          tags,
+	}
+}
+
+func convertStatus(status string) int32 {
+	switch status {
+	case "pending_review":
+		return 1
+	case "normal":
+		return 0
+	case "low_quality":
+		return 2
+	default:
+		return 1 // 默认为待审核
 	}
 }
 
@@ -112,28 +125,28 @@ func (r ResourceRating) ToResourceRatingModule() *module.ResourceRating {
 
 type Resource struct {
 	ResourceID    int64         `gorm:"primaryKey;autoIncrement"`
-	Title         string        `gorm:"size:255;not null"`
+	ResourceName  string        `gorm:"column:resource_name;size:255;not null"`
 	Description   string        `gorm:"type:text"`
-	FilePath      string        `gorm:"size:255;not null"`
-	FileType      string        `gorm:"size:50;not null"`
-	FileSize      int64         `gorm:"not null"`
+	FilePath      string        `gorm:"column:resource_url;size:255;not null"`
+	FileType      string        `gorm:"column:type;size:50;not null"`
+	FileSize      int64         `gorm:"column:size;not null"`
 	UploaderID    int64         `gorm:"not null"`
 	CourseID      int64         `gorm:"not null"`
 	DownloadCount int64         `gorm:"default:0"`
 	AverageRating float64       `gorm:"default:0.0"`
 	RatingCount   int64         `gorm:"default:0"`
-	Status        int32         `gorm:"not null;default:0"`
+	Status        string        `gorm:"type:enum('normal','low_quality','pending_review');default:'pending_review'"`
 	CreatedAt     time.Time     `gorm:"autoCreateTime"`
-	Tags          []ResourceTag `gorm:"many2many:resource_tag_mappings;"`
+	Tags          []ResourceTag `gorm:"many2many:resource_tags;joinForeignKey:resource_id;joinReferences:tag_id"`
 }
 
 type ResourceTag struct {
-	TagID   int64  `gorm:"primaryKey;autoIncrement"`
+	TagID   int64  `gorm:"primaryKey;autoIncrement;table:tags"`
 	TagName string `gorm:"size:50;unique;not null"`
 }
 
 type ResourceTagMapping struct {
-	ResourceID int64 `gorm:"primaryKey"`
+	ResourceID int64 `gorm:"primaryKey;table:resource_tags"`
 	TagID      int64 `gorm:"primaryKey"`
 }
 
@@ -170,12 +183,13 @@ type ResourceRating struct {
 
 // Review 审核模型
 type Review struct {
-	ReviewID   int64     `gorm:"primaryKey;autoIncrement"`
-	UserID     int64     `gorm:"not null"`
-	TargetID   int64     `gorm:"not null"`
-	TargetType string    `gorm:"size:50;not null"`
-	Reason     string    `gorm:"type:text;not null"`
-	Status     string    `gorm:"type:enum('pending','approved','rejected');default:'pending'"`
-	CreatedAt  time.Time `gorm:"autoCreateTime"`
-	UpdatedAt  time.Time `gorm:"autoUpdateTime"`
+	ReviewID   int64      `gorm:"primaryKey;autoIncrement;column:review_id"`
+	TargetID   int64      `gorm:"not null;column:target_id"`
+	TargetType string     `gorm:"size:50;not null;column:target_type"`
+	Reason     string     `gorm:"type:text;not null;column:reason"`
+	Status     string     `gorm:"type:enum('pending','approved','rejected');default:'pending';column:status"`
+	Priority   int        `gorm:"default:3;column:priority"`
+	ReviewerID *int64     `gorm:"column:reviewer_id"`
+	ReviewedAt *time.Time `gorm:"column:reviewed_at"`
+	CreatedAt  time.Time  `gorm:"autoCreateTime;column:created_at"`
 }

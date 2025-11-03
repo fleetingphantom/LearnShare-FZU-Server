@@ -16,7 +16,7 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 	db := DB.WithContext(ctx).Table(constants.ResourceTableName)
 
 	if keyword != nil && *keyword != "" {
-		db = db.Where("title LIKE ? OR description LIKE ?", "%"+*keyword+"%", "%"+*keyword+"%")
+		db = db.Where("resource_name LIKE ? OR description LIKE ?", "%"+*keyword+"%", "%"+*keyword+"%")
 	}
 
 	if courseID != nil {
@@ -24,8 +24,8 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 	}
 
 	if tagID != nil {
-		db = db.Joins("JOIN resource_tag_mapping ON resource_tag_mapping.resource_id = resource.resource_id").
-			Where("resource_tag_mapping.tag_id = ?", *tagID)
+		db = db.Joins("JOIN "+constants.ResourceTagMappingTableName+" ON "+constants.ResourceTagMappingTableName+".resource_id = "+constants.ResourceTableName+".resource_id").
+			Where(constants.ResourceTagMappingTableName+".tag_id = ?", *tagID)
 	}
 
 	switch {
@@ -60,6 +60,9 @@ func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 		First(&resource).Error
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "记录未找到")
+		}
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "根据ID查询资源失败: "+err.Error())
 	}
 
@@ -68,68 +71,68 @@ func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 
 // GetResourceComments 获取资源评论列表
 func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, pageNum, pageSize int) ([]*ResourceComment, int64, error) {
-	var comments []*ResourceComment
-	var total int64
+    var comments []*ResourceComment
+    var total int64
 
-	db := DB.WithContext(ctx).Table(constants.ResourceCommentTableName).
-		Preload("User").
-		Where("resource_id = ?", resourceID).
-		Where("is_visible = ?", true).
-		Where("status = ?", "normal")
+    // 使用 Model(&ResourceComment{}) 以便 GORM 识别关联关系；
+    // 不在 Count 阶段使用 Preload，避免“model value required when using preload”报错。
+    base := DB.WithContext(ctx).Model(&ResourceComment{}).
+        Where("resource_id = ?", resourceID).
+        Where("is_visible = ?", true).
+        Where("status = ?", "normal")
 
-	// 根据排序参数进行排序
-	if sortBy != nil {
-		switch *sortBy {
-		case "latest":
-			db = db.Order("created_at DESC")
-		case "hottest":
-			db = db.Order("likes DESC, created_at DESC")
-		default:
-			db = db.Order("created_at DESC")
-		}
-	} else {
-		db = db.Order("created_at DESC")
-	}
+    // 先统计总数（不需要排序与预加载）
+    if err := base.Count(&total).Error; err != nil {
+        return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源评论数量失败: "+err.Error())
+    }
 
-	// 获取总数
-	err := db.Count(&total).Error
-	if err != nil {
-		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源评论数量失败: "+err.Error())
-	}
+    // 根据排序参数设置查询顺序（仅用于数据查询阶段）
+    switch {
+    case sortBy != nil && *sortBy == "hottest":
+        base = base.Order("likes DESC, created_at DESC")
+    default:
+        // latest 或默认
+        base = base.Order("created_at DESC")
+    }
 
-	// 获取分页数据
-	err = db.Offset((pageNum - 1) * pageSize).
-		Limit(pageSize).
-		Find(&comments).Error
-	if err != nil {
-		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评论列表失败: "+err.Error())
-	}
+    // 获取分页数据（此处再进行关联预加载）
+    err := base.Offset((pageNum - 1) * pageSize).
+        Limit(pageSize).
+        Preload("User").
+        Find(&comments).Error
+    if err != nil {
+        return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评论列表失败: "+err.Error())
+    }
 
-	return comments, total, nil
+    return comments, total, nil
 }
 
 // SubmitResourceRating 提交资源评分
 func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recommendation float64) (*ResourceRating, error) {
-	// 开始事务
-	tx := DB.WithContext(ctx).Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+    // 开始事务
+    tx := DB.WithContext(ctx).Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
 
 	// 检查是否已经评分过
 	var existingRating ResourceRating
-	err := tx.Table(constants.ResourceRatingTableName).Where("user_id = ? AND resource_id = ?", userID, resourceID).First(&existingRating).Error
+    err := tx.Table(constants.ResourceRatingTableName).Where("user_id = ? AND resource_id = ?", userID, resourceID).Find(&existingRating).Error
+    if err != nil {
+        tx.Rollback()
+        return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评分记录失败: "+err.Error())
+    }
 
 	var rating *ResourceRating
 
-	if err == nil {
-		// 更新现有评分
-		existingRating.Recommendation = recommendation
-		existingRating.IsVisible = true // 确保在重新评分时，记录是可见的
-		err = tx.Table(constants.ResourceRatingTableName).Save(&existingRating).Error
-		rating = &existingRating
+    if existingRating.RatingID > 0 {
+        // 更新现有评分
+        existingRating.Recommendation = recommendation
+        existingRating.IsVisible = true // 确保在重新评分时，记录是可见的
+        err = tx.Table(constants.ResourceRatingTableName).Save(&existingRating).Error
+        rating = &existingRating
 	} else {
 		// 创建新评分
 		rating = &ResourceRating{
@@ -325,17 +328,17 @@ func DeleteResourceComment(ctx context.Context, commentID, userID int64) error {
 }
 
 // CreateReview 创建一个新的举报（审核）
-func CreateReview(ctx context.Context, targetID int64, targetType, reason string) error {
+func CreateReview(ctx context.Context, creatorID int64, targetID int64, targetType, reason string) error {
 	review := &Review{
 		TargetID:   targetID,
 		TargetType: targetType,
 		Reason:     reason,
-		Status:     "pending", // 默认为待审核
+		ReviewerID: &creatorID, // 使用 creatorID
 	}
 
-	err := DB.WithContext(ctx).Table(constants.ReviewTableName).Create(review).Error
-	if err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建举报失败: "+err.Error())
+	result := DB.WithContext(ctx).Table(constants.ReviewTableName).Create(review)
+	if result.Error != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建举报失败: "+result.Error.Error())
 	}
 
 	return nil
