@@ -174,9 +174,7 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 
 	// 处理 ParentID 默认值
 	parentID := req.ParentID
-	if parentID == 0 {
-		parentID = 0 // 已经是默认值
-	}
+
 
 	// 处理 IsVisible 默认值
 	isVisible := req.IsVisible
