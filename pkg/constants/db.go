@@ -16,4 +16,7 @@ const (
 	ResourceCommentTableName = "resource_comments"
 	ResourceRatingTableName = "resource_ratings"
 	ReviewTableName = "reviews"
+	PermissionTableName         = "permissions"
+	RolePermissionTableName     = "role_permissions"
+	RoleTableName               = "roles"
 )
