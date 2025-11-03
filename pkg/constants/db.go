@@ -10,10 +10,13 @@ const (
 )
 
 const (
-	UserTableName = "users"
-	ResourceTableName = "resource"
+	UserTableName               = "users"
+	ResourceTableName           = "resource"
 	ResourceTagMappingTableName = "resource_tag_mapping"
-	ResourceCommentTableName = "resource_comment"
-	ResourceRatingTableName = "resource_rating"
-	ReviewTableName = "review"
+	ResourceCommentTableName    = "resource_comment"
+	ResourceRatingTableName     = "resource_rating"
+	ReviewTableName             = "review"
+	PermissionTableName         = "permissions"
+	RolePermissionTableName     = "role_permissions"
+	RoleTableName               = "roles"
 )

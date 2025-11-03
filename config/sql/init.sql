@@ -503,88 +503,70 @@ ADD
     CONSTRAINT `fk_ui_item` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`) ON DELETE CASCADE;
 
 -- ----------------------------
--- 初始化角色数据
+-- 1. 初始化角色数据 (Roles)
+-- 仅保留超级管理员 (1) 和审核员 (3)
 -- ----------------------------
 INSERT INTO
     `roles` (`role_id`, `role_name`, `description`)
 VALUES
     (1, '超级管理员', '拥有平台全部系统配置、账号管理与内容审核权限'),
-    (2, '普通用户', '平台注册用户，可浏览、上传课程资料并参与互动'),
-    (3, '审核员', '负责全站资源与评论的审核处理');
+    (3, '审核员', '负责全站资源与评论的审核处理，以及用户管理辅助');
+
 
 -- ----------------------------
--- 初始化权限数据
+-- 2. 初始化权限数据 (Permissions)
+-- (权限数据保持不变，共 18 项权限)
 -- ----------------------------
 INSERT INTO
     `permissions` (
-        `permission_id`,
-        `permission_name`,
-        `description`
-    )
+    `permission_id`,
+    `permission_name`,
+    `description`
+)
 VALUES
-    (1, 'user.profile.read', '查看个人或指定用户的基础信息'),
-    (2, 'user.profile.update', '修改个人基础资料与账户安全信息'),
-    (3, 'user.email.verify', '请求与校验邮箱验证码'),
-    (4, 'resource.search', '查询与检索学习资源'),
-    (5, 'resource.download', '下载学习资源文件'),
-    (6, 'resource.upload', '上传并发布新的学习资源'),
-    (7, 'resource.manage_own', '管理本人上传的资源（更新、下架）'),
-    (8, 'resource.manage_all', '管理全站资源内容与状态'),
-    (9, 'resource.comment.create', '发表或回复资源评论'),
-    (10, 'resource.comment.moderate', '审核、隐藏或删除资源评论'),
-    (11, 'resource.rating.create', '提交或更新资源评分'),
-    (12, 'resource.rating.moderate', '审核或删除资源评分'),
-    (13, 'resource.report', '发起资源举报与申诉'),
-    (14, 'course.view', '浏览课程详情与资源列表'),
-    (15, 'course.comment.create', '在课程页面发表讨论或评论'),
-    (16, 'course.comment.moderate', '审核或删除课程评论'),
-    (17, 'course.rating.create', '提交课程评分或体验反馈'),
-    (18, 'course.rating.moderate', '审核或删除课程评分'),
-    (19, 'review.handle', '处理举报、审核与处罚流程'),
-    (20, 'role.manage', '维护角色、权限及其分配关系');
+    (1, 'user.profile.update', '修改个人基础资料与账户安全信息'),
+    (2, 'resource.download', '下载学习资源文件'),
+    (3, 'resource.upload', '上传并发布新的学习资源'),
+    (4, 'resource.manage_all', '管理全站资源内容与状态'),
+    (5, 'resource.comment.moderate', '审核、隐藏或删除资源评论'),
+    (6, 'resource.rating.moderate', '审核或删除资源评分'),
+    (7, 'course.comment.moderate', '审核或删除课程评论'),
+    (8, 'course.rating.moderate', '审核或删除课程评分'),
+    (9, 'review.handle', '处理举报、审核与处罚流程'),
+    (10, 'role.manage', '维护角色、权限及其分配关系'),
+    (11, 'user.reputation.adjust', '调整用户信誉分与记录变动原因'),
+    (12, 'user.account.manage', '冻结、解封或禁用用户账户'),
+    (13, 'content.tag.manage', '编辑或删除资源与课程标签'),
+    (14, 'content.category.manage', '管理课程分类与专业信息'),
+    (15, 'teacher.profile.manage', '维护教师信息与关联课程'),
+    (16, 'system.config.manage', '修改系统配置与全局参数'),
+    (17, 'audit.log.view', '查看系统操作日志与审核记录'),
+    (18, 'data.report.view', '访问平台数据报表与统计信息');
+
 
 -- ----------------------------
--- 角色权限映射
+-- 3. 角色权限映射 (Role Permissions)
 -- ----------------------------
--- 普通用户：具备学习资料的浏览、上传与互动能力
+
+-- 审核员 (Role ID: 2)：内容治理、用户管理、元数据管理与数据查看
 INSERT INTO
     `role_permissions` (`role_id`, `permission_id`)
 VALUES
-    (2, 1),
-    (2, 2),
-    (2, 3),
-    (2, 4),
-    (2, 5),
-    (2, 6),
-    (2, 7),
-    (2, 9),
-    (2, 11),
-    (2, 13),
-    (2, 14),
-    (2, 15),
-    (2, 17);
+    (3, 4),  -- resource.manage_all
+    (3, 5),  -- resource.comment.moderate
+    (3, 6),  -- resource.rating.moderate
+    (3, 7),  -- course.comment.moderate
+    (3, 8),  -- course.rating.moderate
+    (3, 9),  -- review.handle
+    (3, 11), -- user.reputation.adjust
+    (3, 12), -- user.account.manage
+    (3, 13), -- content.tag.manage
+    (3, 14), -- content.category.manage
+    (3, 15), -- teacher.profile.manage
+    (3, 17), -- audit.log.view
+    (3, 18); -- data.report.view
 
--- 审核员：侧重内容治理与举报处理
-INSERT INTO
-    `role_permissions` (`role_id`, `permission_id`)
-VALUES
-    (3, 1),
-    (3, 4),
-    (3, 5),
-    (3, 8),
-    (3, 9),
-    (3, 10),
-    (3, 11),
-    (3, 12),
-    (3, 13),
-    (3, 14),
-    (3, 15),
-    (3, 16),
-    (3, 17),
-    (3, 18),
-    (3, 19);
-
--- 超级管理员：拥有全部权限
+-- 超级管理员 (Role ID: 1)：全部权限 (1-18)
 INSERT INTO
     `role_permissions` (`role_id`, `permission_id`)
 SELECT
@@ -592,6 +574,7 @@ SELECT
     `permission_id`
 FROM
     `permissions`;
+
 
 -- 恢复环境参数
 SET
