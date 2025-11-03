@@ -216,7 +216,18 @@ func UploadAvatar(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		pack.BuildFailResponse(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
 	resp := new(user.UploadAvatarResp)
+	err = service.NewUserService(ctx, c).UploadAvatar(file)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)

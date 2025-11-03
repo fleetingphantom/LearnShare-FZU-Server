@@ -510,6 +510,7 @@ INSERT INTO
     `roles` (`role_id`, `role_name`, `description`)
 VALUES
     (1, '超级管理员', '拥有平台全部系统配置、账号管理与内容审核权限'),
+    (2, '普通用户', '拥有基本功能'),
     (3, '审核员', '负责全站资源与评论的审核处理，以及用户管理辅助');
 
 
@@ -548,7 +549,7 @@ VALUES
 -- 3. 角色权限映射 (Role Permissions)
 -- ----------------------------
 
--- 审核员 (Role ID: 2)：内容治理、用户管理、元数据管理与数据查看
+-- 审核员 (Role ID: 3)：内容治理、用户管理、元数据管理与数据查看
 INSERT INTO
     `role_permissions` (`role_id`, `permission_id`)
 VALUES

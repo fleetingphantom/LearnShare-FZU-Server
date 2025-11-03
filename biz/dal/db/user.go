@@ -47,6 +47,14 @@ func UpdateMajorID(ctx context.Context, userID int, majorID int) error {
 	return nil
 }
 
+func UpdateAvatarURL(ctx context.Context, userID int64, avatarURL string) error {
+	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("avatar_url", avatarURL).Error
+	if err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户头像失败: "+err.Error())
+	}
+	return nil
+}
+
 // UpdateUserStatues 更新用户状态
 func UpdateUserStatues(ctx context.Context, userID int64, newStatus string) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("status", newStatus).Error
