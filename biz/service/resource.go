@@ -191,8 +191,11 @@ func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error 
 		return errno.NewErrNo(errno.ServiceInvalidParameter, "举报原因不能超过500字符")
 	}
 
+	// 从上下文获取当前用户ID
+    userID := GetUidFormContext(s.c)
+
 	// 调用数据库层创建举报记录
-	err := db.CreateReview(s.ctx, req.ResourceID, "resource", req.Reason)
+	err := db.CreateReview(s.ctx, userID, req.ResourceID, "resource", req.Reason)
 	if err != nil {
 		return err
 	}

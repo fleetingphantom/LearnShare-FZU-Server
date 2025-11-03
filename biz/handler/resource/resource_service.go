@@ -8,7 +8,6 @@ import (
 	"LearnShare/biz/service"
 	"LearnShare/pkg/errno"
 	"context"
-	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -110,7 +109,6 @@ func ReportResource(ctx context.Context, c *app.RequestContext) {
 // GetResource .
 // @router /api/resources/{resource_id} [GET]
 func GetResource(ctx context.Context, c *app.RequestContext) {
-	fmt.Println("GetResource handler called!")
 	var err error
 	var req resource.GetResourceReq
 	err = c.BindAndValidate(&req)

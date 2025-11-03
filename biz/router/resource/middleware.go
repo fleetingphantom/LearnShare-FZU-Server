@@ -121,3 +121,8 @@ func _resources1Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _resource_idMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

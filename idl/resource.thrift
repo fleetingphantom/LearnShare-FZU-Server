@@ -118,16 +118,16 @@ struct GetResourceCommentsResp {
 service ResourceService {
     SearchResourceResp searchResources(1: SearchResourceReq req)(api.get="/api/resources/search"),
     UploadResourceResp uploadResource(1: UploadResourceReq req)(api.post="/api/resources"),
-    DownloadResourceResp downloadResource(1: DownloadResourceReq req)(api.get="/api/resources/{resource_id}/download"),
-    ReportResourceResp reportResource(1: ReportResourceReq req)(api.post="/api/resources/{resource_id}/report"),
-    GetResourceResp getResource(1: GetResourceReq req)(api.get="/api/resources/{resource_id}"),
+    DownloadResourceResp downloadResource(1: DownloadResourceReq req)(api.get="/api/resources/:resource_id/download"),
+    ReportResourceResp reportResource(1: ReportResourceReq req)(api.post="/api/resources/:resource_id/report"),
+    GetResourceResp getResource(1: GetResourceReq req)(api.get="/api/resources/:resource_id"),
     
     // 资源评分相关API
-    SubmitResourceRatingResp submitResourceRating(1: SubmitResourceRatingReq req)(api.post="/api/resource_ratings/{resource_id}"),
-    DeleteResourceRatingResp deleteResourceRating(1: DeleteResourceRatingReq req)(api.delete="/api/resource_ratings/{rating_id}"),
+    SubmitResourceRatingResp submitResourceRating(1: SubmitResourceRatingReq req)(api.post="/api/resource_ratings/:resource_id"),
+    DeleteResourceRatingResp deleteResourceRating(1: DeleteResourceRatingReq req)(api.delete="/api/resource_ratings/:rating_id"),
     
     // 资源评论相关API
-    SubmitResourceCommentResp submitResourceComment(1: SubmitResourceCommentReq req)(api.post="/api/resource_comments/{resource_id}"),
-    DeleteResourceCommentResp deleteResourceComment(1: DeleteResourceCommentReq req)(api.delete="/api/resource_comments/{comment_id}"),
-    GetResourceCommentsResp getResourceComments(1: GetResourceCommentsReq req)(api.get="/api/resource_comments/{resource_id}"),
+    SubmitResourceCommentResp submitResourceComment(1: SubmitResourceCommentReq req)(api.post="/api/resource_comments/:resource_id"),
+    DeleteResourceCommentResp deleteResourceComment(1: DeleteResourceCommentReq req)(api.delete="/api/resource_comments/:comment_id"),
+    GetResourceCommentsResp getResourceComments(1: GetResourceCommentsReq req)(api.get="/api/resource_comments/:resource_id"),
 }

@@ -183,12 +183,13 @@ type ResourceRating struct {
 
 // Review 审核模型
 type Review struct {
-	ReviewID   int64     `gorm:"primaryKey;autoIncrement"`
-	UserID     int64     `gorm:"not null"`
-	TargetID   int64     `gorm:"not null"`
-	TargetType string    `gorm:"size:50;not null"`
-	Reason     string    `gorm:"type:text;not null"`
-	Status     string    `gorm:"type:enum('pending','approved','rejected');default:'pending'"`
-	CreatedAt  time.Time `gorm:"autoCreateTime"`
-	UpdatedAt  time.Time `gorm:"autoUpdateTime"`
+	ReviewID   int64      `gorm:"primaryKey;autoIncrement;column:review_id"`
+	TargetID   int64      `gorm:"not null;column:target_id"`
+	TargetType string     `gorm:"size:50;not null;column:target_type"`
+	Reason     string     `gorm:"type:text;not null;column:reason"`
+	Status     string     `gorm:"type:enum('pending','approved','rejected');default:'pending';column:status"`
+	Priority   int        `gorm:"default:3;column:priority"`
+	ReviewerID *int64     `gorm:"column:reviewer_id"`
+	ReviewedAt *time.Time `gorm:"column:reviewed_at"`
+	CreatedAt  time.Time  `gorm:"autoCreateTime;column:created_at"`
 }

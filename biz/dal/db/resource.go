@@ -5,7 +5,7 @@ import (
 	"LearnShare/pkg/errno"
 	"context"
 	"errors"
-	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -52,7 +52,6 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 
 // GetResourceByID 根据资源ID获取单个资源信息
 func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
-	fmt.Println("resourceID:", resourceID)
 	var resource Resource
 
 	err := DB.WithContext(ctx).Table(constants.ResourceTableName).
@@ -329,17 +328,17 @@ func DeleteResourceComment(ctx context.Context, commentID, userID int64) error {
 }
 
 // CreateReview 创建一个新的举报（审核）
-func CreateReview(ctx context.Context, targetID int64, targetType, reason string) error {
+func CreateReview(ctx context.Context, creatorID int64, targetID int64, targetType, reason string) error {
 	review := &Review{
 		TargetID:   targetID,
 		TargetType: targetType,
 		Reason:     reason,
-		Status:     "pending", // 默认为待审核
+		ReviewerID: &creatorID, // 使用 creatorID
 	}
 
-	err := DB.WithContext(ctx).Table(constants.ReviewTableName).Create(review).Error
-	if err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建举报失败: "+err.Error())
+	result := DB.WithContext(ctx).Table(constants.ReviewTableName).Create(review)
+	if result.Error != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建举报失败: "+result.Error.Error())
 	}
 
 	return nil
