@@ -5,9 +5,15 @@ import (
 	"LearnShare/biz/dal/redis"
 	"LearnShare/biz/model/module"
 	"LearnShare/biz/model/user"
+	oss "LearnShare/pkg"
 	"LearnShare/pkg/errno"
 	"LearnShare/pkg/utils"
 	"context"
+	"mime/multipart"
+	"path"
+	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -105,6 +111,10 @@ func (s *UserService) VerifyEmail(req *user.VerifyEmailReq) error {
 
 	userId := GetUidFormContext(s.c)
 
+	if !redis.IsKeyExist(s.ctx, req.Email) {
+		return errno.UserVerificationCodeExpiredError
+	}
+
 	storeCode, err := redis.GetCodeCache(s.ctx, req.Email)
 	if err != nil {
 		return err
@@ -177,8 +187,33 @@ func (s *UserService) UpdateMajor(req *user.UpdateMajorReq) error {
 	return nil
 }
 
-func (s *UserService) uploadAvatarReq(req *user.UploadAvatarReq) (string, error) {
-	return "", nil
+func (s *UserService) UploadAvatar(data *multipart.FileHeader) error {
+	userId := GetUidFormContext(s.c)
+
+	err := oss.IsImage(data)
+	if err != nil {
+		return err
+	}
+
+	ext := strings.ToLower(path.Ext(data.Filename))
+
+	fileName := strconv.FormatInt(userId, 10) + ext
+	storePath := filepath.Join("static", strconv.FormatInt(userId, 10), "avatar")
+
+	if err = oss.SaveFile(data, storePath, fileName); err != nil {
+		return err
+	}
+
+	url, err := oss.Upload(filepath.Join(storePath, fileName), fileName, "avatar", userId)
+	if err != nil {
+		return err
+	}
+
+	err = db.UpdateAvatarURL(s.ctx, userId, url)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
