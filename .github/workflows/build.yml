@@ -9,7 +9,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GOACTION }}      
 jobs:
   buildAndDeploy:
-    runs-on:  ubuntu-latest
+    runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     # 交叉构建，多平台交叉编译
@@ -50,4 +50,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: LearnShare-${{ matrix.goos }}-${{ matrix.goarch }}
-        path: LearnShare-${{ matrix.goos }}-${{ matrix.goarch }}*
+        path: |
+          LearnShare-${{ matrix.goos }}-${{ matrix.goarch }}*
+          config/config.example.yaml
