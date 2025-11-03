@@ -10,7 +10,11 @@ const (
 )
 
 const (
-	UserTableName = "users"
+
+	UserTableName          = "users"
+	CourseTableName        = "courses"
+	CourseRatingTableName  = "course_ratings"
+	CourseCommentTableName = "course_comments"
 	ResourceTableName = "resources"
 	ResourceTagMappingTableName = "resource_tags"
 	ResourceCommentTableName = "resource_comments"

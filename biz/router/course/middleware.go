@@ -3,6 +3,7 @@
 package course
 
 import (
+	"LearnShare/biz/router/auth"
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -22,13 +23,11 @@ func _course_ratingsMw() []app.HandlerFunc {
 }
 
 func _deletecourseratingMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return auth.Auth() // 删除课程评分需要认证
 }
 
 func _submitcourseratingMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return auth.Auth() // 提交课程评分需要认证
 }
 
 func _coursesMw() []app.HandlerFunc {
@@ -42,27 +41,26 @@ func __7bcourse_id_7dMw() []app.HandlerFunc {
 }
 
 func _getcoursedetailMw() []app.HandlerFunc {
-	// your code...
+	// 课程详情公开访问，不需要认证
 	return nil
 }
 
 func _getcoursecommentsMw() []app.HandlerFunc {
-	// your code...
+	// 获取课程评论公开访问，不需要认证
 	return nil
 }
 
 func _submitcoursecommentMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return auth.Auth() // 提交课程评论需要认证
 }
 
 func _getcourseresourcelistMw() []app.HandlerFunc {
-	// your code...
+	// 获取课程资源列表公开访问，不需要认证
 	return nil
 }
 
 func _searchMw() []app.HandlerFunc {
-	// your code...
+	// 搜索功能公开访问，不需要认证
 	return nil
 }
 
@@ -72,6 +70,15 @@ func _courses_commentsMw() []app.HandlerFunc {
 }
 
 func _deletecoursecommentMw() []app.HandlerFunc {
+	return auth.Auth() // 删除课程评论需要认证
+}
+
+func _course_commentsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _course_idMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

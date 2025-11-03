@@ -993,15 +993,15 @@ func (p *User) String() string {
 }
 
 type Course struct {
-	CourseId    int64  `thrift:"courseId,1,required" form:"courseId,required" json:"courseId,required" query:"courseId,required"`
-	CourseName  string `thrift:"courseName,2,required" form:"courseName,required" json:"courseName,required" query:"courseName,required"`
-	TeacherId   int64  `thrift:"teacherId,3,required" form:"teacherId,required" json:"teacherId,required" query:"teacherId,required"`
-	Credit      int64  `thrift:"credit,4,required" form:"credit,required" json:"credit,required" query:"credit,required"`
-	MajorId     int64  `thrift:"majorId,5,required" form:"majorId,required" json:"majorId,required" query:"majorId,required"`
-	Grade       string `thrift:"grade,6,required" form:"grade,required" json:"grade,required" query:"grade,required"`
-	Description string `thrift:"description,7,required" form:"description,required" json:"description,required" query:"description,required"`
-	CreatedAt   int64  `thrift:"createdAt,8,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
-	UpdatedAt   int64  `thrift:"updatedAt,9,required" form:"updatedAt,required" json:"updatedAt,required" query:"updatedAt,required"`
+	CourseId    int64   `thrift:"courseId,1,required" form:"courseId,required" json:"courseId,required" query:"courseId,required"`
+	CourseName  string  `thrift:"courseName,2,required" form:"courseName,required" json:"courseName,required" query:"courseName,required"`
+	TeacherId   int64   `thrift:"teacherId,3,required" form:"teacherId,required" json:"teacherId,required" query:"teacherId,required"`
+	Credit      float64 `thrift:"credit,4,required" form:"credit,required" json:"credit,required" query:"credit,required"`
+	MajorId     int64   `thrift:"majorId,5,required" form:"majorId,required" json:"majorId,required" query:"majorId,required"`
+	Grade       string  `thrift:"grade,6,required" form:"grade,required" json:"grade,required" query:"grade,required"`
+	Description string  `thrift:"description,7,required" form:"description,required" json:"description,required" query:"description,required"`
+	CreatedAt   int64   `thrift:"createdAt,8,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
+	UpdatedAt   int64   `thrift:"updatedAt,9,required" form:"updatedAt,required" json:"updatedAt,required" query:"updatedAt,required"`
 }
 
 func NewCourse() *Course {
@@ -1023,7 +1023,7 @@ func (p *Course) GetTeacherId() (v int64) {
 	return p.TeacherId
 }
 
-func (p *Course) GetCredit() (v int64) {
+func (p *Course) GetCredit() (v float64) {
 	return p.Credit
 }
 
@@ -1115,7 +1115,7 @@ func (p *Course) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 4:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.DOUBLE {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1278,8 +1278,8 @@ func (p *Course) ReadField3(iprot thrift.TProtocol) error {
 }
 func (p *Course) ReadField4(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field float64
+	if v, err := iprot.ReadDouble(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -1455,10 +1455,10 @@ WriteFieldEndError:
 }
 
 func (p *Course) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("credit", thrift.I64, 4); err != nil {
+	if err = oprot.WriteFieldBegin("credit", thrift.DOUBLE, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Credit); err != nil {
+	if err := oprot.WriteDouble(p.Credit); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {

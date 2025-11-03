@@ -19,7 +19,7 @@ struct SearchResp {
 
 // 获取课程详情
 struct GetCourseDetailReq {
-  required i64 course_id  
+  required i64 course_id  (api.path="course_id");
 }
 
 struct GetCourseDetailResp {
@@ -29,7 +29,7 @@ struct GetCourseDetailResp {
 
 // 获取课程资源列表
 struct GetCourseResourceListReq {
-  required i64 course_id  
+  required i64 course_id  (api.path="course_id");
   required i32 page_num   
   required i32 page_size  
   optional string type     
@@ -44,7 +44,7 @@ struct GetCourseResourceListResp {
 
 // 获取课程评论列表
 struct GetCourseCommentsReq {
-  required i64 course_id
+  required i64 course_id (api.path="course_id");
   optional string sort_by = "latest" 
   required i32 page_size
   required i32 page_num
@@ -58,14 +58,8 @@ struct GetCourseCommentsResp {
 
 // 提交课程评分
 struct SubmitCourseRatingReq {
-  required i64 rating_id
-  required i64 user_id
-  required i64 course_id
-  required i64 recommendation  
-  required string difficulty   
-  required i64 workload        
-  required i64 usefulness      
-  optional bool is_visible = true  
+  required i64 course_id (api.path="course_id");
+  required double rating 
 }
 
 struct SubmitCourseRatingResp {
@@ -76,8 +70,8 @@ struct SubmitCourseRatingResp {
 
 // 提交课程评论
 struct SubmitCourseCommentReq {
-  required i64 course_id
-  required string content      
+  required i64 course_id (api.path="course_id");
+  required string contents      
   optional i64 parent_id = 0   
   optional bool is_visible = true  
 }
@@ -89,7 +83,7 @@ struct SubmitCourseCommentResp {
 
 // 删除课程评论
 struct DeleteCourseCommentReq {
-  required i64 comment_id
+  required i64 comment_id (api.path="comment_id"); 
 }
 
 struct DeleteCourseCommentResp {
@@ -98,7 +92,7 @@ struct DeleteCourseCommentResp {
 
 // 删除课程评分
 struct DeleteCourseRatingReq {
-  required i64 rating_id
+  required i64 rating_id (api.path="rating_id"); 
 }
 
 struct DeleteCourseRatingResp {
@@ -107,13 +101,11 @@ struct DeleteCourseRatingResp {
 
 service CourseService {
   SearchResp search(1: SearchReq req)(api.get="/api/courses/search"),
-  GetCourseDetailResp getCourseDetail(1: GetCourseDetailReq req)(api.get="/api/courses/{course_id}"),
-  GetCourseResourceListResp getCourseResourceList(1: GetCourseResourceListReq req)(api.get="/api/courses/{course_id}/resources"),
-  GetCourseCommentsResp getCourseComments(1: GetCourseCommentsReq req)(api.get="/api/courses/{course_id}/comments"),
-  SubmitCourseRatingResp submitCourseRating(1: SubmitCourseRatingReq req)(api.post="/api/course_ratings/{rating_id}"),
-  SubmitCourseCommentResp submitCourseComment(1: SubmitCourseCommentReq req)(api.post="/api/courses/{course_id}/comments"),
-  DeleteCourseCommentResp deleteCourseComment(1: DeleteCourseCommentReq req)(api.delete="/api/courses_comments/{comment_id}"),
-  DeleteCourseRatingResp deleteCourseRating(1: DeleteCourseRatingReq req)(api.delete="/api/course_ratings/{rating_id}"),
+  GetCourseDetailResp getCourseDetail(1: GetCourseDetailReq req)(api.get="/api/courses/:course_id"),
+  GetCourseResourceListResp getCourseResourceList(1: GetCourseResourceListReq req)(api.get="/api/courses/:course_id/resources"),
+  GetCourseCommentsResp getCourseComments(1: GetCourseCommentsReq req)(api.get="/api/courses/:course_id/comments"),
+  SubmitCourseRatingResp submitCourseRating(1: SubmitCourseRatingReq req)(api.post="/api/course_ratings/:course_id"),
+  SubmitCourseCommentResp submitCourseComment(1: SubmitCourseCommentReq req)(api.post="/api/course_comments/:course_id"),
+  DeleteCourseCommentResp deleteCourseComment(1: DeleteCourseCommentReq req)(api.delete="/api/courses_comments/:comment_id"),
+  DeleteCourseRatingResp deleteCourseRating(1: DeleteCourseRatingReq req)(api.delete="/api/course_ratings/:rating_id"),
 }
-
-

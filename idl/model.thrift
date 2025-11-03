@@ -24,7 +24,7 @@ struct Course{
     required i64 courseId,
     required string courseName,
     required i64 teacherId,
-    required i64 credit,
+    required double credit,
     required i64 majorId,
     required string grade,
     required string description,

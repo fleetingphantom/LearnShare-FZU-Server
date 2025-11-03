@@ -42,6 +42,29 @@ func (u User) ToUserModule() *module.User {
 	return user
 }
 
+//Course相关结构体
+type Course struct {
+	CourseID    int64     `json:"course_id" db:"course_id"`
+	CourseName  string    `json:"course_name" db:"course_name"`
+	TeacherID   int64     `json:"teacher_id" db:"teacher_id"`
+	Credit      float64   `json:"credit" db:"credit"`
+	MajorID     int64     `json:"major_id" db:"major_id"`
+	Grade       string    `json:"grade" db:"grade"`
+	Description *string   `json:"description,omitempty" db:"description"`
+	CreatedAt   time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at" db:"updated_at"`
+}
+
+func (c Course) ToCourseModule() *module.Course {
+	course := &module.Course{
+		CourseId:   c.CourseID,
+		CourseName: c.CourseName,
+		TeacherId:  c.TeacherID,
+		Credit:     c.Credit,
+		MajorId:    c.MajorID,
+		Grade:      c.Grade,
+		CreatedAt:  c.CreatedAt.Unix(),
+		UpdatedAt:  c.UpdatedAt.Unix(),
 // ToResourceModule 将db.Resource转换为model.Resource
 func (r Resource) ToResourceModule() *module.Resource {
 	var tags []*module.ResourceTag
@@ -86,43 +109,70 @@ func (t ResourceTag) ToResourceTagModule() *module.ResourceTag {
 		TagId:   t.TagID,
 		TagName: t.TagName,
 	}
+
+	// 确保description有合理值
+	if c.Description != nil {
+		course.Description = *c.Description
+	} else {
+		course.Description = "暂无描述" // 提供默认值
+	}
+	return course
 }
 
-// ToResourceCommentModule 将db.ResourceComment转换为model.ResourceComment
-func (c ResourceComment) ToResourceCommentModule() *module.ResourceComment {
-	var parentId int64
-	if c.ParentID != nil {
-		parentId = *c.ParentID
-	}
-
-	var status module.ResourceCommentStatus
-	status, _ = module.ResourceCommentStatusFromString(c.Status)
-
-	return &module.ResourceComment{
-		CommentId:  c.CommentID,
-		UserId:     c.UserID,
-		ResourceId: c.ResourceID,
-		Content:    c.Content,
-		ParentId:   parentId,
-		Likes:      c.Likes,
-		IsVisible:  c.IsVisible,
-		Status:     status,
-		CreatedAt:  c.CreatedAt.Unix(),
-	}
+// CourseRating 课程评分
+type CourseRating struct {
+	RatingID       int64     `json:"rating_id" db:"rating_id"`
+	UserID         int64     `json:"user_id" db:"user_id"`
+	CourseID       int64     `json:"course_id" db:"course_id"`
+	Recommendation int64     `json:"recommendation" db:"recommendation"`
+	Difficulty     string    `json:"difficulty" db:"difficulty"`
+	Workload       int64     `json:"workload" db:"workload"`
+	Usefulness     int64     `json:"usefulness" db:"usefulness"`
+	IsVisible      bool      `json:"is_visible" db:"is_visible"`
+	CreatedAt      time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
 }
 
-// ToResourceRatingModule 将db.ResourceRating转换为model.ResourceRating
-func (r ResourceRating) ToResourceRatingModule() *module.ResourceRating {
-	return &module.ResourceRating{
+func (r CourseRating) ToCourseRatingModule() *module.CourseRating {
+	return &module.CourseRating{
 		RatingId:       r.RatingID,
 		UserId:         r.UserID,
-		ResourceId:     r.ResourceID,
-		Recommendation: r.Recommendation * 10, // 转换为0-50的浮点数
+		CourseId:       r.CourseID,
+		Recommendation: r.Recommendation,
+		Difficulty:     r.Difficulty,
+		Workload:       r.Workload,
+		Usefulness:     r.Usefulness,
 		IsVisible:      r.IsVisible,
-		CreatedAt:      r.CreatedAt.Unix(),
 	}
 }
 
+// CourseComment 课程评论
+type CourseComment struct {
+	CommentID int64     `json:"comment_id" db:"comment_id"`
+	CourseID  int64     `json:"course_id" db:"course_id"`
+	UserID    int64     `json:"user_id" db:"user_id"`
+	Content   string    `json:"content" db:"content"`
+	ParentID  int64     `json:"parent_id" db:"parent_id"`
+	IsVisible bool      `json:"is_visible" db:"is_visible"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+}
+
+func (c CourseComment) ToCourseCommentModule() *module.CourseComment {
+	return &module.CourseComment{
+		CommentId: c.CommentID,
+		UserId:    c.UserID,
+		CourseId:  c.CourseID,
+		Content:   c.Content,
+		ParentId:  c.ParentID,
+		Likes:     0, // 必须：Thrift required字段
+		IsVisible: c.IsVisible,
+		Status:    0,                  // 必须：Thrift required字段
+		CreatedAt: c.CreatedAt.Unix(), // 必须：时间戳转换
+	}
+}
+
+// 添加上游的Resource相关结构体
 type Resource struct {
 	ResourceID    int64         `gorm:"primaryKey;autoIncrement"`
 	ResourceName  string        `gorm:"column:resource_name;size:255;not null"`
@@ -181,6 +231,73 @@ type ResourceRating struct {
 	Resource Resource `gorm:"foreignKey:ResourceID;references:ResourceID"`
 }
 
+// 添加上游的转换方法
+// ToResourceModule 将db.Resource转换为model.Resource
+func (r Resource) ToResourceModule() *module.Resource {
+	var tags []*module.ResourceTag
+	for _, t := range r.Tags {
+		tags = append(tags, t.ToResourceTagModule())
+	}
+
+	return &module.Resource{
+		ResourceId:    r.ResourceID,
+		Title:         r.Title,
+		Description:   &r.Description,
+		FilePath:      r.FilePath,
+		FileType:      r.FileType,
+		FileSize:      r.FileSize,
+		UploaderId:    r.UploaderID,
+		CourseId:      r.CourseID,
+		DownloadCount: r.DownloadCount,
+		AverageRating: r.AverageRating,
+		RatingCount:   r.RatingCount,
+		Status:        r.Status,
+		CreatedAt:     r.CreatedAt.Unix(),
+		Tags:          tags,
+	}
+}
+
+// ToResourceTagModule 将db.ResourceTag转换为model.ResourceTag
+func (t ResourceTag) ToResourceTagModule() *module.ResourceTag {
+	return &module.ResourceTag{
+		TagId:   t.TagID,
+		TagName: t.TagName,
+	}
+}
+
+// ToResourceCommentModule 将db.ResourceComment转换为model.ResourceComment
+func (c ResourceComment) ToResourceCommentModule() *module.ResourceComment {
+	var parentId int64
+	if c.ParentID != nil {
+		parentId = *c.ParentID
+	}
+
+	var status module.ResourceCommentStatus
+	status, _ = module.ResourceCommentStatusFromString(c.Status)
+
+	return &module.ResourceComment{
+		CommentId:  c.CommentID,
+		UserId:     c.UserID,
+		ResourceId: c.ResourceID,
+		Content:    c.Content,
+		ParentId:   parentId,
+		Likes:      c.Likes,
+		IsVisible:  c.IsVisible,
+		Status:     status,
+		CreatedAt:  c.CreatedAt.Unix(),
+	}
+}
+
+// ToResourceRatingModule 将db.ResourceRating转换为model.ResourceRating
+func (r ResourceRating) ToResourceRatingModule() *module.ResourceRating {
+	return &module.ResourceRating{
+		RatingId:       r.RatingID,
+		UserId:         r.UserID,
+		ResourceId:     r.ResourceID,
+		Recommendation: r.Recommendation * 10, // 转换为0-50的浮点数
+		IsVisible:      r.IsVisible,
+		CreatedAt:      r.CreatedAt.Unix(),
+	}
 // Review 审核模型
 type Review struct {
 	ReviewID   int64      `gorm:"primaryKey;autoIncrement;column:review_id"`
