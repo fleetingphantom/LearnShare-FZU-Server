@@ -37,7 +37,7 @@ func (s *ResourceService) SearchResources(req *resource.SearchResourceReq) ([]*m
 		req.PageSize = 20
 	}
 
-	resources, total, err := db.SearchResources(s.ctx, req.Keyword, req.TagId, req.CourseId, req.SortBy, int(req.PageNum), int(req.PageSize))
+	resources, total, err := db.SearchResources(s.ctx, req.Keyword, req.TagId, req.CourseID, req.SortBy, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, 0, err
 	}
@@ -53,11 +53,11 @@ func (s *ResourceService) SearchResources(req *resource.SearchResourceReq) ([]*m
 // GetResource 执行获取单个资源信息
 func (s *ResourceService) GetResource(req *resource.GetResourceReq) (*model.Resource, error) {
 	// 验证资源ID
-	if req.ResourceId <= 0 {
+	if req.ResourceID <= 0 {
 		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
 	}
 
-	resource, err := db.GetResourceByID(s.ctx, req.ResourceId)
+	resource, err := db.GetResourceByID(s.ctx, req.ResourceID)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func (s *ResourceService) GetResource(req *resource.GetResourceReq) (*model.Reso
 // GetResourceComments 执行获取资源评论列表
 func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceComment, int64, error) {
 	// 验证资源ID
-	if req.ResourceId <= 0 {
+	if req.ResourceID <= 0 {
 		return nil, 0, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
 	}
 
@@ -81,7 +81,7 @@ func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsR
 	}
 
 	// 调用数据库层获取评论数据
-	comments, total, err := db.GetResourceComments(s.ctx, req.ResourceId, req.SortBy, int(req.PageNum), int(req.PageSize))
+	comments, total, err := db.GetResourceComments(s.ctx, req.ResourceID, req.SortBy, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, 0, err
 	}
@@ -104,7 +104,7 @@ func (s *ResourceService) SubmitResourceRating(req *resource.SubmitResourceRatin
 	}
 
 	// 调用数据库层提交评分，使用rating字段
-	rating, err := db.SubmitResourceRating(s.ctx, userID, req.ResourceId, req.Rating)
+	rating, err := db.SubmitResourceRating(s.ctx, userID, req.ResourceID, req.Rating)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (s *ResourceService) SubmitResourceComment(req *resource.SubmitResourceComm
 	}
 
 	// 调用数据库层提交评论
-	comment, err := db.SubmitResourceComment(s.ctx, userID, req.ResourceId, req.Content, parentID)
+	comment, err := db.SubmitResourceComment(s.ctx, userID, req.ResourceID, req.Content, parentID)
 	if err != nil {
 		return nil, err
 	}
@@ -145,12 +145,12 @@ func (s *ResourceService) DeleteResourceRating(req *resource.DeleteResourceRatin
 	userID := GetUidFormContext(s.c)
 
 	// 验证评分ID
-	if req.RatingId <= 0 {
+	if req.RatingID <= 0 {
 		return errno.NewErrNo(errno.ServiceInvalidParameter, "评分ID无效")
 	}
 
 	// 调用数据库层删除评分
-	err := db.DeleteResourceRating(s.ctx, req.RatingId, userID)
+	err := db.DeleteResourceRating(s.ctx, req.RatingID, userID)
 	if err != nil {
 		return err
 	}
@@ -163,12 +163,12 @@ func (s *ResourceService) DeleteResourceComment(req *resource.DeleteResourceComm
 	userID := GetUidFormContext(s.c)
 
 	// 验证评论ID
-	if req.CommentId <= 0 {
+	if req.CommentID <= 0 {
 		return errno.NewErrNo(errno.ServiceInvalidParameter, "评论ID无效")
 	}
 
 	// 调用数据库层删除评论
-	err := db.DeleteResourceComment(s.ctx, req.CommentId, userID)
+	err := db.DeleteResourceComment(s.ctx, req.CommentID, userID)
 	if err != nil {
 		return err
 	}
@@ -179,7 +179,7 @@ func (s *ResourceService) DeleteResourceComment(req *resource.DeleteResourceComm
 // ReportResource 举报一个资源
 func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error {
 	// 验证资源ID
-	if req.ResourceId <= 0 {
+	if req.ResourceID <= 0 {
 		return errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
 	}
 
@@ -192,7 +192,7 @@ func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error 
 	}
 
 	// 调用数据库层创建举报记录
-	err := db.CreateReview(s.ctx, req.ResourceId, "resource", req.Reason)
+	err := db.CreateReview(s.ctx, req.ResourceID, "resource", req.Reason)
 	if err != nil {
 		return err
 	}

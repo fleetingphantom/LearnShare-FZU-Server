@@ -11,9 +11,9 @@ const (
 
 const (
 	UserTableName = "users"
-	ResourceTableName = "resource"
-	ResourceTagMappingTableName = "resource_tag_mapping"
-	ResourceCommentTableName = "resource_comment"
-	ResourceRatingTableName = "resource_rating"
-	ReviewTableName = "review"
+	ResourceTableName = "resources"
+	ResourceTagMappingTableName = "resource_tags"
+	ResourceCommentTableName = "resource_comments"
+	ResourceRatingTableName = "resource_ratings"
+	ReviewTableName = "reviews"
 )

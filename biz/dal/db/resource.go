@@ -5,7 +5,7 @@ import (
 	"LearnShare/pkg/errno"
 	"context"
 	"errors"
-
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -16,7 +16,7 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 	db := DB.WithContext(ctx).Table(constants.ResourceTableName)
 
 	if keyword != nil && *keyword != "" {
-		db = db.Where("title LIKE ? OR description LIKE ?", "%"+*keyword+"%", "%"+*keyword+"%")
+		db = db.Where("resource_name LIKE ? OR description LIKE ?", "%"+*keyword+"%", "%"+*keyword+"%")
 	}
 
 	if courseID != nil {
@@ -24,8 +24,8 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 	}
 
 	if tagID != nil {
-		db = db.Joins("JOIN resource_tag_mapping ON resource_tag_mapping.resource_id = resource.resource_id").
-			Where("resource_tag_mapping.tag_id = ?", *tagID)
+		db = db.Joins("JOIN "+constants.ResourceTagMappingTableName+" ON "+constants.ResourceTagMappingTableName+".resource_id = "+constants.ResourceTableName+".resource_id").
+			Where(constants.ResourceTagMappingTableName+".tag_id = ?", *tagID)
 	}
 
 	switch {
@@ -52,6 +52,7 @@ func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int6
 
 // GetResourceByID 根据资源ID获取单个资源信息
 func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
+	fmt.Println("resourceID:", resourceID)
 	var resource Resource
 
 	err := DB.WithContext(ctx).Table(constants.ResourceTableName).
@@ -60,6 +61,9 @@ func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 		First(&resource).Error
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "记录未找到")
+		}
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "根据ID查询资源失败: "+err.Error())
 	}
 

@@ -8,6 +8,7 @@ import (
 	"LearnShare/biz/service"
 	"LearnShare/pkg/errno"
 	"context"
+	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/protocol/consts"
@@ -22,6 +23,13 @@ func SearchResources(ctx context.Context, c *app.RequestContext) {
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
+	}
+
+	if req.TagId != nil && *req.TagId == 0 {
+		req.TagId = nil
+	}
+	if req.CourseID != nil && *req.CourseID == 0 {
+		req.CourseID = nil
 	}
 
 	resp := new(resource.SearchResourceResp)
@@ -102,6 +110,7 @@ func ReportResource(ctx context.Context, c *app.RequestContext) {
 // GetResource .
 // @router /api/resources/{resource_id} [GET]
 func GetResource(ctx context.Context, c *app.RequestContext) {
+	fmt.Println("GetResource handler called!")
 	var err error
 	var req resource.GetResourceReq
 	err = c.BindAndValidate(&req)
