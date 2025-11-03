@@ -14,9 +14,9 @@ type SearchResourceReq struct {
 	Keyword  *string `thrift:"keyword,1,optional" form:"keyword" json:"keyword,omitempty" query:"keyword"`
 	TagId    *int64  `thrift:"tagId,2,optional" form:"tagId" json:"tagId,omitempty" query:"tagId"`
 	SortBy   *string `thrift:"sortBy,3,optional" form:"sortBy" json:"sortBy,omitempty" query:"sortBy"`
-	CourseId *int64  `thrift:"courseId,4,optional" form:"courseId" json:"courseId,omitempty" query:"courseId"`
-	PageSize int32   `thrift:"pageSize,5,required" form:"pageSize,required" json:"pageSize,required" query:"pageSize,required"`
-	PageNum  int32   `thrift:"pageNum,6,required" form:"pageNum,required" json:"pageNum,required" query:"pageNum,required"`
+	CourseID *int64  `thrift:"course_id,4,optional" form:"course_id" json:"course_id,omitempty" query:"course_id"`
+	PageSize int32   `thrift:"page_size,5,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
+	PageNum  int32   `thrift:"page_num,6,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
 }
 
 func NewSearchResourceReq() *SearchResourceReq {
@@ -53,13 +53,13 @@ func (p *SearchResourceReq) GetSortBy() (v string) {
 	return *p.SortBy
 }
 
-var SearchResourceReq_CourseId_DEFAULT int64
+var SearchResourceReq_CourseID_DEFAULT int64
 
-func (p *SearchResourceReq) GetCourseId() (v int64) {
-	if !p.IsSetCourseId() {
-		return SearchResourceReq_CourseId_DEFAULT
+func (p *SearchResourceReq) GetCourseID() (v int64) {
+	if !p.IsSetCourseID() {
+		return SearchResourceReq_CourseID_DEFAULT
 	}
-	return *p.CourseId
+	return *p.CourseID
 }
 
 func (p *SearchResourceReq) GetPageSize() (v int32) {
@@ -74,9 +74,9 @@ var fieldIDToName_SearchResourceReq = map[int16]string{
 	1: "keyword",
 	2: "tagId",
 	3: "sortBy",
-	4: "courseId",
-	5: "pageSize",
-	6: "pageNum",
+	4: "course_id",
+	5: "page_size",
+	6: "page_num",
 }
 
 func (p *SearchResourceReq) IsSetKeyword() bool {
@@ -91,8 +91,8 @@ func (p *SearchResourceReq) IsSetSortBy() bool {
 	return p.SortBy != nil
 }
 
-func (p *SearchResourceReq) IsSetCourseId() bool {
-	return p.CourseId != nil
+func (p *SearchResourceReq) IsSetCourseID() bool {
+	return p.CourseID != nil
 }
 
 func (p *SearchResourceReq) Read(iprot thrift.TProtocol) (err error) {
@@ -246,7 +246,7 @@ func (p *SearchResourceReq) ReadField4(iprot thrift.TProtocol) error {
 	} else {
 		_field = &v
 	}
-	p.CourseId = _field
+	p.CourseID = _field
 	return nil
 }
 func (p *SearchResourceReq) ReadField5(iprot thrift.TProtocol) error {
@@ -375,11 +375,11 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 func (p *SearchResourceReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if p.IsSetCourseId() {
-		if err = oprot.WriteFieldBegin("courseId", thrift.I64, 4); err != nil {
+	if p.IsSetCourseID() {
+		if err = oprot.WriteFieldBegin("course_id", thrift.I64, 4); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := oprot.WriteI64(*p.CourseId); err != nil {
+		if err := oprot.WriteI64(*p.CourseID); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {
@@ -393,7 +393,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 func (p *SearchResourceReq) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageSize", thrift.I32, 5); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 5); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageSize); err != nil {
@@ -409,7 +409,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
 func (p *SearchResourceReq) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageNum", thrift.I32, 6); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 6); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageNum); err != nil {
@@ -715,8 +715,8 @@ type UploadResourceReq struct {
 	FileData    []byte   `thrift:"fileData,1,required" form:"fileData,required" json:"fileData,required" query:"fileData,required"`
 	Title       string   `thrift:"title,2,required" form:"title,required" json:"title,required" query:"title,required"`
 	Description *string  `thrift:"description,3,optional" form:"description" json:"description,omitempty" query:"description"`
-	CourseId    int64    `thrift:"courseId,4,required" form:"courseId,required" json:"courseId,required" query:"courseId,required"`
-	Tags        []string `thrift:"tags,5,optional" form:"tags" json:"tags,omitempty" query:"tags"`
+	CourseID    int64    `thrift:"course_id,4,required" form:"course_id,required" json:"course_id,required" query:"course_id,required"`
+	Tags        []string `thrift:"tags,5,optional,list<string>" form:"tags" json:"tags,omitempty" query:"tags"`
 }
 
 func NewUploadResourceReq() *UploadResourceReq {
@@ -743,8 +743,8 @@ func (p *UploadResourceReq) GetDescription() (v string) {
 	return *p.Description
 }
 
-func (p *UploadResourceReq) GetCourseId() (v int64) {
-	return p.CourseId
+func (p *UploadResourceReq) GetCourseID() (v int64) {
+	return p.CourseID
 }
 
 var UploadResourceReq_Tags_DEFAULT []string
@@ -760,7 +760,7 @@ var fieldIDToName_UploadResourceReq = map[int16]string{
 	1: "fileData",
 	2: "title",
 	3: "description",
-	4: "courseId",
+	4: "course_id",
 	5: "tags",
 }
 
@@ -777,7 +777,7 @@ func (p *UploadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldId int16
 	var issetFileData bool = false
 	var issetTitle bool = false
-	var issetCourseId bool = false
+	var issetCourseID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -824,7 +824,7 @@ func (p *UploadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCourseId = true
+				issetCourseID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -859,7 +859,7 @@ func (p *UploadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetCourseId {
+	if !issetCourseID {
 		fieldId = 4
 		goto RequiredFieldNotSetError
 	}
@@ -922,7 +922,7 @@ func (p *UploadResourceReq) ReadField4(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.CourseId = _field
+	p.CourseID = _field
 	return nil
 }
 func (p *UploadResourceReq) ReadField5(iprot thrift.TProtocol) error {
@@ -1044,10 +1044,10 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 func (p *UploadResourceReq) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("courseId", thrift.I64, 4); err != nil {
+	if err = oprot.WriteFieldBegin("course_id", thrift.I64, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CourseId); err != nil {
+	if err := oprot.WriteI64(p.CourseID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1302,7 +1302,7 @@ func (p *UploadResourceResp) String() string {
 
 // 下载资源请求
 type DownloadResourceReq struct {
-	ResourceId int64 `thrift:"resourceId,1,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
+	ResourceID int64 `thrift:"resource_id,1,required" form:"resource_id,required" json:"resource_id,required" query:"resource_id,required"`
 }
 
 func NewDownloadResourceReq() *DownloadResourceReq {
@@ -1312,18 +1312,18 @@ func NewDownloadResourceReq() *DownloadResourceReq {
 func (p *DownloadResourceReq) InitDefault() {
 }
 
-func (p *DownloadResourceReq) GetResourceId() (v int64) {
-	return p.ResourceId
+func (p *DownloadResourceReq) GetResourceID() (v int64) {
+	return p.ResourceID
 }
 
 var fieldIDToName_DownloadResourceReq = map[int16]string{
-	1: "resourceId",
+	1: "resource_id",
 }
 
 func (p *DownloadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetResourceId bool = false
+	var issetResourceID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -1344,7 +1344,7 @@ func (p *DownloadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetResourceId = true
+				issetResourceID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1361,7 +1361,7 @@ func (p *DownloadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetResourceId {
+	if !issetResourceID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -1391,7 +1391,7 @@ func (p *DownloadResourceReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.ResourceId = _field
+	p.ResourceID = _field
 	return nil
 }
 
@@ -1424,10 +1424,10 @@ WriteStructEndError:
 }
 
 func (p *DownloadResourceReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("resourceId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("resource_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ResourceId); err != nil {
+	if err := oprot.WriteI64(p.ResourceID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1655,7 +1655,7 @@ func (p *DownloadResourceResp) String() string {
 
 // 举报资源请求
 type ReportResourceReq struct {
-	ResourceId int64  `thrift:"resourceId,1,required" json:"resourceId,required" path:"resource_id,required"`
+	ResourceID int64  `thrift:"resource_id,1,required" json:"resource_id,required" path:"resource_id,required"`
 	Reason     string `thrift:"reason,2,required" form:"reason,required" json:"reason,required"`
 }
 
@@ -1666,8 +1666,8 @@ func NewReportResourceReq() *ReportResourceReq {
 func (p *ReportResourceReq) InitDefault() {
 }
 
-func (p *ReportResourceReq) GetResourceId() (v int64) {
-	return p.ResourceId
+func (p *ReportResourceReq) GetResourceID() (v int64) {
+	return p.ResourceID
 }
 
 func (p *ReportResourceReq) GetReason() (v string) {
@@ -1675,14 +1675,14 @@ func (p *ReportResourceReq) GetReason() (v string) {
 }
 
 var fieldIDToName_ReportResourceReq = map[int16]string{
-	1: "resourceId",
+	1: "resource_id",
 	2: "reason",
 }
 
 func (p *ReportResourceReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetResourceId bool = false
+	var issetResourceID bool = false
 	var issetReason bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -1704,7 +1704,7 @@ func (p *ReportResourceReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetResourceId = true
+				issetResourceID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1730,7 +1730,7 @@ func (p *ReportResourceReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetResourceId {
+	if !issetResourceID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -1765,7 +1765,7 @@ func (p *ReportResourceReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.ResourceId = _field
+	p.ResourceID = _field
 	return nil
 }
 func (p *ReportResourceReq) ReadField2(iprot thrift.TProtocol) error {
@@ -1813,10 +1813,10 @@ WriteStructEndError:
 }
 
 func (p *ReportResourceReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("resourceId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("resource_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ResourceId); err != nil {
+	if err := oprot.WriteI64(p.ResourceID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2008,7 +2008,7 @@ func (p *ReportResourceResp) String() string {
 
 // 获取资源信息请求
 type GetResourceReq struct {
-	ResourceId int64 `thrift:"resourceId,1,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
+	ResourceID int64 `thrift:"resource_id,1,required" json:"resource_id,required" path:"resource_id,required"`
 }
 
 func NewGetResourceReq() *GetResourceReq {
@@ -2018,18 +2018,18 @@ func NewGetResourceReq() *GetResourceReq {
 func (p *GetResourceReq) InitDefault() {
 }
 
-func (p *GetResourceReq) GetResourceId() (v int64) {
-	return p.ResourceId
+func (p *GetResourceReq) GetResourceID() (v int64) {
+	return p.ResourceID
 }
 
 var fieldIDToName_GetResourceReq = map[int16]string{
-	1: "resourceId",
+	1: "resource_id",
 }
 
 func (p *GetResourceReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetResourceId bool = false
+	var issetResourceID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2050,7 +2050,7 @@ func (p *GetResourceReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetResourceId = true
+				issetResourceID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2067,7 +2067,7 @@ func (p *GetResourceReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetResourceId {
+	if !issetResourceID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -2097,7 +2097,7 @@ func (p *GetResourceReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.ResourceId = _field
+	p.ResourceID = _field
 	return nil
 }
 
@@ -2130,10 +2130,10 @@ WriteStructEndError:
 }
 
 func (p *GetResourceReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("resourceId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("resource_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ResourceId); err != nil {
+	if err := oprot.WriteI64(p.ResourceID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2362,7 +2362,7 @@ func (p *GetResourceResp) String() string {
 
 // 提交资源评分请求
 type SubmitResourceRatingReq struct {
-	ResourceId int64   `thrift:"resourceId,1,required" json:"resourceId,required" path:"resource_id,required"`
+	ResourceID int64   `thrift:"resource_id,1,required" json:"resource_id,required" path:"resource_id,required"`
 	Rating     float64 `thrift:"rating,2,required" form:"rating,required" json:"rating,required" query:"rating,required"`
 }
 
@@ -2373,8 +2373,8 @@ func NewSubmitResourceRatingReq() *SubmitResourceRatingReq {
 func (p *SubmitResourceRatingReq) InitDefault() {
 }
 
-func (p *SubmitResourceRatingReq) GetResourceId() (v int64) {
-	return p.ResourceId
+func (p *SubmitResourceRatingReq) GetResourceID() (v int64) {
+	return p.ResourceID
 }
 
 func (p *SubmitResourceRatingReq) GetRating() (v float64) {
@@ -2382,14 +2382,14 @@ func (p *SubmitResourceRatingReq) GetRating() (v float64) {
 }
 
 var fieldIDToName_SubmitResourceRatingReq = map[int16]string{
-	1: "resourceId",
+	1: "resource_id",
 	2: "rating",
 }
 
 func (p *SubmitResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetResourceId bool = false
+	var issetResourceID bool = false
 	var issetRating bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -2411,7 +2411,7 @@ func (p *SubmitResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetResourceId = true
+				issetResourceID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2437,7 +2437,7 @@ func (p *SubmitResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetResourceId {
+	if !issetResourceID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -2472,7 +2472,7 @@ func (p *SubmitResourceRatingReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.ResourceId = _field
+	p.ResourceID = _field
 	return nil
 }
 func (p *SubmitResourceRatingReq) ReadField2(iprot thrift.TProtocol) error {
@@ -2520,10 +2520,10 @@ WriteStructEndError:
 }
 
 func (p *SubmitResourceRatingReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("resourceId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("resource_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ResourceId); err != nil {
+	if err := oprot.WriteI64(p.ResourceID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2715,7 +2715,7 @@ func (p *SubmitResourceRatingResp) String() string {
 
 // 删除资源评分请求
 type DeleteResourceRatingReq struct {
-	RatingId int64 `thrift:"ratingId,1,required" form:"ratingId,required" json:"ratingId,required" query:"ratingId,required"`
+	RatingID int64 `thrift:"rating_id,1,required" json:"rating_id,required" path:"rating_id,required"`
 }
 
 func NewDeleteResourceRatingReq() *DeleteResourceRatingReq {
@@ -2725,18 +2725,18 @@ func NewDeleteResourceRatingReq() *DeleteResourceRatingReq {
 func (p *DeleteResourceRatingReq) InitDefault() {
 }
 
-func (p *DeleteResourceRatingReq) GetRatingId() (v int64) {
-	return p.RatingId
+func (p *DeleteResourceRatingReq) GetRatingID() (v int64) {
+	return p.RatingID
 }
 
 var fieldIDToName_DeleteResourceRatingReq = map[int16]string{
-	1: "ratingId",
+	1: "rating_id",
 }
 
 func (p *DeleteResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetRatingId bool = false
+	var issetRatingID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2757,7 +2757,7 @@ func (p *DeleteResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetRatingId = true
+				issetRatingID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2774,7 +2774,7 @@ func (p *DeleteResourceRatingReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetRatingId {
+	if !issetRatingID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -2804,7 +2804,7 @@ func (p *DeleteResourceRatingReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.RatingId = _field
+	p.RatingID = _field
 	return nil
 }
 
@@ -2837,10 +2837,10 @@ WriteStructEndError:
 }
 
 func (p *DeleteResourceRatingReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("ratingId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("rating_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.RatingId); err != nil {
+	if err := oprot.WriteI64(p.RatingID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3016,7 +3016,7 @@ func (p *DeleteResourceRatingResp) String() string {
 
 // 提交资源评价请求
 type SubmitResourceCommentReq struct {
-	ResourceId int64  `thrift:"resourceId,1,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
+	ResourceID int64  `thrift:"resource_id,1,required" json:"resource_id,required" path:"resource_id,required"`
 	Content    string `thrift:"content,2,required" form:"content,required" json:"content,required" query:"content,required"`
 	ParentId   *int64 `thrift:"parentId,3,optional" form:"parentId" json:"parentId,omitempty" query:"parentId"`
 }
@@ -3028,8 +3028,8 @@ func NewSubmitResourceCommentReq() *SubmitResourceCommentReq {
 func (p *SubmitResourceCommentReq) InitDefault() {
 }
 
-func (p *SubmitResourceCommentReq) GetResourceId() (v int64) {
-	return p.ResourceId
+func (p *SubmitResourceCommentReq) GetResourceID() (v int64) {
+	return p.ResourceID
 }
 
 func (p *SubmitResourceCommentReq) GetContent() (v string) {
@@ -3046,7 +3046,7 @@ func (p *SubmitResourceCommentReq) GetParentId() (v int64) {
 }
 
 var fieldIDToName_SubmitResourceCommentReq = map[int16]string{
-	1: "resourceId",
+	1: "resource_id",
 	2: "content",
 	3: "parentId",
 }
@@ -3058,7 +3058,7 @@ func (p *SubmitResourceCommentReq) IsSetParentId() bool {
 func (p *SubmitResourceCommentReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetResourceId bool = false
+	var issetResourceID bool = false
 	var issetContent bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -3080,7 +3080,7 @@ func (p *SubmitResourceCommentReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetResourceId = true
+				issetResourceID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -3114,7 +3114,7 @@ func (p *SubmitResourceCommentReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetResourceId {
+	if !issetResourceID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -3149,7 +3149,7 @@ func (p *SubmitResourceCommentReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.ResourceId = _field
+	p.ResourceID = _field
 	return nil
 }
 func (p *SubmitResourceCommentReq) ReadField2(iprot thrift.TProtocol) error {
@@ -3212,10 +3212,10 @@ WriteStructEndError:
 }
 
 func (p *SubmitResourceCommentReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("resourceId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("resource_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ResourceId); err != nil {
+	if err := oprot.WriteI64(p.ResourceID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3425,7 +3425,7 @@ func (p *SubmitResourceCommentResp) String() string {
 
 // 删除资源评价请求
 type DeleteResourceCommentReq struct {
-	CommentId int64 `thrift:"commentId,1,required" form:"commentId,required" json:"commentId,required" query:"commentId,required"`
+	CommentID int64 `thrift:"comment_id,1,required" json:"comment_id,required" path:"comment_id,required"`
 }
 
 func NewDeleteResourceCommentReq() *DeleteResourceCommentReq {
@@ -3435,18 +3435,18 @@ func NewDeleteResourceCommentReq() *DeleteResourceCommentReq {
 func (p *DeleteResourceCommentReq) InitDefault() {
 }
 
-func (p *DeleteResourceCommentReq) GetCommentId() (v int64) {
-	return p.CommentId
+func (p *DeleteResourceCommentReq) GetCommentID() (v int64) {
+	return p.CommentID
 }
 
 var fieldIDToName_DeleteResourceCommentReq = map[int16]string{
-	1: "commentId",
+	1: "comment_id",
 }
 
 func (p *DeleteResourceCommentReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetCommentId bool = false
+	var issetCommentID bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -3467,7 +3467,7 @@ func (p *DeleteResourceCommentReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCommentId = true
+				issetCommentID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -3484,7 +3484,7 @@ func (p *DeleteResourceCommentReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetCommentId {
+	if !issetCommentID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -3514,7 +3514,7 @@ func (p *DeleteResourceCommentReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.CommentId = _field
+	p.CommentID = _field
 	return nil
 }
 
@@ -3547,10 +3547,10 @@ WriteStructEndError:
 }
 
 func (p *DeleteResourceCommentReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("commentId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("comment_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CommentId); err != nil {
+	if err := oprot.WriteI64(p.CommentID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3726,9 +3726,9 @@ func (p *DeleteResourceCommentResp) String() string {
 
 // 获取资源评论列表请求
 type GetResourceCommentsReq struct {
-	ResourceId int64 `thrift:"resourceId,1,required" form:"resourceId,required" json:"resourceId,required" query:"resourceId,required"`
-	PageSize   int32 `thrift:"pageSize,2,required" form:"pageSize,required" json:"pageSize,required" query:"pageSize,required"`
-	PageNum    int32 `thrift:"pageNum,3,required" form:"pageNum,required" json:"pageNum,required" query:"pageNum,required"`
+	ResourceID int64 `thrift:"resource_id,1,required" json:"resource_id,required" path:"resource_id,required"`
+	PageSize   int32 `thrift:"page_size,2,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
+	PageNum    int32 `thrift:"page_num,3,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
 	// latest, hottest
 	SortBy *string `thrift:"sortBy,4,optional" form:"sortBy" json:"sortBy,omitempty" query:"sortBy"`
 }
@@ -3740,8 +3740,8 @@ func NewGetResourceCommentsReq() *GetResourceCommentsReq {
 func (p *GetResourceCommentsReq) InitDefault() {
 }
 
-func (p *GetResourceCommentsReq) GetResourceId() (v int64) {
-	return p.ResourceId
+func (p *GetResourceCommentsReq) GetResourceID() (v int64) {
+	return p.ResourceID
 }
 
 func (p *GetResourceCommentsReq) GetPageSize() (v int32) {
@@ -3762,9 +3762,9 @@ func (p *GetResourceCommentsReq) GetSortBy() (v string) {
 }
 
 var fieldIDToName_GetResourceCommentsReq = map[int16]string{
-	1: "resourceId",
-	2: "pageSize",
-	3: "pageNum",
+	1: "resource_id",
+	2: "page_size",
+	3: "page_num",
 	4: "sortBy",
 }
 
@@ -3775,7 +3775,7 @@ func (p *GetResourceCommentsReq) IsSetSortBy() bool {
 func (p *GetResourceCommentsReq) Read(iprot thrift.TProtocol) (err error) {
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetResourceId bool = false
+	var issetResourceID bool = false
 	var issetPageSize bool = false
 	var issetPageNum bool = false
 
@@ -3798,7 +3798,7 @@ func (p *GetResourceCommentsReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetResourceId = true
+				issetResourceID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -3841,7 +3841,7 @@ func (p *GetResourceCommentsReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetResourceId {
+	if !issetResourceID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -3881,7 +3881,7 @@ func (p *GetResourceCommentsReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.ResourceId = _field
+	p.ResourceID = _field
 	return nil
 }
 func (p *GetResourceCommentsReq) ReadField2(iprot thrift.TProtocol) error {
@@ -3959,10 +3959,10 @@ WriteStructEndError:
 }
 
 func (p *GetResourceCommentsReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("resourceId", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("resource_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.ResourceId); err != nil {
+	if err := oprot.WriteI64(p.ResourceID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -3975,7 +3975,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 func (p *GetResourceCommentsReq) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageSize", thrift.I32, 2); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 2); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageSize); err != nil {
@@ -3991,7 +3991,7 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 func (p *GetResourceCommentsReq) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("pageNum", thrift.I32, 3); err != nil {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageNum); err != nil {

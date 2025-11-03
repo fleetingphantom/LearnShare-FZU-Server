@@ -24,6 +24,13 @@ func SearchResources(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
+	if req.TagId != nil && *req.TagId == 0 {
+		req.TagId = nil
+	}
+	if req.CourseID != nil && *req.CourseID == 0 {
+		req.CourseID = nil
+	}
+
 	resp := new(resource.SearchResourceResp)
 
 	// Call service

@@ -6,9 +6,9 @@ struct SearchResourceReq {
     1: optional string keyword,          
     2: optional i64 tagId,               
     3: optional string sortBy, 
-    4: optional i64 courseId,  
-    5: required i32 pageSize, 
-    6: required i32 pageNum,             
+    4: optional i64 course_id,  
+    5: required i32 page_size, 
+    6: required i32 page_num,             
 }
 
 struct SearchResourceResp {
@@ -22,7 +22,7 @@ struct UploadResourceReq {
     1: required binary fileData, 
     2: required string title,  
     3: optional string description,
-    4: required i64 courseId, 
+    4: required i64 course_id, 
     5: optional list<string> tags,
 }
 
@@ -33,7 +33,7 @@ struct UploadResourceResp {
 
 // 下载资源请求
 struct DownloadResourceReq {
-    1: required i64 resourceId, 
+    1: required i64 resource_id, 
 }
 
 struct DownloadResourceResp {
@@ -43,7 +43,7 @@ struct DownloadResourceResp {
 
 // 举报资源请求
 struct ReportResourceReq {
-    1: required i64 resourceId (api.path="resource_id"),
+    1: required i64 resource_id (api.path="resource_id"),
     2: required string reason (api.body="reason"),
 }
 
@@ -53,7 +53,7 @@ struct ReportResourceResp {
 
 // 获取资源信息请求
 struct GetResourceReq {
-    1: required i64 resourceId, 
+    1: required i64 resource_id (api.path="resource_id"), 
 }
 
 struct GetResourceResp {
@@ -63,7 +63,7 @@ struct GetResourceResp {
 
 // 提交资源评分请求
 struct SubmitResourceRatingReq {
-    1: required i64 resourceId (api.path="resource_id"),
+    1: required i64 resource_id (api.path="resource_id"),
     2: required double rating,
 }
 
@@ -73,7 +73,7 @@ struct SubmitResourceRatingResp {
 
 // 删除资源评分请求
 struct DeleteResourceRatingReq {
-    1: required i64 ratingId,
+    1: required i64 rating_id (api.path="rating_id"),
 }
 
 struct DeleteResourceRatingResp {
@@ -82,7 +82,7 @@ struct DeleteResourceRatingResp {
 
 // 提交资源评价请求
 struct SubmitResourceCommentReq {
-    1: required i64 resourceId,
+    1: required i64 resource_id (api.path="resource_id"),
     2: required string content,
     3: optional i64 parentId,
 }
@@ -93,7 +93,7 @@ struct SubmitResourceCommentResp {
 
 // 删除资源评价请求
 struct DeleteResourceCommentReq {
-    1: required i64 commentId,
+    1: required i64 comment_id (api.path="comment_id"),
 }
 
 struct DeleteResourceCommentResp {
@@ -102,9 +102,9 @@ struct DeleteResourceCommentResp {
 
 // 获取资源评论列表请求
 struct GetResourceCommentsReq {
-    1: required i64 resourceId,
-    2: required i32 pageSize,
-    3: required i32 pageNum,
+    1: required i64 resource_id (api.path="resource_id"),
+    2: required i32 page_size,
+    3: required i32 page_num,
     4: optional string sortBy, // latest, hottest
 }
 
@@ -118,16 +118,16 @@ struct GetResourceCommentsResp {
 service ResourceService {
     SearchResourceResp searchResources(1: SearchResourceReq req)(api.get="/api/resources/search"),
     UploadResourceResp uploadResource(1: UploadResourceReq req)(api.post="/api/resources"),
-    DownloadResourceResp downloadResource(1: DownloadResourceReq req)(api.get="/api/resources/{resource_id}/download"),
-    ReportResourceResp reportResource(1: ReportResourceReq req)(api.post="/api/resources/{resource_id}/report"),
-    GetResourceResp getResource(1: GetResourceReq req)(api.get="/api/resources/{resource_id}"),
+    DownloadResourceResp downloadResource(1: DownloadResourceReq req)(api.get="/api/resources/:resource_id/download"),
+    ReportResourceResp reportResource(1: ReportResourceReq req)(api.post="/api/resources/:resource_id/report"),
+    GetResourceResp getResource(1: GetResourceReq req)(api.get="/api/resources/:resource_id"),
     
     // 资源评分相关API
-    SubmitResourceRatingResp submitResourceRating(1: SubmitResourceRatingReq req)(api.post="/api/resource_ratings/{resource_id}"),
-    DeleteResourceRatingResp deleteResourceRating(1: DeleteResourceRatingReq req)(api.delete="/api/resource_ratings/{rating_id}"),
+    SubmitResourceRatingResp submitResourceRating(1: SubmitResourceRatingReq req)(api.post="/api/resource_ratings/:resource_id"),
+    DeleteResourceRatingResp deleteResourceRating(1: DeleteResourceRatingReq req)(api.delete="/api/resource_ratings/:rating_id"),
     
     // 资源评论相关API
-    SubmitResourceCommentResp submitResourceComment(1: SubmitResourceCommentReq req)(api.post="/api/resource_comments/{resource_id}"),
-    DeleteResourceCommentResp deleteResourceComment(1: DeleteResourceCommentReq req)(api.delete="/api/resource_comments/{comment_id}"),
-    GetResourceCommentsResp getResourceComments(1: GetResourceCommentsReq req)(api.get="/api/resource_comments/{resource_id}"),
+    SubmitResourceCommentResp submitResourceComment(1: SubmitResourceCommentReq req)(api.post="/api/resource_comments/:resource_id"),
+    DeleteResourceCommentResp deleteResourceComment(1: DeleteResourceCommentReq req)(api.delete="/api/resource_comments/:comment_id"),
+    GetResourceCommentsResp getResourceComments(1: GetResourceCommentsReq req)(api.get="/api/resource/:resource_id/comment"),
 }
