@@ -14,10 +14,11 @@ import (
 
 var DB *gorm.DB
 
+// Init 初始化数据库连接
 func Init() error {
 	dsn, err := utils.GetMysqlDSN()
 	if err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("dal.InitMySQL get mysql DSN error: %v", err))
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("数据库初始化获取DSN失败: %v", err))
 	}
 
 	DB, err = gorm.Open(mysql.Open(dsn),

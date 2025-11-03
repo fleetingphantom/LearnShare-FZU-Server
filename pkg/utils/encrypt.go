@@ -18,7 +18,7 @@ func EncryptPassword(pwd string) (string, error) {
 
 func ComparePassword(passwordDigest, password string) error {
 	if bcrypt.CompareHashAndPassword([]byte(passwordDigest), []byte(password)) != nil {
-		return errno.NewErrNo(errno.ServiceInvalidPassword, "密码错误")
+		return errno.UserPasswordIncorrectError
 	}
 	return nil
 }

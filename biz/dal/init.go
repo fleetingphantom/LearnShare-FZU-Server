@@ -5,6 +5,7 @@ import (
 	"LearnShare/biz/dal/redis"
 )
 
+// Init 初始化数据访问层
 func Init() error {
 	err := db.Init()
 	if err != nil {

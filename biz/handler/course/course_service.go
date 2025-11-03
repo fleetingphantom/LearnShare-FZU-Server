@@ -6,8 +6,10 @@ import (
 	"context"
 
 	course "LearnShare/biz/model/course"
+	"LearnShare/biz/pack"
+	"LearnShare/pkg/errno"
+
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/protocol/consts"
 )
 
 // Search .
@@ -17,13 +19,14 @@ func Search(ctx context.Context, c *app.RequestContext) {
 	var req course.SearchReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(course.SearchResp)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // GetCourseDetail .
@@ -33,13 +36,14 @@ func GetCourseDetail(ctx context.Context, c *app.RequestContext) {
 	var req course.GetCourseDetailReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(course.GetCourseDetailResp)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // GetCourseResourceList .
@@ -49,13 +53,14 @@ func GetCourseResourceList(ctx context.Context, c *app.RequestContext) {
 	var req course.GetCourseResourceListReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(course.GetCourseResourceListResp)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // GetCourseComments .
@@ -65,13 +70,14 @@ func GetCourseComments(ctx context.Context, c *app.RequestContext) {
 	var req course.GetCourseCommentsReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(course.GetCourseCommentsResp)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // SubmitCourseRating .
@@ -81,13 +87,14 @@ func SubmitCourseRating(ctx context.Context, c *app.RequestContext) {
 	var req course.SubmitCourseRatingReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(course.SubmitCourseRatingResp)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // SubmitCourseComment .
@@ -97,13 +104,14 @@ func SubmitCourseComment(ctx context.Context, c *app.RequestContext) {
 	var req course.SubmitCourseCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(course.SubmitCourseCommentResp)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // DeleteCourseComment .
@@ -113,13 +121,14 @@ func DeleteCourseComment(ctx context.Context, c *app.RequestContext) {
 	var req course.DeleteCourseCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(course.DeleteCourseCommentResp)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }
 
 // DeleteCourseRating .
@@ -129,11 +138,12 @@ func DeleteCourseRating(ctx context.Context, c *app.RequestContext) {
 	var req course.DeleteCourseRatingReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
-		c.String(consts.StatusBadRequest, err.Error())
+		pack.BuildFailResponse(c, err)
 		return
 	}
 
 	resp := new(course.DeleteCourseRatingResp)
+	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
 
-	c.JSON(consts.StatusOK, resp)
+	pack.SendResponse(c, resp)
 }

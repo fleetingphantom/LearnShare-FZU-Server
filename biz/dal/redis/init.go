@@ -11,9 +11,10 @@ import (
 
 var RDB *redis.Client
 
+// Init 初始化Redis连接
 func Init() error {
 	if config.Redis == nil {
-		return errno.NewErrNo(errno.InternalServiceErrorCode, "redis config is nil")
+		return errno.NewErrNo(errno.InternalServiceErrorCode, "Redis配置为空")
 	}
 	RDB = redis.NewClient(&redis.Options{
 		Addr:     config.Redis.Addr,
@@ -23,7 +24,7 @@ func Init() error {
 
 	_, err := RDB.Ping(context.TODO()).Result()
 	if err != nil {
-		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("client.NewRedisClient: ping redis failed: %v", err))
+		return errno.NewErrNo(errno.InternalRedisErrorCode, fmt.Sprintf("Redis连接测试失败: %v", err))
 	}
 	return nil
 }

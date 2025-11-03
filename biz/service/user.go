@@ -111,7 +111,7 @@ func (s *UserService) VerifyEmail(req *user.VerifyEmailReq) error {
 	}
 
 	if storeCode != req.Code {
-		return errno.NewErrNo(errno.ServiceInvalidCode, "验证码不正确")
+		return errno.UserVerificationCodeInvalidError
 	}
 
 	err = db.UpdateUserStatues(s.ctx, userId, "active")
@@ -131,7 +131,7 @@ func (s *UserService) UpdateEmail(req *user.UpdateEmailReq) error {
 	}
 
 	if storeCode != req.Code {
-		return errno.NewErrNo(errno.ServiceInvalidCode, "验证码不正确")
+		return errno.UserVerificationCodeInvalidError
 	}
 
 	err = db.UpdateUserEmail(s.ctx, int(userId), req.NewEmail)
@@ -149,7 +149,7 @@ func (s *UserService) UpdatePassword(req *user.UpdatePasswordReq) error {
 	}
 
 	if err := utils.ComparePassword(userInfo.PasswordHash, req.OldPassword); err != nil {
-		return errno.NewErrNo(errno.ServiceInvalidPassword, "旧密码不正确")
+		return errno.UserPasswordIncorrectError
 	}
 	newPasswordHash, err := utils.EncryptPassword(req.NewPassword)
 	if err != nil {
@@ -188,7 +188,7 @@ func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
 	}
 
 	if storeCode != req.Code {
-		return errno.NewErrNo(errno.ServiceInvalidCode, "验证码不正确")
+		return errno.UserVerificationCodeInvalidError
 	}
 
 	newPasswordHash, err := utils.EncryptPassword(req.NewPassword)
