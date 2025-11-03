@@ -79,7 +79,7 @@ func _resource_commentsMw() []app.HandlerFunc {
 
 func _submitresourcecommentMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _resource_ratingsMw() []app.HandlerFunc {
@@ -94,7 +94,7 @@ func _deleteresourceratingMw() []app.HandlerFunc {
 
 func _submitresourceratingMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func _resources_commentsMw() []app.HandlerFunc {
@@ -104,7 +104,7 @@ func _resources_commentsMw() []app.HandlerFunc {
 
 func _deleteresourcecommentMw() []app.HandlerFunc {
 	// your code...
-	return nil
+	return auth.Auth()
 }
 
 func __7bresource_id_7d1Mw() []app.HandlerFunc {
