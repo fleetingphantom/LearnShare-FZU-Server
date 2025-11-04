@@ -1,7 +1,7 @@
 services:
   # LearnShare 主应用服务
   LearnShare-app:
-    container_name: LearnShare-app
+    image: learnshare:latest
     build:
       context: ..
       dockerfile: Dockerfile
