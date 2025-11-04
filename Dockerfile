@@ -17,10 +17,11 @@ FROM alpine
 
 RUN apk update --no-cache && apk add --no-cache ca-certificates tzdata ffmpeg
 ENV TZ Asia/Shanghai
-ENV service tiktok
+ENV service LearnShare
 
 WORKDIR /app
 
 COPY --from=builder /app/output /app/output
-ADD ./bootstrap.sh /app/
+ADD ./docker/bootstrap.sh /app/
+EXPOSE 8888
 CMD ["sh","bootstrap.sh"]
