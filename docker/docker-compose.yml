@@ -11,7 +11,7 @@ services:
       - LearnShare-redis
       - LearnShare-mysql
     volumes:
-      - ../config/config.yaml:/app/output/config/config.yaml
+      - ../config/:/app/config/
     networks:
       - LearnShare
     restart: unless-stopped
