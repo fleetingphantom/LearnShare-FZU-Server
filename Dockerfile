@@ -22,6 +22,6 @@ ENV service LearnShare
 WORKDIR /app
 
 COPY --from=builder /app/output /app/output
-ADD ./docker/bootstrap.sh /app/
+ADD ./script/bootstrap.sh /app/
 EXPOSE 8888
 CMD ["sh","bootstrap.sh"]
