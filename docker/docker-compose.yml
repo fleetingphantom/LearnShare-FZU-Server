@@ -10,6 +10,8 @@ services:
     depends_on:
       - LearnShare-redis
       - LearnShare-mysql
+    volumes:
+      - ../config/config.yaml:/app/output/config/config.yaml
     networks:
       - LearnShare
     restart: unless-stopped
