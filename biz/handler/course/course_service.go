@@ -26,7 +26,7 @@ func Search(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.SearchResp)
 
 	// Call service
-	resp, err = service.NewCourseService(ctx, c).Search(&req)
+	data, err := service.NewCourseService(ctx, c).Search(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -34,6 +34,7 @@ func Search(ctx context.Context, c *app.RequestContext) {
 
 	// Build response
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	resp.Courses = data
 
 	pack.SendResponse(c, resp)
 }
@@ -52,7 +53,7 @@ func GetCourseDetail(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.GetCourseDetailResp)
 
 	// Call service
-	resp, err = service.NewCourseService(ctx, c).GetCourseDetail(&req)
+	dara, err := service.NewCourseService(ctx, c).GetCourseDetail(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -60,6 +61,7 @@ func GetCourseDetail(ctx context.Context, c *app.RequestContext) {
 
 	// Build response
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	resp.Course = dara
 
 	pack.SendResponse(c, resp)
 }
@@ -78,7 +80,7 @@ func GetCourseResourceList(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.GetCourseResourceListResp)
 
 	// Call service
-	resp, err = service.NewCourseService(ctx, c).GetCourseResourceList(&req)
+	data, err := service.NewCourseService(ctx, c).GetCourseResourceList(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -86,6 +88,7 @@ func GetCourseResourceList(ctx context.Context, c *app.RequestContext) {
 
 	// Build response
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	resp.Resources = data
 
 	pack.SendResponse(c, resp)
 }
@@ -104,7 +107,7 @@ func GetCourseComments(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.GetCourseCommentsResp)
 
 	// Call service
-	resp, err = service.NewCourseService(ctx, c).GetCourseComments(&req)
+	dara, err := service.NewCourseService(ctx, c).GetCourseComments(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -112,6 +115,7 @@ func GetCourseComments(ctx context.Context, c *app.RequestContext) {
 
 	// Build response
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
+	resp.Comments = dara
 
 	pack.SendResponse(c, resp)
 }
@@ -130,7 +134,7 @@ func SubmitCourseRating(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.SubmitCourseRatingResp)
 
 	// Call service
-	resp, err = service.NewCourseService(ctx, c).SubmitCourseRating(&req)
+	err = service.NewCourseService(ctx, c).SubmitCourseRating(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -156,7 +160,7 @@ func SubmitCourseComment(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.SubmitCourseCommentResp)
 
 	// Call service
-	resp, err = service.NewCourseService(ctx, c).SubmitCourseComment(&req)
+	err = service.NewCourseService(ctx, c).SubmitCourseComment(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -182,7 +186,7 @@ func DeleteCourseComment(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.DeleteCourseCommentResp)
 
 	// Call service
-	resp, err = service.NewCourseService(ctx, c).DeleteCourseComment(&req)
+	err = service.NewCourseService(ctx, c).DeleteCourseComment(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -208,7 +212,7 @@ func DeleteCourseRating(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.DeleteCourseRatingResp)
 
 	// Call service
-	resp, err = service.NewCourseService(ctx, c).DeleteCourseRating(&req)
+	err = service.NewCourseService(ctx, c).DeleteCourseRating(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return

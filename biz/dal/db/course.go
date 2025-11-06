@@ -48,9 +48,9 @@ func GetCourseByID(ctx context.Context, courseID int64) (*Course, error) {
 	return &course, nil
 }
 
-func GetCoursesByTeacherID(ctx context.Context, teacherID int64) ([]*Course, error) {
+func GetCoursesByTeacherID(ctx context.Context, teacherID int64, pageSize, pageNum int) ([]*Course, error) {
 	var courses []*Course
-	err := DB.WithContext(ctx).Table(constants.CourseTableName).Where("teacher_id = ?", teacherID).Find(&courses).Error
+	err := DB.WithContext(ctx).Table(constants.CourseTableName).Where("teacher_id = ?", teacherID).Limit(pageSize).Offset(pageSize * (pageNum - 1)).Find(&courses).Error
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询教师课程失败: "+err.Error())
 	}
@@ -66,7 +66,7 @@ func GetCoursesByMajorID(ctx context.Context, majorID int64) ([]*Course, error) 
 	return courses, nil
 }
 
-func SearchCourses(ctx context.Context, keywords string, grade string) ([]*Course, error) {
+func SearchCourses(ctx context.Context, keywords string, grade string, pageNum, pageSize int) ([]*Course, error) {
 	var courses []*Course // 声明courses变量
 
 	query := DB.WithContext(ctx).Table(constants.CourseTableName)
@@ -78,7 +78,7 @@ func SearchCourses(ctx context.Context, keywords string, grade string) ([]*Cours
 		query = query.Where("grade = ?", grade)
 	}
 
-	err := query.Find(&courses).Error
+	err := query.Limit(pageSize).Offset(pageSize * (pageNum - 1)).Find(&courses).Error
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "搜索课程失败: "+err.Error())
 	}
@@ -160,7 +160,7 @@ func GetCourseCommentByID(ctx context.Context, commentID int64) (*CourseComment,
 	return &comment, nil
 }
 
-func GetCourseCommentsByCourseID(ctx context.Context, courseID int64, sortBy string) ([]*CourseComment, error) {
+func GetCourseCommentsByCourseID(ctx context.Context, courseID int64, sortBy string, pageNum, pageSize int) ([]*CourseComment, error) {
 	var comments []*CourseComment
 
 	query := DB.WithContext(ctx).Table(constants.CourseCommentTableName).Where("course_id = ? AND is_visible = ?", courseID, true)
@@ -177,7 +177,7 @@ func GetCourseCommentsByCourseID(ctx context.Context, courseID int64, sortBy str
 		query = query.Order("created_at DESC")
 	}
 
-	err := query.Find(&comments).Error
+	err := query.Limit(pageSize).Offset(pageSize * (pageNum - 1)).Find(&comments).Error
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程评论列表失败: "+err.Error())
 	}
@@ -186,7 +186,7 @@ func GetCourseCommentsByCourseID(ctx context.Context, courseID int64, sortBy str
 }
 
 // 获取课程资源列表
-func GetCourseResources(ctx context.Context, courseID int64, resourceType, status string) ([]*Resource, error) {
+func GetCourseResources(ctx context.Context, courseID int64, resourceType, status string, pageNum, pageSize int) ([]*Resource, error) {
 	var resources []*Resource
 
 	query := DB.WithContext(ctx).Table(constants.ResourceTableName).Where("course_id = ?", courseID)
@@ -198,7 +198,7 @@ func GetCourseResources(ctx context.Context, courseID int64, resourceType, statu
 		query = query.Where("status = ?", status)
 	}
 
-	err := query.Order("created_at DESC").Find(&resources).Error
+	err := query.Order("created_at DESC").Limit(pageSize).Offset(pageSize * (pageNum - 1)).Find(&resources).Error
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程资源列表失败: "+err.Error())
 	}

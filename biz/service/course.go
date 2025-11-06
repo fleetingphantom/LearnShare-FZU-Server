@@ -20,7 +20,7 @@ func NewCourseService(ctx context.Context, c *app.RequestContext) *CourseService
 	return &CourseService{ctx: ctx, c: c}
 }
 
-func (s *CourseService) Search(req *course.SearchReq) (*course.SearchResp, error) {
+func (s *CourseService) Search(req *course.SearchReq) ([]*module.Course, error) {
 
 	// 使用strings包处理指针类型的参数
 	keywords := ""
@@ -33,8 +33,15 @@ func (s *CourseService) Search(req *course.SearchReq) (*course.SearchResp, error
 		grade = strings.TrimSpace(*req.Grade)
 	}
 
+	if req.PageNum <= 0 {
+		req.PageNum = 1
+	}
+	if req.PageSize <= 0 {
+		req.PageSize = 10
+	}
+
 	// 调用数据库查询课程
-	courses, err := db.SearchCourses(s.ctx, keywords, grade)
+	courses, err := db.SearchCourses(s.ctx, keywords, grade, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "搜索课程失败: "+err.Error())
 	}
@@ -45,36 +52,20 @@ func (s *CourseService) Search(req *course.SearchReq) (*course.SearchResp, error
 		courseModules = append(courseModules, c.ToCourseModule())
 	}
 
-	// 构建响应
-	resp := &course.SearchResp{
-		BaseResponse: &module.BaseResp{
-			Code:    errno.SuccessCode,
-			Message: errno.SuccessMsg,
-		},
-		Courses: courseModules,
-	}
-
-	return resp, nil
+	return courseModules, nil
 }
 
-func (s *CourseService) GetCourseDetail(req *course.GetCourseDetailReq) (*course.GetCourseDetailResp, error) {
+func (s *CourseService) GetCourseDetail(req *course.GetCourseDetailReq) (*module.Course, error) {
 	// 获取课程详情
 	courseDetail, err := db.GetCourseByID(s.ctx, req.CourseID)
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "获取课程详情失败: "+err.Error())
 	}
 
-	resp := &course.GetCourseDetailResp{
-		BaseResponse: &module.BaseResp{
-			Code:    errno.SuccessCode,
-			Message: errno.SuccessMsg,
-		},
-		Course: courseDetail.ToCourseModule(),
-	}
-	return resp, nil
+	return courseDetail.ToCourseModule(), nil
 }
 
-func (s *CourseService) GetCourseResourceList(req *course.GetCourseResourceListReq) (*course.GetCourseResourceListResp, error) {
+func (s *CourseService) GetCourseResourceList(req *course.GetCourseResourceListReq) ([]*module.Resource, error) {
 	// 处理指针类型的参数
 	var resourceType string
 	if req.Type != nil {
@@ -85,9 +76,15 @@ func (s *CourseService) GetCourseResourceList(req *course.GetCourseResourceListR
 	if req.Status != nil {
 		status = *req.Status
 	}
+	if req.PageNum <= 0 {
+		req.PageNum = 1
+	}
+	if req.PageSize <= 0 {
+		req.PageSize = 10
+	}
 
 	// 获取课程资源列表 - 使用正确的字段名
-	resources, err := db.GetCourseResources(s.ctx, req.CourseID, resourceType, status) // 改为 CourseID
+	resources, err := db.GetCourseResources(s.ctx, req.CourseID, resourceType, status, int(req.PageNum), int(req.PageSize)) // 改为 CourseID
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "获取课程资源失败: "+err.Error())
 	}
@@ -98,25 +95,25 @@ func (s *CourseService) GetCourseResourceList(req *course.GetCourseResourceListR
 		resourceModules = append(resourceModules, r.ToResourceModule())
 	}
 
-	resp := &course.GetCourseResourceListResp{
-		BaseResponse: &module.BaseResp{
-			Code:    errno.SuccessCode,
-			Message: errno.SuccessMsg,
-		},
-		Resources: resourceModules,
-	}
-	return resp, nil
+	return resourceModules, nil
 }
 
-func (s *CourseService) GetCourseComments(req *course.GetCourseCommentsReq) (*course.GetCourseCommentsResp, error) {
+func (s *CourseService) GetCourseComments(req *course.GetCourseCommentsReq) ([]*module.CourseComment, error) {
 	// SortBy 是普通 string 类型，不是指针
 	sortBy := req.SortBy
 	if sortBy == "" {
 		sortBy = "latest" // 使用默认值
 	}
 
+	if req.PageNum <= 0 {
+		req.PageNum = 1
+	}
+	if req.PageSize <= 0 {
+		req.PageSize = 10
+	}
+
 	// 获取课程评论列表
-	comments, err := db.GetCourseCommentsByCourseID(s.ctx, req.CourseID, sortBy)
+	comments, err := db.GetCourseCommentsByCourseID(s.ctx, req.CourseID, sortBy, int(req.PageNum), int(req.PageSize))
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "获取课程评论失败: "+err.Error())
 	}
@@ -127,17 +124,10 @@ func (s *CourseService) GetCourseComments(req *course.GetCourseCommentsReq) (*co
 		commentModules = append(commentModules, c.ToCourseCommentModule())
 	}
 
-	resp := &course.GetCourseCommentsResp{
-		BaseResponse: &module.BaseResp{
-			Code:    errno.SuccessCode,
-			Message: errno.SuccessMsg,
-		},
-		Comments: commentModules,
-	}
-	return resp, nil
+	return commentModules, nil
 }
 
-func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) (*course.SubmitCourseRatingResp, error) {
+func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) error {
 	// 获取用户ID
 	userID := GetUidFormContext(s.c)
 
@@ -155,26 +145,18 @@ func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) (*
 	// 提交评分
 	err := db.SubmitCourseRating(s.ctx, rating)
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分失败: "+err.Error())
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分失败: "+err.Error())
 	}
 
-	resp := &course.SubmitCourseRatingResp{
-		BaseResponse: &module.BaseResp{
-			Code:    errno.SuccessCode,
-			Message: errno.SuccessMsg,
-		},
-		Rating: rating.ToCourseRatingModule(),
-	}
-	return resp, nil
+	return nil
 }
 
-func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) (*course.SubmitCourseCommentResp, error) {
+func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) error {
 	// 获取用户ID
 	userID := GetUidFormContext(s.c)
 
 	// 处理 ParentID 默认值
 	parentID := req.ParentID
-
 
 	// 处理 IsVisible 默认值
 	isVisible := req.IsVisible
@@ -194,47 +176,28 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 	// 提交评论
 	err := db.SubmitCourseComment(s.ctx, comment)
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评论失败: "+err.Error())
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评论失败: "+err.Error())
 	}
 
-	resp := &course.SubmitCourseCommentResp{
-		BaseResponse: &module.BaseResp{
-			Code:    errno.SuccessCode,
-			Message: errno.SuccessMsg,
-		},
-		Comment: comment.ToCourseCommentModule(),
-	}
-	return resp, nil
+	return nil
 }
 
-func (s *CourseService) DeleteCourseComment(req *course.DeleteCourseCommentReq) (*course.DeleteCourseCommentResp, error) {
+func (s *CourseService) DeleteCourseComment(req *course.DeleteCourseCommentReq) error {
 	// 删除评论
 	err := db.DeleteCourseComment(s.ctx, req.CommentID)
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评论失败: "+err.Error())
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评论失败: "+err.Error())
 	}
 
-	resp := &course.DeleteCourseCommentResp{
-		BaseResponse: &module.BaseResp{
-			Code:    errno.SuccessCode,
-			Message: errno.SuccessMsg,
-		},
-	}
-	return resp, nil
+	return nil
 }
 
-func (s *CourseService) DeleteCourseRating(req *course.DeleteCourseRatingReq) (*course.DeleteCourseRatingResp, error) {
+func (s *CourseService) DeleteCourseRating(req *course.DeleteCourseRatingReq) error {
 	// 删除评分
 	err := db.DeleteCourseRating(s.ctx, req.RatingID)
 	if err != nil {
-		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评分失败: "+err.Error())
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评分失败: "+err.Error())
 	}
 
-	resp := &course.DeleteCourseRatingResp{
-		BaseResponse: &module.BaseResp{
-			Code:    errno.SuccessCode,
-			Message: errno.SuccessMsg,
-		},
-	}
-	return resp, nil
+	return nil
 }
