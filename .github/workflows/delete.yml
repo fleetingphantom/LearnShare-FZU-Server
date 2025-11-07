@@ -1,0 +1,19 @@
+name: Delete old workflow runs
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  del_runs:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Delete workflow runs for remote repo
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: '2451965602/LearnShare-FZU-Server'
+          keep_minimum_runs: 6
