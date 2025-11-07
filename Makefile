@@ -10,7 +10,7 @@ OUTPUT_PATH = $(DIR)/output
 # 启动必要的环境，比如 etcd、mysql
 .PHONY: env-up
 env-up:
-	@ docker compose -f ./docker/docker-compose.yml up -d
+	@ docker compose -f ./docker/docker-compose-env.yml up -d
 
 # 关闭必要的环境，但不清理 data（位于 docker/data 目录中）
 .PHONY: env-down
@@ -38,7 +38,7 @@ clean-all: clean
 
 .PHONY: build
 build:
-	@docker build -t learnshare .
+	@docker build -t ghcr.io/2451965602/learnshare:latest .
 
 .PHONY: run
 run:

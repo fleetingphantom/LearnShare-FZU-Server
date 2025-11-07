@@ -1,0 +1,31 @@
+services:
+  # Redis 服务，用于缓存、会话管理等，提供键值存储功能
+  LearnShare-redis:
+    container_name: LearnShare-redis
+    image: redis:bookworm
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "6379:6379"
+    env_file:
+      - "./env/redis.env"
+    networks:
+      - LearnShare
+  # MySQL 服务，提供关系型数据库，用于存储结构化数据
+  LearnShare-mysql:
+    container_name: LearnShare-mysql
+    image: mysql:9.0.1
+    env_file:
+      - "./env/mysql.env"
+    ports:
+      - "3306:3306"
+    networks:
+      - LearnShare
+    volumes:
+      - ../config/sql:/docker-entrypoint-initdb.d
+      - ./data/mysql:/var/lib/mysql
+
+networks:
+  LearnShare:
+    driver: bridge
+    name: LearnShare
