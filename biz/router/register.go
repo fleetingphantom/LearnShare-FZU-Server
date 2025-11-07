@@ -3,7 +3,6 @@
 package router
 
 import (
-	admin "LearnShare/biz/router/admin"
 	audit "LearnShare/biz/router/audit"
 	course "LearnShare/biz/router/course"
 	favorite "LearnShare/biz/router/favorite"
@@ -22,8 +21,6 @@ func GeneratedRegister(r *server.Hertz) {
 	audit.Register(r)
 
 	school_struct.Register(r)
-
-	admin.Register(r)
 
 	course.Register(r)
 
