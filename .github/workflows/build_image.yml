@@ -39,7 +39,6 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/2451965602/learnshare:latest
-            ghcr.io/2451965602/learnshare:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
