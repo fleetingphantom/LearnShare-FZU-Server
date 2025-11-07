@@ -38,5 +38,9 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/2451965602/learnshare:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: |
+            type=gha
+            type=registry,ref=ghcr.io/2451965602/learnshare:cache
+          cache-to: |
+            type=gha,mode=max
+            type=registry,mode=max,ref=ghcr.io/2451965602/learnshare:cache
