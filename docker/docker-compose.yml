@@ -1,7 +1,7 @@
 services:
   # LearnShare 主应用服务
   LearnShare-app:
-    image: learnshare:latest
+    image: ghcr.io/2451965602/learnshare:latest
     build:
       context: ..
       dockerfile: Dockerfile
