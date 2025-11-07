@@ -1,7 +1,6 @@
 name: Build and publish Docker image
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -31,7 +30,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
@@ -41,4 +40,3 @@ jobs:
             ghcr.io/2451965602/learnshare:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
