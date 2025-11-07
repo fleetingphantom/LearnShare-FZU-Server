@@ -131,3 +131,34 @@ service ResourceService {
     DeleteResourceCommentResp deleteResourceComment(1: DeleteResourceCommentReq req)(api.delete="/api/resource_comments/:comment_id"),
     GetResourceCommentsResp getResourceComments(1: GetResourceCommentsReq req)(api.get="/api/resource/:resource_id/comment"),
 }
+
+struct AdminDeleteResourceCommentReq{
+    required i64 comment_id(api.path="comment_id"),
+}
+struct AdminDeleteResourceCommentResp{
+    required model.BaseResp base_resp,
+}
+
+
+struct AdminDeleteResourceRatingReq{
+    required i64 rating_id(api.path="rating_id"),
+}
+struct AdminDeleteResourceRatingResp{
+    required model.BaseResp base_resp,
+}
+
+struct AdminDeleteResourceReq{
+    required i64 resource_id(api.path="resource_id"),
+}
+struct AdminDeleteResourceResp{
+    required model.BaseResp base_resp,
+}
+
+service AdminResourceService {
+    AdminDeleteResourceCommentResp AdminDeleteResourceComment(1:AdminDeleteResourceCommentReq req)(api.delete="/api/admin/resource_comments/:comment_id"),
+    AdminDeleteResourceRatingResp AdminDeleteResourceRating(1:AdminDeleteResourceRatingReq req)(api.delete="/api/admin/resource_ratings/:rating_id"),
+    AdminDeleteResourceResp AdminDeleteResource(1:AdminDeleteResourceReq req)(api.delete="/api/admin/resources/:resource_id"),
+
+}
+
+

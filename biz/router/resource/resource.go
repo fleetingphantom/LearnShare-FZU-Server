@@ -28,6 +28,21 @@ func Register(r *server.Hertz) {
 			_resource_id.POST("/report", append(_reportresourceMw(), resource.ReportResource)...)
 		}
 		{
+			_admin := _api.Group("/admin", _adminMw()...)
+			{
+				_resource_comments := _admin.Group("/resource_comments", _resource_commentsMw()...)
+				_resource_comments.DELETE("/:comment_id", append(_admindeleteresourcecommentMw(), resource.AdminDeleteResourceComment)...)
+			}
+			{
+				_resource_ratings := _admin.Group("/resource_ratings", _resource_ratingsMw()...)
+				_resource_ratings.DELETE("/:rating_id", append(_admindeleteresourceratingMw(), resource.AdminDeleteResourceRating)...)
+			}
+			{
+				_resources0 := _admin.Group("/resources", _resources0Mw()...)
+				_resources0.DELETE("/:resource_id", append(_admindeleteresourceMw(), resource.AdminDeleteResource)...)
+			}
+		}
+		{
 			_resource := _api.Group("/resource", _resourceMw()...)
 			{
 				_resource_id0 := _resource.Group("/:resource_id", _resource_id0Mw()...)
@@ -35,18 +50,18 @@ func Register(r *server.Hertz) {
 			}
 		}
 		{
-			_resource_comments := _api.Group("/resource_comments", _resource_commentsMw()...)
-			_resource_comments.DELETE("/:comment_id", append(_deleteresourcecommentMw(), resource.DeleteResourceComment)...)
-			_resource_comments.POST("/:resource_id", append(_submitresourcecommentMw(), resource.SubmitResourceComment)...)
+			_resource_comments0 := _api.Group("/resource_comments", _resource_comments0Mw()...)
+			_resource_comments0.DELETE("/:comment_id", append(_deleteresourcecommentMw(), resource.DeleteResourceComment)...)
+			_resource_comments0.POST("/:resource_id", append(_submitresourcecommentMw(), resource.SubmitResourceComment)...)
 		}
 		{
-			_resource_ratings := _api.Group("/resource_ratings", _resource_ratingsMw()...)
-			_resource_ratings.DELETE("/:rating_id", append(_deleteresourceratingMw(), resource.DeleteResourceRating)...)
-			_resource_ratings.POST("/:resource_id", append(_submitresourceratingMw(), resource.SubmitResourceRating)...)
+			_resource_ratings0 := _api.Group("/resource_ratings", _resource_ratings0Mw()...)
+			_resource_ratings0.DELETE("/:rating_id", append(_deleteresourceratingMw(), resource.DeleteResourceRating)...)
+			_resource_ratings0.POST("/:resource_id", append(_submitresourceratingMw(), resource.SubmitResourceRating)...)
 		}
 		{
-			_resources0 := _api.Group("/resources", _resources0Mw()...)
-			_resources0.GET("/search", append(_searchresourcesMw(), resource.SearchResources)...)
+			_resources1 := _api.Group("/resources", _resources1Mw()...)
+			_resources1.GET("/search", append(_searchresourcesMw(), resource.SearchResources)...)
 		}
 	}
 }

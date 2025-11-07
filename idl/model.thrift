@@ -108,3 +108,63 @@ struct ResourceComment{
     required i64 createdAt,
 }
 
+struct College{
+    required i64 collegeId,
+    required string collegeName,
+    required string school
+}
+
+struct Major{
+    required i64 majorId,
+    required string majorName,
+    required i64 collegeId,
+}
+
+struct Teacher{
+    required i64 teacherId,
+    required string teacherName,
+    required i64 collegeId
+    required string introduction,
+    required string email,
+    required string avatar_url,
+    required i64 created_at,
+    required i64 updated_at,
+}
+
+struct Permission{
+    required i64 permissionId,
+    required string permissionName,
+    required string description,
+}
+
+struct Role{
+    required i64 roleId,
+    required string roleName,
+    required string description,
+    required list<Permission> permissions,
+}
+
+struct RolePermission{
+    required i64 roleId,
+    required i64 permissionId,
+}
+
+struct Favorite{
+    required i64 favoriteId,
+    required i64 userId,
+    required i64 targetId,
+    required string targetType,
+    required i64 createdAt,
+}
+
+struct review{
+    required i64 reviewId,
+    required i64 reviewerId,
+    required i64 reporterId,
+    required i64 targetId,
+    required string targetType,
+    required string reason,
+    required string status,
+    required i64 priority,
+    required i64 createdAt,
+}

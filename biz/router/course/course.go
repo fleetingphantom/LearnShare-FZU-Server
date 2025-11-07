@@ -20,21 +20,36 @@ func Register(r *server.Hertz) {
 	{
 		_api := root.Group("/api", _apiMw()...)
 		{
-			_course_comments := _api.Group("/course_comments", _course_commentsMw()...)
-			_course_comments.POST("/:course_id", append(_submitcoursecommentMw(), course.SubmitCourseComment)...)
+			_admin := _api.Group("/admin", _adminMw()...)
+			{
+				_course_comments := _admin.Group("/course_comments", _course_commentsMw()...)
+				_course_comments.DELETE("/:comment_id", append(_admindeletecoursecommentMw(), course.AdminDeleteCourseComment)...)
+			}
+			{
+				_course_ratings := _admin.Group("/course_ratings", _course_ratingsMw()...)
+				_course_ratings.DELETE("/:rating_id", append(_admindeletecourseratingMw(), course.AdminDeleteCourseRating)...)
+			}
+			{
+				_courses := _admin.Group("/courses", _coursesMw()...)
+				_courses.DELETE("/:course_id", append(_admindeletecourseMw(), course.AdminDeleteCourse)...)
+			}
 		}
 		{
-			_course_ratings := _api.Group("/course_ratings", _course_ratingsMw()...)
-			_course_ratings.POST("/:course_id", append(_submitcourseratingMw(), course.SubmitCourseRating)...)
-			_course_ratings.DELETE("/:rating_id", append(_deletecourseratingMw(), course.DeleteCourseRating)...)
+			_course_comments0 := _api.Group("/course_comments", _course_comments0Mw()...)
+			_course_comments0.POST("/:course_id", append(_submitcoursecommentMw(), course.SubmitCourseComment)...)
 		}
 		{
-			_courses := _api.Group("/courses", _coursesMw()...)
-			_courses.GET("/:course_id", append(_getcoursedetailMw(), course.GetCourseDetail)...)
-			_course_id := _courses.Group("/:course_id", _course_idMw()...)
+			_course_ratings0 := _api.Group("/course_ratings", _course_ratings0Mw()...)
+			_course_ratings0.POST("/:course_id", append(_submitcourseratingMw(), course.SubmitCourseRating)...)
+			_course_ratings0.DELETE("/:rating_id", append(_deletecourseratingMw(), course.DeleteCourseRating)...)
+		}
+		{
+			_courses0 := _api.Group("/courses", _courses0Mw()...)
+			_courses0.GET("/:course_id", append(_getcoursedetailMw(), course.GetCourseDetail)...)
+			_course_id := _courses0.Group("/:course_id", _course_idMw()...)
 			_course_id.GET("/comments", append(_getcoursecommentsMw(), course.GetCourseComments)...)
 			_course_id.GET("/resources", append(_getcourseresourcelistMw(), course.GetCourseResourceList)...)
-			_courses.GET("/search", append(_searchMw(), course.Search)...)
+			_courses0.GET("/search", append(_searchMw(), course.Search)...)
 		}
 		{
 			_courses_comments := _api.Group("/courses_comments", _courses_commentsMw()...)

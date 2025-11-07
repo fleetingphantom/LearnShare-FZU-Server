@@ -22,5 +22,5 @@ WORKDIR /app
 COPY --from=builder /app/output /app
 COPY --from=builder /app/script/bootstrap.sh /app/
 COPY --from=builder /app/config/config.example.yaml /app/config/
-EXPOSE 8888
+
 CMD ["sh","bootstrap.sh"]

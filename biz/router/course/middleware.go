@@ -78,3 +78,38 @@ func _course_idMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _adminMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _admindeletecoursecommentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _admindeletecourseratingMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _admindeletecourseMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _course_comments0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _course_ratings0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _courses0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

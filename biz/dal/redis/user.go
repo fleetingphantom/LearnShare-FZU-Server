@@ -51,7 +51,7 @@ func DeleteCodeCache(ctx context.Context, key string) error {
 
 // SetBlacklistToken 将令牌加入黑名单
 func SetBlacklistToken(ctx context.Context, token string) error {
-	err := RDB.Set(ctx, token, "blacklisted", 12*time.Hour).Err()
+	err := RDB.Set(ctx, token, "blacklisted", time.Hour*72).Err()
 	if err != nil {
 		return errno.NewErrNo(errno.InternalRedisErrorCode, "设置令牌黑名单失败: "+err.Error())
 	}

@@ -109,3 +109,31 @@ service CourseService {
   DeleteCourseCommentResp deleteCourseComment(1: DeleteCourseCommentReq req)(api.delete="/api/courses_comments/:comment_id"),
   DeleteCourseRatingResp deleteCourseRating(1: DeleteCourseRatingReq req)(api.delete="/api/course_ratings/:rating_id"),
 }
+
+struct AdminDeleteCourseCommentReq{
+    required i64 comment_id(api.path="comment_id"),
+}
+struct AdminDeleteCourseCommentResp{
+    required model.BaseResp base_resp,
+}
+
+struct AdminDeleteCourseRatingReq{
+    required i64 rating_id(api.path="rating_id"),
+}
+struct AdminDeleteCourseRatingResp{
+    required model.BaseResp base_resp,
+}
+
+struct AdminDeleteCourseReq{
+    required i64 course_id(api.path="course_id"),
+}
+struct AdminDeleteCourseResp{
+    required model.BaseResp base_resp,
+}
+
+service AdminCourseService{
+    AdminDeleteCourseCommentResp AdminDeleteCourseComment(1:AdminDeleteCourseCommentReq req)(api.delete="/api/admin/course_comments/:comment_id"),
+    AdminDeleteCourseRatingResp AdminDeleteCourseRating(1:AdminDeleteCourseRatingReq req)(api.delete="/api/admin/course_ratings/:rating_id"),
+    AdminDeleteCourseResp AdminDeleteCourse(1:AdminDeleteCourseReq req)(api.delete="/api/admin/courses/:course_id"),
+
+}

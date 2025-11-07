@@ -124,3 +124,64 @@ service UserService {
   GetUserInfoResp getUserInfo(1: GetUserInfoReq req)(api.get="/api/users/:user_id"),
 }
 
+struct AdminAddUserReq{
+    required string username,
+    required string password,
+    required string email,
+    required i64 role_id,
+    required i64 status,
+}
+struct AdminAddUserResp{
+    required model.BaseResp base_resp,
+    required i64 user_id,
+}
+
+struct AdminUpdateUserReq{
+    required i64 user_id,
+    optional string username,
+    optional string password,
+    optional string email,
+    optional string college_id,
+    optional string major_id,
+    optional binary avatar,
+    optional i64 reputation_score,
+    optional i64 role_id,
+    optional i64 status,
+}
+struct AdminUpdateUserResp{
+    required model.BaseResp base_resp,
+}
+
+service UserAdminService {
+    AdminAddUserResp AdminAddUser(1:AdminAddUserReq req)(api.post="/api/admin/users"),
+    AdminUpdateUserResp AdminUpdateUser(1:AdminUpdateUserReq req)(api.put="/api/admin/users"),
+}
+
+struct GetPermissionListReq{
+}
+struct GetPermissionListResp{
+    required model.BaseResp base_resp,
+    required list<model.Permission> permission_list,
+}
+
+struct GetRoleListReq{
+}
+struct GetRoleListResp{
+    required model.BaseResp base_resp,
+    required list<model.Role> role_list,
+}
+
+struct AddRoleReq{
+    required string role_name,
+    required list<i64> permission_ids,
+}
+struct AddRoleResp{
+    required model.BaseResp base_resp,
+    required i64 role_id,
+}
+
+service RoleAdminService {
+    GetPermissionListResp GetPermissionList(1:GetPermissionListReq req)(api.get="/api/admin/permissions"),
+    GetRoleListResp GetRoleList(1:GetRoleListReq req)(api.get="/api/admin/roles"),
+    AddRoleResp AddRole(1:AddRoleReq req)(api.post="/api/admin/roles"),
+}

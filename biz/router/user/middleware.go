@@ -101,3 +101,33 @@ func _verifyemailMw() []app.HandlerFunc {
 	// your code...
 	return auth.Auth()
 }
+
+func _adminMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getpermissionlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getrolelistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _addroleMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _adminadduserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _adminupdateuserMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

@@ -117,3 +117,33 @@ func _resource_id0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
+
+func _adminMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _admindeleteresourcecommentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _admindeleteresourceratingMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _admindeleteresourceMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_comments0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_ratings0Mw() []app.HandlerFunc {
+	// your code...
+	return nil
+}

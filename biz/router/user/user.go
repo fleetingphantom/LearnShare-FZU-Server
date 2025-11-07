@@ -20,6 +20,14 @@ func Register(r *server.Hertz) {
 	{
 		_api := root.Group("/api", _apiMw()...)
 		{
+			_admin := _api.Group("/admin", _adminMw()...)
+			_admin.GET("/permissions", append(_getpermissionlistMw(), user.GetPermissionList)...)
+			_admin.GET("/roles", append(_getrolelistMw(), user.GetRoleList)...)
+			_admin.POST("/roles", append(_addroleMw(), user.AddRole)...)
+			_admin.POST("/users", append(_adminadduserMw(), user.AdminAddUser)...)
+			_admin.PUT("/users", append(_adminupdateuserMw(), user.AdminUpdateUser)...)
+		}
+		{
 			_auth := _api.Group("/auth", _authMw()...)
 			_auth.POST("/login", append(_logininMw(), user.LoginIn)...)
 			_auth.POST("/logout", append(_loginoutMw(), user.LoginOut)...)
