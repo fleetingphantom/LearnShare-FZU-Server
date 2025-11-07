@@ -24,7 +24,6 @@ func GetMysqlDSN() (string, error) {
 func GetServerAddress() string {
 	if config.Server == nil {
 		panic("未找到配置")
-		return ""
 	}
 
 	address := strings.Join([]string{
