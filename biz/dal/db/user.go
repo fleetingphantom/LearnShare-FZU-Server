@@ -21,7 +21,7 @@ func CreateUser(ctx context.Context, username, passwordHash, email string) error
 
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Create(user).Error
 	if err != nil {
-		if errors.As(err, &gorm.ErrDuplicatedKey) {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return errno.NewErrNo(errno.ServiceUserExist, "用户已存在")
 		}
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建用户失败: "+err.Error())
