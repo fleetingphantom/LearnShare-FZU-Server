@@ -4,6 +4,7 @@ package course
 
 import (
 	"LearnShare/biz/router/auth"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -31,11 +32,6 @@ func _submitcourseratingMw() []app.HandlerFunc {
 }
 
 func _coursesMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func __7bcourse_id_7dMw() []app.HandlerFunc {
 	// your code...
 	return nil
 }

@@ -150,7 +150,7 @@ CREATE TABLE IF NOT EXISTS reviews (
 func seedResourceForService(t *testing.T, name, description string, courseID int64) *db.Resource {
 	t.Helper()
 	now := time.Now()
-	resource := &db.Resource{
+	resourcedata := &db.Resource{
 		ResourceName:  name,
 		Description:   description,
 		FilePath:      "/files/test.pdf",
@@ -165,10 +165,10 @@ func seedResourceForService(t *testing.T, name, description string, courseID int
 		CreatedAt:     now,
 	}
 
-	if err := db.DB.WithContext(context.Background()).Table(constants.ResourceTableName).Create(resource).Error; err != nil {
+	if err := db.DB.WithContext(context.Background()).Table(constants.ResourceTableName).Create(resourcedata).Error; err != nil {
 		t.Fatalf("插入测试资源失败: %v", err)
 	}
-	return resource
+	return resourcedata
 }
 
 // seedUserForService 为service层测试插入用户数据

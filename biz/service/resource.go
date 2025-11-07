@@ -57,12 +57,12 @@ func (s *ResourceService) GetResource(req *resource.GetResourceReq) (*model.Reso
 		return nil, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
 	}
 
-	resource, err := db.GetResourceByID(s.ctx, req.ResourceID)
+	resourcedata, err := db.GetResourceByID(s.ctx, req.ResourceID)
 	if err != nil {
 		return nil, err
 	}
 
-	return resource.ToResourceModule(), nil
+	return resourcedata.ToResourceModule(), nil
 }
 
 // GetResourceComments 执行获取资源评论列表
@@ -192,7 +192,7 @@ func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error 
 	}
 
 	// 从上下文获取当前用户ID
-    userID := GetUidFormContext(s.c)
+	userID := GetUidFormContext(s.c)
 
 	// 调用数据库层创建举报记录
 	err := db.CreateReview(s.ctx, userID, req.ResourceID, "resource", req.Reason)

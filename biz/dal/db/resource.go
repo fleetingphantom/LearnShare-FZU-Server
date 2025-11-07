@@ -71,68 +71,68 @@ func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 
 // GetResourceComments 获取资源评论列表
 func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, pageNum, pageSize int) ([]*ResourceComment, int64, error) {
-    var comments []*ResourceComment
-    var total int64
+	var comments []*ResourceComment
+	var total int64
 
-    // 使用 Model(&ResourceComment{}) 以便 GORM 识别关联关系；
-    // 不在 Count 阶段使用 Preload，避免“model value required when using preload”报错。
-    base := DB.WithContext(ctx).Model(&ResourceComment{}).
-        Where("resource_id = ?", resourceID).
-        Where("is_visible = ?", true).
-        Where("status = ?", "normal")
+	// 使用 Model(&ResourceComment{}) 以便 GORM 识别关联关系；
+	// 不在 Count 阶段使用 Preload，避免“model value required when using preload”报错。
+	base := DB.WithContext(ctx).Model(&ResourceComment{}).
+		Where("resource_id = ?", resourceID).
+		Where("is_visible = ?", true).
+		Where("status = ?", "normal")
 
-    // 先统计总数（不需要排序与预加载）
-    if err := base.Count(&total).Error; err != nil {
-        return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源评论数量失败: "+err.Error())
-    }
+	// 先统计总数（不需要排序与预加载）
+	if err := base.Count(&total).Error; err != nil {
+		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源评论数量失败: "+err.Error())
+	}
 
-    // 根据排序参数设置查询顺序（仅用于数据查询阶段）
-    switch {
-    case sortBy != nil && *sortBy == "hottest":
-        base = base.Order("likes DESC, created_at DESC")
-    default:
-        // latest 或默认
-        base = base.Order("created_at DESC")
-    }
+	// 根据排序参数设置查询顺序（仅用于数据查询阶段）
+	switch {
+	case sortBy != nil && *sortBy == "hottest":
+		base = base.Order("likes DESC, created_at DESC")
+	default:
+		// latest 或默认
+		base = base.Order("created_at DESC")
+	}
 
-    // 获取分页数据（此处再进行关联预加载）
-    err := base.Offset((pageNum - 1) * pageSize).
-        Limit(pageSize).
-        Preload("User").
-        Find(&comments).Error
-    if err != nil {
-        return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评论列表失败: "+err.Error())
-    }
+	// 获取分页数据（此处再进行关联预加载）
+	err := base.Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
+		Preload("User").
+		Find(&comments).Error
+	if err != nil {
+		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评论列表失败: "+err.Error())
+	}
 
-    return comments, total, nil
+	return comments, total, nil
 }
 
 // SubmitResourceRating 提交资源评分
 func SubmitResourceRating(ctx context.Context, userID, resourceID int64, recommendation float64) (*ResourceRating, error) {
-    // 开始事务
-    tx := DB.WithContext(ctx).Begin()
-    defer func() {
-        if r := recover(); r != nil {
-            tx.Rollback()
-        }
-    }()
+	// 开始事务
+	tx := DB.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
 	// 检查是否已经评分过
 	var existingRating ResourceRating
-    err := tx.Table(constants.ResourceRatingTableName).Where("user_id = ? AND resource_id = ?", userID, resourceID).Find(&existingRating).Error
-    if err != nil {
-        tx.Rollback()
-        return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评分记录失败: "+err.Error())
-    }
+	err := tx.Table(constants.ResourceRatingTableName).Where("user_id = ? AND resource_id = ?", userID, resourceID).Find(&existingRating).Error
+	if err != nil {
+		tx.Rollback()
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评分记录失败: "+err.Error())
+	}
 
 	var rating *ResourceRating
 
-    if existingRating.RatingID > 0 {
-        // 更新现有评分
-        existingRating.Recommendation = recommendation
-        existingRating.IsVisible = true // 确保在重新评分时，记录是可见的
-        err = tx.Table(constants.ResourceRatingTableName).Save(&existingRating).Error
-        rating = &existingRating
+	if existingRating.RatingID > 0 {
+		// 更新现有评分
+		existingRating.Recommendation = recommendation
+		existingRating.IsVisible = true // 确保在重新评分时，记录是可见的
+		err = tx.Table(constants.ResourceRatingTableName).Save(&existingRating).Error
+		rating = &existingRating
 	} else {
 		// 创建新评分
 		rating = &ResourceRating{

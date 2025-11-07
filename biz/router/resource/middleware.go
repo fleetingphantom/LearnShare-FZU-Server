@@ -4,6 +4,7 @@ package resource
 
 import (
 	"LearnShare/biz/router/auth"
+
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
@@ -32,11 +33,6 @@ func _getresourceMw() []app.HandlerFunc {
 	return nil
 }
 
-func __7bresource_id_7dMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
 func _downloadresourceMw() []app.HandlerFunc {
 	// your code...
 	return nil
@@ -58,11 +54,6 @@ func _searchresourcesMw() []app.HandlerFunc {
 }
 
 func _resourceMw() []app.HandlerFunc {
-	// your code...
-	return nil
-}
-
-func __7bresource_id_7d0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
 }
@@ -105,11 +96,6 @@ func _resources_commentsMw() []app.HandlerFunc {
 func _deleteresourcecommentMw() []app.HandlerFunc {
 	// your code...
 	return auth.Auth()
-}
-
-func __7bresource_id_7d1Mw() []app.HandlerFunc {
-	// your code...
-	return nil
 }
 
 func _reportMw() []app.HandlerFunc {

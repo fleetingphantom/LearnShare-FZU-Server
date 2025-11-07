@@ -27,7 +27,7 @@ func Init() error {
 			SkipDefaultTransaction: false, // 不禁用默认事务(即单个创建、更新、删除时使用事务)
 			TranslateError:         true,  // 允许翻译错误
 			NamingStrategy: schema.NamingStrategy{
-				SingularTable: false, 
+				SingularTable: false,
 			},
 		})
 	if err != nil {

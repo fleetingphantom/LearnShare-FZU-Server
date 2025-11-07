@@ -10,17 +10,16 @@ const (
 )
 
 const (
-
-	UserTableName          = "users"
-	CourseTableName        = "courses"
-	CourseRatingTableName  = "course_ratings"
-	CourseCommentTableName = "course_comments"
-	ResourceTableName = "resources"
+	UserTableName               = "users"
+	CourseTableName             = "courses"
+	CourseRatingTableName       = "course_ratings"
+	CourseCommentTableName      = "course_comments"
+	ResourceTableName           = "resources"
 	ResourceTagMappingTableName = "resource_tags"
-	ResourceCommentTableName = "resource_comments"
-	ResourceRatingTableName = "resource_ratings"
-	ReviewTableName = "reviews"
+	ResourceCommentTableName    = "resource_comments"
+	ResourceRatingTableName     = "resource_ratings"
+	ReviewTableName             = "reviews"
 	PermissionTableName         = "permissions"
 	RolePermissionTableName     = "role_permissions"
-	RoleTableName               = "roles"
+	//RoleTableName               = "roles"
 )
