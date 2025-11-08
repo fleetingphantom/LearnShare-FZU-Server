@@ -8,7 +8,7 @@ import (
 	"LearnShare/pkg/errno"
 	"context"
 
-	user "LearnShare/biz/model/user"
+	"LearnShare/biz/model/user"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )

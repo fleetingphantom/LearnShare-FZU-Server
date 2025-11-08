@@ -4,9 +4,11 @@ package favorite
 
 import (
 	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
 	"context"
 
-	favorite "LearnShare/biz/model/favorite"
+	"LearnShare/biz/model/favorite"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -24,6 +26,16 @@ func GetFavorites(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(favorite.GetFavoriteResp)
 
+	// 调用服务层
+	favorites, err := service.NewFavoriteService(ctx, c).GetFavorites(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.Resp = pack.BuildBaseResp(errno.Success)
+	resp.Items = favorites
+
 	pack.SendResponse(c, resp)
 }
 
@@ -40,6 +52,16 @@ func AddFavorite(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(favorite.AddFavoriteResp)
 
+	// 调用服务层
+	fav, err := service.NewFavoriteService(ctx, c).AddFavorite(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.Resp = pack.BuildBaseResp(errno.Success)
+	resp.Favorite = fav
+
 	pack.SendResponse(c, resp)
 }
 
@@ -55,6 +77,15 @@ func RemoveFavorite(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(favorite.RemoveFavoriteResp)
+
+	// 调用服务层
+	err = service.NewFavoriteService(ctx, c).RemoveFavorite(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.Resp = pack.BuildBaseResp(errno.Success)
 
 	pack.SendResponse(c, resp)
 }

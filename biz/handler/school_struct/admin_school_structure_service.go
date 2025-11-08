@@ -4,9 +4,11 @@ package school_struct
 
 import (
 	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
 	"context"
 
-	school_struct "LearnShare/biz/model/school_struct"
+	"LearnShare/biz/model/school_struct"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -24,6 +26,16 @@ func AdminAddCollege(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(school_struct.AdminAddCollegeResp)
 
+	// 调用服务层
+	collegeID, err := service.NewSchoolStructService(ctx, c).AdminAddCollege(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.CollegeID = collegeID
+
 	pack.SendResponse(c, resp)
 }
 
@@ -40,6 +52,16 @@ func AdminAddMajor(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(school_struct.AdminAddMajorResp)
 
+	// 调用服务层
+	majorID, err := service.NewSchoolStructService(ctx, c).AdminAddMajor(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.MajorID = majorID
+
 	pack.SendResponse(c, resp)
 }
 
@@ -55,6 +77,16 @@ func AdminAddTeacher(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(school_struct.AdminAddTeacherResp)
+
+	// 调用服务层
+	teacherID, err := service.NewSchoolStructService(ctx, c).AdminAddTeacher(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.TeacherID = teacherID
 
 	pack.SendResponse(c, resp)
 }

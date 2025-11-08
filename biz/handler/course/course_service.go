@@ -3,7 +3,7 @@
 package course
 
 import (
-	course "LearnShare/biz/model/course"
+	"LearnShare/biz/model/course"
 	"LearnShare/biz/pack"
 	"LearnShare/biz/service"
 	"LearnShare/pkg/errno"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	miniredis "github.com/alicebob/miniredis/v2"
+	"github.com/alicebob/miniredis/v2"
 	goRedis "github.com/redis/go-redis/v9"
 )
 

@@ -22,4 +22,8 @@ const (
 	PermissionTableName         = "permissions"
 	RolePermissionTableName     = "role_permissions"
 	RoleTableName               = "roles"
+	CollegeTableName            = "colleges"
+	MajorTableName              = "majors"
+	TeacherTableName            = "teachers"
+	FavoriteTableName           = "favorites"
 )

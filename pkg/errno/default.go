@@ -18,7 +18,7 @@ var (
 
 	QiNiuYunFileError = NewErrNo(QiNiuYunFileErrorCode, "七牛云操作失败")
 
-	// User Specific Errors
+	//  User Module Errors
 	UserPasswordIncorrectError       = NewErrNo(UserPasswordIncorrect, "密码不正确")
 	UserPasswordFormatInvalidError   = NewErrNo(UserPasswordFormatInvalid, "密码格式不正确，应为8-20位字母和数字组成")
 	UserUsernameFormatInvalidError   = NewErrNo(UserUsernameFormatInvalid, "用户名格式不正确，应为4-16位字母、数字或下划线组成")

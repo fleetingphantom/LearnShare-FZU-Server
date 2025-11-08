@@ -6,7 +6,7 @@ import (
 	"LearnShare/biz/pack"
 	"context"
 
-	course "LearnShare/biz/model/course"
+	"LearnShare/biz/model/course"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )

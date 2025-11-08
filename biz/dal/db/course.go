@@ -257,7 +257,7 @@ func GetCourseCommentsByCourseID(ctx context.Context, courseID int64, sortBy str
 	return comments, nil
 }
 
-// 获取课程资源列表
+// GetCourseResources 获取课程资源列表
 func GetCourseResources(ctx context.Context, courseID int64, resourceType, status string, pageNum, pageSize int) ([]*Resource, error) {
 	var resources []*Resource
 
@@ -278,7 +278,7 @@ func GetCourseResources(ctx context.Context, courseID int64, resourceType, statu
 	return resources, nil
 }
 
-// 创建资源
+// CreateResource 创建资源
 func CreateResource(ctx context.Context, resource *Resource) error {
 	err := DB.WithContext(ctx).Table(constants.ResourceTableName).Create(resource).Error
 	if err != nil {
@@ -295,7 +295,7 @@ func CreateResourceAsync(ctx context.Context, resource *Resource) chan error {
 	})
 }
 
-// 更新资源
+// UpdateResource 更新资源
 func UpdateResource(ctx context.Context, resourceID int64, updates map[string]interface{}) error {
 	err := DB.WithContext(ctx).Table(constants.ResourceTableName).Where("resource_id = ?", resourceID).Updates(updates).Error
 	if err != nil {

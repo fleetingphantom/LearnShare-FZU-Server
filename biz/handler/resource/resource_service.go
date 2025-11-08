@@ -5,7 +5,7 @@ package resource
 import (
 	"context"
 
-	resource "LearnShare/biz/model/resource"
+	"LearnShare/biz/model/resource"
 	"LearnShare/biz/pack"
 	"LearnShare/biz/service"
 	"LearnShare/pkg/errno"
@@ -122,7 +122,7 @@ func GetResource(ctx context.Context, c *app.RequestContext) {
 	resp := new(resource.GetResourceResp)
 
 	// Call service
-	resource, err := service.NewResourceService(ctx, c).GetResource(&req)
+	resourceData, err := service.NewResourceService(ctx, c).GetResource(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -130,7 +130,7 @@ func GetResource(ctx context.Context, c *app.RequestContext) {
 
 	// Build response
 	resp.BaseResp = pack.BuildBaseResp(errno.Success)
-	resp.Resource = resource
+	resp.Resource = resourceData
 
 	pack.SendResponse(c, resp)
 }

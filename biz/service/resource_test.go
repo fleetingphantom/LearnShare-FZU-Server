@@ -6,6 +6,7 @@ import (
 	"LearnShare/pkg/constants"
 	"LearnShare/pkg/errno"
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -275,7 +276,7 @@ func TestResourceServiceSearchResources(t *testing.T) {
 		if err == nil {
 			t.Fatalf("预期返回错误，实际成功")
 		}
-		if err != errno.ValidationKeywordTooLongError {
+		if !errors.Is(err, errno.ValidationKeywordTooLongError) {
 			t.Fatalf("预期返回关键词过长错误，实际错误为 %v", err)
 		}
 	})
@@ -460,7 +461,7 @@ func TestResourceServiceSubmitResourceRating(t *testing.T) {
 		if err == nil {
 			t.Fatalf("预期返回错误，实际成功")
 		}
-		if err != errno.ValidationRatingRangeInvalidError {
+		if !errors.Is(err, errno.ValidationRatingRangeInvalidError) {
 			t.Fatalf("预期返回评分范围错误，实际错误为 %v", err)
 		}
 	})
@@ -474,7 +475,7 @@ func TestResourceServiceSubmitResourceRating(t *testing.T) {
 		if err == nil {
 			t.Fatalf("预期返回错误，实际成功")
 		}
-		if err != errno.ValidationRatingRangeInvalidError {
+		if !errors.Is(err, errno.ValidationRatingRangeInvalidError) {
 			t.Fatalf("预期返回评分范围错误，实际错误为 %v", err)
 		}
 	})
@@ -515,7 +516,7 @@ func TestResourceServiceSubmitResourceComment(t *testing.T) {
 		if err == nil {
 			t.Fatalf("预期返回错误，实际成功")
 		}
-		if err != errno.ResourceInvalidCommentError {
+		if !errors.Is(err, errno.ResourceInvalidCommentError) {
 			t.Fatalf("预期返回评论无效错误，实际错误为 %v", err)
 		}
 	})
@@ -530,7 +531,7 @@ func TestResourceServiceSubmitResourceComment(t *testing.T) {
 		if err == nil {
 			t.Fatalf("预期返回错误，实际成功")
 		}
-		if err != errno.ValidationCommentTooLongError {
+		if !errors.Is(err, errno.ValidationCommentTooLongError) {
 			t.Fatalf("预期返回评论过长错误，实际错误为 %v", err)
 		}
 	})
@@ -681,7 +682,7 @@ func TestResourceServiceReportResource(t *testing.T) {
 		if err == nil {
 			t.Fatalf("预期返回错误，实际成功")
 		}
-		if err != errno.ResourceReportInvalidReasonError {
+		if !errors.Is(err, errno.ResourceReportInvalidReasonError) {
 			t.Fatalf("预期返回举报原因无效错误，实际错误为 %v", err)
 		}
 	})
@@ -696,7 +697,7 @@ func TestResourceServiceReportResource(t *testing.T) {
 		if err == nil {
 			t.Fatalf("预期返回错误，实际成功")
 		}
-		if err != errno.ValidationReportReasonTooLongError {
+		if !errors.Is(err, errno.ValidationReportReasonTooLongError) {
 			t.Fatalf("预期返回举报原因过长错误，实际错误为 %v", err)
 		}
 	})

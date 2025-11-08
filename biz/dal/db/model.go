@@ -42,7 +42,7 @@ func (u User) ToUserModule() *module.User {
 	return user
 }
 
-// Course相关结构体
+// Course 相关结构体
 type Course struct {
 	CourseID    int64     `json:"course_id" db:"course_id"`
 	CourseName  string    `json:"course_name" db:"course_name"`
@@ -327,4 +327,83 @@ func (r RoleWithPermissions) ToRoleModule() *module.Role {
 	}
 
 	return role
+}
+
+// College 学院模型
+type College struct {
+	CollegeID   int64  `json:"college_id" db:"college_id"`
+	CollegeName string `json:"college_name" db:"college_name"`
+	School      string `json:"school" db:"school"`
+}
+
+func (c College) ToCollegeModule() *module.College {
+	return &module.College{
+		CollegeId:   c.CollegeID,
+		CollegeName: c.CollegeName,
+	}
+}
+
+// Major 专业模型
+type Major struct {
+	MajorID   int64  `json:"major_id" db:"major_id"`
+	MajorName string `json:"major_name" db:"major_name"`
+	CollegeID int64  `json:"college_id" db:"college_id"`
+}
+
+func (m Major) ToMajorModule() *module.Major {
+	return &module.Major{
+		MajorId:   m.MajorID,
+		MajorName: m.MajorName,
+		CollegeId: m.CollegeID,
+	}
+}
+
+// Teacher 教师模型
+type Teacher struct {
+	TeacherID    int64     `json:"teacher_id" db:"teacher_id"`
+	Name         string    `json:"name" db:"name"`
+	CollegeID    *int64    `json:"college_id" db:"college_id"`
+	Introduction *string   `json:"introduction" db:"introduction"`
+	Email        *string   `json:"email" db:"email"`
+	AvatarURL    *string   `json:"avatar_url" db:"avatar_url"`
+	CreatedAt    time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at" db:"updated_at"`
+}
+
+func (t Teacher) ToTeacherModule() *module.Teacher {
+	teacher := &module.Teacher{
+		TeacherId:   t.TeacherID,
+		TeacherName: t.Name,
+	}
+	if t.CollegeID != nil {
+		teacher.CollegeId = *t.CollegeID
+	}
+	if t.Introduction != nil {
+		teacher.Introduction = *t.Introduction
+	}
+	if t.Email != nil {
+		teacher.Email = *t.Email
+	}
+	if t.AvatarURL != nil {
+		teacher.AvatarURL = *t.AvatarURL
+	}
+	return teacher
+}
+
+// Favorite 收藏模型
+type Favorite struct {
+	FavoriteID int64     `json:"favorite_id" db:"favorite_id"`
+	UserID     int64     `json:"user_id" db:"user_id"`
+	TargetID   int64     `json:"target_id" db:"target_id"`
+	TargetType string    `json:"target_type" db:"target_type"`
+	CreatedAt  time.Time `json:"created_at" db:"created_at"`
+}
+
+func (f Favorite) ToFavoriteModule() *module.Favorite {
+	return &module.Favorite{
+		FavoriteId: f.FavoriteID,
+		TargetId:   f.TargetID,
+		TargetType: f.TargetType,
+		CreatedAt:  f.CreatedAt.Unix(),
+	}
 }

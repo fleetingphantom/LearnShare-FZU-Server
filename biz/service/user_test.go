@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"testing"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 	"LearnShare/pkg/errno"
 	"LearnShare/pkg/utils"
 
-	miniredis "github.com/alicebob/miniredis/v2"
+	"github.com/alicebob/miniredis/v2"
 	"github.com/cloudwego/hertz/pkg/app"
 	goRedis "github.com/redis/go-redis/v9"
 	"gorm.io/driver/sqlite"
@@ -157,7 +158,8 @@ func TestUserServiceLoginInWrongPassword(t *testing.T) {
 	if err == nil {
 		t.Fatalf("密码错误时应返回错误")
 	}
-	if errNo, ok := err.(errno.ErrNo); !ok || errNo.ErrorCode != errno.UserPasswordIncorrect {
+	var errNo errno.ErrNo
+	if !errors.As(err, &errNo) || errNo.ErrorCode != errno.UserPasswordIncorrect {
 		t.Fatalf("预期返回密码错误码 %d, 实际错误为 %v", errno.UserPasswordIncorrect, err)
 	}
 }
@@ -272,7 +274,8 @@ func TestUserServiceUpdatePasswordWrongOld(t *testing.T) {
 	if err == nil {
 		t.Fatalf("旧密码错误时应返回错误")
 	}
-	if errNo, ok := err.(errno.ErrNo); !ok || errNo.ErrorCode != errno.UserPasswordIncorrect {
+	var errNo errno.ErrNo
+	if !errors.As(err, &errNo) || errNo.ErrorCode != errno.UserPasswordIncorrect {
 		t.Fatalf("预期错误码 %d, 实际为 %v", errno.UserPasswordIncorrect, err)
 	}
 }

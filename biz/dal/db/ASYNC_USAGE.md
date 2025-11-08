@@ -47,13 +47,13 @@ pool.SubmitNoWait(func() error {
 
 ### User 模块 (biz/dal/db/user.go)
 
-| 同步函数 | 异步函数 | 说明 |
-|---------|---------|------|
+| 同步函数                 | 异步函数                      | 说明     |
+|----------------------|---------------------------|--------|
 | `UpdateUserPassword` | `UpdateUserPasswordAsync` | 更新用户密码 |
-| `UpdateMajorID` | `UpdateMajorIDAsync` | 更新用户专业 |
-| `UpdateAvatarURL` | `UpdateAvatarURLAsync` | 更新用户头像 |
-| `UpdateUserStatues` | `UpdateUserStatuesAsync` | 更新用户状态 |
-| `UpdateUserEmail` | `UpdateUserEmailAsync` | 更新用户邮箱 |
+| `UpdateMajorID`      | `UpdateMajorIDAsync`      | 更新用户专业 |
+| `UpdateAvatarURL`    | `UpdateAvatarURLAsync`    | 更新用户头像 |
+| `UpdateUserStatues`  | `UpdateUserStatuesAsync`  | 更新用户状态 |
+| `UpdateUserEmail`    | `UpdateUserEmailAsync`    | 更新用户邮箱 |
 
 **使用示例:**
 ```go
@@ -69,20 +69,20 @@ if err := <-errChan; err != nil {
 
 ### Course 模块 (biz/dal/db/course.go)
 
-| 同步函数 | 异步函数 | 说明 |
-|---------|---------|------|
-| `CreateCourse` | `CreateCourseAsync` | 创建课程 |
-| `UpdateCourse` | `UpdateCourseAsync` | 更新课程 |
-| `DeleteCourse` | `DeleteCourseAsync` | 删除课程 |
-| `SubmitCourseRating` | `SubmitCourseRatingAsync` | 提交课程评分 |
-| `UpdateCourseRating` | `UpdateCourseRatingAsync` | 更新课程评分 |
-| `DeleteCourseRating` | `DeleteCourseRatingAsync` | 删除课程评分 |
+| 同步函数                  | 异步函数                       | 说明     |
+|-----------------------|----------------------------|--------|
+| `CreateCourse`        | `CreateCourseAsync`        | 创建课程   |
+| `UpdateCourse`        | `UpdateCourseAsync`        | 更新课程   |
+| `DeleteCourse`        | `DeleteCourseAsync`        | 删除课程   |
+| `SubmitCourseRating`  | `SubmitCourseRatingAsync`  | 提交课程评分 |
+| `UpdateCourseRating`  | `UpdateCourseRatingAsync`  | 更新课程评分 |
+| `DeleteCourseRating`  | `DeleteCourseRatingAsync`  | 删除课程评分 |
 | `SubmitCourseComment` | `SubmitCourseCommentAsync` | 提交课程评论 |
 | `UpdateCourseComment` | `UpdateCourseCommentAsync` | 更新课程评论 |
 | `DeleteCourseComment` | `DeleteCourseCommentAsync` | 删除课程评论 |
-| `CreateResource` | `CreateResourceAsync` | 创建资源 |
-| `UpdateResource` | `UpdateResourceAsync` | 更新资源 |
-| `DeleteResource` | `DeleteResourceAsync` | 删除资源 |
+| `CreateResource`      | `CreateResourceAsync`      | 创建资源   |
+| `UpdateResource`      | `UpdateResourceAsync`      | 更新资源   |
+| `DeleteResource`      | `DeleteResourceAsync`      | 删除资源   |
 
 **使用示例:**
 ```go
@@ -95,12 +95,12 @@ if err := <-errChan; err != nil {
 
 ### Resource 模块 (biz/dal/db/resource.go)
 
-| 同步函数 | 异步函数 | 说明 |
-|---------|---------|------|
+| 同步函数                    | 异步函数                         | 说明     |
+|-------------------------|------------------------------|--------|
 | `SubmitResourceComment` | `SubmitResourceCommentAsync` | 提交资源评论 |
-| `DeleteResourceRating` | `DeleteResourceRatingAsync` | 删除资源评分 |
+| `DeleteResourceRating`  | `DeleteResourceRatingAsync`  | 删除资源评分 |
 | `DeleteResourceComment` | `DeleteResourceCommentAsync` | 删除资源评论 |
-| `CreateReview` | `CreateReviewAsync` | 创建举报 |
+| `CreateReview`          | `CreateReviewAsync`          | 创建举报   |
 
 **特殊示例 - SubmitResourceCommentAsync:**
 ```go

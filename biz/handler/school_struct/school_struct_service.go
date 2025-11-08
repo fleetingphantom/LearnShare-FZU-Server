@@ -4,9 +4,10 @@ package school_struct
 
 import (
 	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
 	"context"
 
-	school_struct "LearnShare/biz/model/school_struct"
+	"LearnShare/biz/model/school_struct"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -22,7 +23,18 @@ func GetCollegeList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(school_struct.GetCollegeListResp)
+	// 调用服务层
+	svc := service.NewSchoolStructService(ctx, c)
+	colleges, total, err := svc.GetCollegeList(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := &school_struct.GetCollegeListResp{
+		Total:       total,
+		CollegeList: colleges,
+	}
 
 	pack.SendResponse(c, resp)
 }
@@ -38,7 +50,18 @@ func GetMajorList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(school_struct.GetMajorListResp)
+	// 调用服务层
+	svc := service.NewSchoolStructService(ctx, c)
+	majors, total, err := svc.GetMajorList(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := &school_struct.GetMajorListResp{
+		Total:     total,
+		MajorList: majors,
+	}
 
 	pack.SendResponse(c, resp)
 }
@@ -54,7 +77,18 @@ func GetTeacherList(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	resp := new(school_struct.GetTeacherListResp)
+	// 调用服务层
+	svc := service.NewSchoolStructService(ctx, c)
+	teachers, total, err := svc.GetTeacherList(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := &school_struct.GetTeacherListResp{
+		Total:       total,
+		TeacherList: teachers,
+	}
 
 	pack.SendResponse(c, resp)
 }
