@@ -16,6 +16,7 @@ oss:
   accessKey-secret: "your-access-key-secret"
   BucketName: "learnshare-bucket"
   zone: "files"
+  use_cdn_domains: false
 
 smtp:
   host: "smtp.mailtrap.io"

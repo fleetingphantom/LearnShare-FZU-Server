@@ -20,6 +20,7 @@ type oss struct {
 	AccessKeySecret string `mapstructure:"accessKey-secret"`
 	BucketName      string
 	Zone            string `mapstructure:"zone"`
+	UseCdnDomains   bool   `mapstructure:"use_cdn_domains"`
 }
 
 // SMTP 配置

@@ -65,7 +65,7 @@ INSERT INTO `tags` (`tag_name`) VALUES
 
 -- ----------------------------
 -- 5. 用户 users
---    密码统一为 admin123 -> $2a$10$g6AlcmLuZQLbxAh3DkRL7.xSnM0firkHssuC9g7LcfvfZpJH6n/8.
+--    密码统一为 test123456 -> $2a$10$g6AlcmLuZQLbxAh3DkRL7.xSnM0firkHssuC9g7LcfvfZpJH6n/8.
 -- ----------------------------
 INSERT INTO `users` (`username`, `password_hash`, `email`, `college_id`, `major_id`, `role_id`, `status`, `reputation_score`) VALUES
                                                                                                                                   ('admin',    '$2a$10$g6AlcmLuZQLbxAh3DkRL7.xSnM0firkHssuC9g7LcfvfZpJH6n/8.', 'admin@example.com',    1, 1, 1, 'active', 100), -- ID: 1

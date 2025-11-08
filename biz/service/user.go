@@ -5,15 +5,11 @@ import (
 	"LearnShare/biz/dal/redis"
 	"LearnShare/biz/model/module"
 	"LearnShare/biz/model/user"
-	oss "LearnShare/pkg"
 	"LearnShare/pkg/errno"
+	"LearnShare/pkg/oss"
 	"LearnShare/pkg/utils"
 	"context"
 	"mime/multipart"
-	"path"
-	"path/filepath"
-	"strconv"
-	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -190,21 +186,7 @@ func (s *UserService) UpdateMajor(req *user.UpdateMajorReq) error {
 func (s *UserService) UploadAvatar(data *multipart.FileHeader) error {
 	userId := GetUidFormContext(s.c)
 
-	err := oss.IsImage(data)
-	if err != nil {
-		return err
-	}
-
-	ext := strings.ToLower(path.Ext(data.Filename))
-
-	fileName := strconv.FormatInt(userId, 10) + ext
-	storePath := filepath.Join("static", strconv.FormatInt(userId, 10), "avatar")
-
-	if err = oss.SaveFile(data, storePath, fileName); err != nil {
-		return err
-	}
-
-	url, err := oss.Upload(filepath.Join(storePath, fileName), fileName, "avatar", userId)
+	url, err := oss.UploadFile(data, "avatar", userId)
 	if err != nil {
 		return err
 	}
