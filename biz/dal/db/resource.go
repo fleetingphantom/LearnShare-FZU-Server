@@ -5,15 +5,20 @@ import (
 	"LearnShare/pkg/errno"
 	"context"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
 
 func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int64, sortBy *string, pageNum, pageSize int) ([]*Resource, int64, error) {
+	// 添加超时控制
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
 	var resources []*Resource
 	var total int64
 
-	db := DB.WithContext(ctx).Table(constants.ResourceTableName)
+	db := DB.WithContext(ctxWithTimeout).Table(constants.ResourceTableName)
 
 	if keyword != nil && *keyword != "" {
 		db = db.Where("resource_name LIKE ? OR description LIKE ?", "%"+*keyword+"%", "%"+*keyword+"%")
@@ -71,12 +76,16 @@ func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 
 // GetResourceComments 获取资源评论列表
 func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, pageNum, pageSize int) ([]*ResourceComment, int64, error) {
+	// 添加超时控制
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
 	var comments []*ResourceComment
 	var total int64
 
 	// 使用 Model(&ResourceComment{}) 以便 GORM 识别关联关系；
-	// 不在 Count 阶段使用 Preload，避免“model value required when using preload”报错。
-	base := DB.WithContext(ctx).Model(&ResourceComment{}).
+	// 不在 Count 阶段使用 Preload，避免"model value required when using preload"报错。
+	base := DB.WithContext(ctxWithTimeout).Model(&ResourceComment{}).
 		Where("resource_id = ?", resourceID).
 		Where("is_visible = ?", true).
 		Where("status = ?", "normal")
@@ -230,6 +239,28 @@ func SubmitResourceComment(ctx context.Context, userID, resourceID int64, conten
 	return comment, nil
 }
 
+// SubmitResourceCommentAsync 异步提交资源评论
+func SubmitResourceCommentAsync(ctx context.Context, userID, resourceID int64, content string, parentID *int64) chan struct {
+	Comment *ResourceComment
+	Err     error
+} {
+	resultChan := make(chan struct {
+		Comment *ResourceComment
+		Err     error
+	}, 1)
+
+	go func() {
+		comment, err := SubmitResourceComment(ctx, userID, resourceID, content, parentID)
+		resultChan <- struct {
+			Comment *ResourceComment
+			Err     error
+		}{Comment: comment, Err: err}
+		close(resultChan)
+	}()
+
+	return resultChan
+}
+
 // DeleteResourceRating 删除资源评分
 func DeleteResourceRating(ctx context.Context, ratingID, userID int64) error {
 	// 开始事务
@@ -296,6 +327,14 @@ func DeleteResourceRating(ctx context.Context, ratingID, userID int64) error {
 	return nil
 }
 
+// DeleteResourceRatingAsync 异步删除资源评分
+func DeleteResourceRatingAsync(ctx context.Context, ratingID, userID int64) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return DeleteResourceRating(ctx, ratingID, userID)
+	})
+}
+
 // DeleteResourceComment 删除资源评论
 func DeleteResourceComment(ctx context.Context, commentID, userID int64) error {
 	// 开始事务
@@ -327,6 +366,14 @@ func DeleteResourceComment(ctx context.Context, commentID, userID int64) error {
 	return nil
 }
 
+// DeleteResourceCommentAsync 异步删除资源评论
+func DeleteResourceCommentAsync(ctx context.Context, commentID, userID int64) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return DeleteResourceComment(ctx, commentID, userID)
+	})
+}
+
 // CreateReview 创建一个新的举报（审核）
 func CreateReview(ctx context.Context, creatorID int64, targetID int64, targetType, reason string) error {
 	review := &Review{
@@ -342,4 +389,12 @@ func CreateReview(ctx context.Context, creatorID int64, targetID int64, targetTy
 	}
 
 	return nil
+}
+
+// CreateReviewAsync 异步创建举报
+func CreateReviewAsync(ctx context.Context, creatorID int64, targetID int64, targetType, reason string) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return CreateReview(ctx, creatorID, targetID, targetType, reason)
+	})
 }

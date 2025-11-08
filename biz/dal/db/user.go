@@ -38,6 +38,14 @@ func UpdateUserPassword(ctx context.Context, userID int64, newPasswordHash strin
 	return nil
 }
 
+// UpdateUserPasswordAsync 异步更新用户密码
+func UpdateUserPasswordAsync(ctx context.Context, userID int64, newPasswordHash string) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateUserPassword(ctx, userID, newPasswordHash)
+	})
+}
+
 // UpdateMajorID 更新用户专业ID
 func UpdateMajorID(ctx context.Context, userID int, majorID int) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("major_id", majorID).Error
@@ -47,12 +55,28 @@ func UpdateMajorID(ctx context.Context, userID int, majorID int) error {
 	return nil
 }
 
+// UpdateMajorIDAsync 异步更新用户专业ID
+func UpdateMajorIDAsync(ctx context.Context, userID int, majorID int) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateMajorID(ctx, userID, majorID)
+	})
+}
+
 func UpdateAvatarURL(ctx context.Context, userID int64, avatarURL string) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("avatar_url", avatarURL).Error
 	if err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户头像失败: "+err.Error())
 	}
 	return nil
+}
+
+// UpdateAvatarURLAsync 异步更新用户头像
+func UpdateAvatarURLAsync(ctx context.Context, userID int64, avatarURL string) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateAvatarURL(ctx, userID, avatarURL)
+	})
 }
 
 // UpdateUserStatues 更新用户状态
@@ -64,6 +88,14 @@ func UpdateUserStatues(ctx context.Context, userID int64, newStatus string) erro
 	return nil
 }
 
+// UpdateUserStatuesAsync 异步更新用户状态
+func UpdateUserStatuesAsync(ctx context.Context, userID int64, newStatus string) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateUserStatues(ctx, userID, newStatus)
+	})
+}
+
 // UpdateUserEmail 更新用户邮箱
 func UpdateUserEmail(ctx context.Context, userID int, newEmail string) error {
 	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Update("email", newEmail).Error
@@ -71,6 +103,14 @@ func UpdateUserEmail(ctx context.Context, userID int, newEmail string) error {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户邮箱失败: "+err.Error())
 	}
 	return nil
+}
+
+// UpdateUserEmailAsync 异步更新用户邮箱
+func UpdateUserEmailAsync(ctx context.Context, userID int, newEmail string) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateUserEmail(ctx, userID, newEmail)
+	})
 }
 
 // GetUserByEmail 根据邮箱查询用户

@@ -23,6 +23,14 @@ func CreateCourse(ctx context.Context, courseName string, teacherID, majorID int
 	return nil
 }
 
+// CreateCourseAsync 异步创建课程
+func CreateCourseAsync(ctx context.Context, courseName string, teacherID, majorID int64, credit float64, grade, description string) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return CreateCourse(ctx, courseName, teacherID, majorID, credit, grade, description)
+	})
+}
+
 func UpdateCourse(ctx context.Context, courseID int64, updates map[string]interface{}) error {
 	err := DB.WithContext(ctx).Table(constants.CourseTableName).Where("course_id = ?", courseID).Updates(updates).Error
 	if err != nil {
@@ -31,12 +39,28 @@ func UpdateCourse(ctx context.Context, courseID int64, updates map[string]interf
 	return nil
 }
 
+// UpdateCourseAsync 异步更新课程
+func UpdateCourseAsync(ctx context.Context, courseID int64, updates map[string]interface{}) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateCourse(ctx, courseID, updates)
+	})
+}
+
 func DeleteCourse(ctx context.Context, courseID int64) error {
 	err := DB.WithContext(ctx).Table(constants.CourseTableName).Where("course_id = ?", courseID).Delete(&Course{}).Error
 	if err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程失败: "+err.Error())
 	}
 	return nil
+}
+
+// DeleteCourseAsync 异步删除课程
+func DeleteCourseAsync(ctx context.Context, courseID int64) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return DeleteCourse(ctx, courseID)
+	})
 }
 
 func GetCourseByID(ctx context.Context, courseID int64) (*Course, error) {
@@ -93,6 +117,14 @@ func SubmitCourseRating(ctx context.Context, rating *CourseRating) error {
 	return nil
 }
 
+// SubmitCourseRatingAsync 异步提交课程评分
+func SubmitCourseRatingAsync(ctx context.Context, rating *CourseRating) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return SubmitCourseRating(ctx, rating)
+	})
+}
+
 func UpdateCourseRating(ctx context.Context, ratingID int64, updates map[string]interface{}) error {
 	err := DB.WithContext(ctx).Table(constants.CourseRatingTableName).Where("rating_id = ?", ratingID).Updates(updates).Error
 	if err != nil {
@@ -101,12 +133,28 @@ func UpdateCourseRating(ctx context.Context, ratingID int64, updates map[string]
 	return nil
 }
 
+// UpdateCourseRatingAsync 异步更新课程评分
+func UpdateCourseRatingAsync(ctx context.Context, ratingID int64, updates map[string]interface{}) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateCourseRating(ctx, ratingID, updates)
+	})
+}
+
 func DeleteCourseRating(ctx context.Context, ratingID int64) error {
 	err := DB.WithContext(ctx).Table(constants.CourseRatingTableName).Where("rating_id = ?", ratingID).Delete(&CourseRating{}).Error
 	if err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程评分失败: "+err.Error())
 	}
 	return nil
+}
+
+// DeleteCourseRatingAsync 异步删除课程评分
+func DeleteCourseRatingAsync(ctx context.Context, ratingID int64) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return DeleteCourseRating(ctx, ratingID)
+	})
 }
 
 func GetCourseRatingByID(ctx context.Context, ratingID int64) (*CourseRating, error) {
@@ -135,6 +183,14 @@ func SubmitCourseComment(ctx context.Context, comment *CourseComment) error {
 	return nil
 }
 
+// SubmitCourseCommentAsync 异步提交课程评论
+func SubmitCourseCommentAsync(ctx context.Context, comment *CourseComment) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return SubmitCourseComment(ctx, comment)
+	})
+}
+
 func UpdateCourseComment(ctx context.Context, commentID int64, updates map[string]interface{}) error {
 	err := DB.WithContext(ctx).Table(constants.CourseCommentTableName).Where("comment_id = ?", commentID).Updates(updates).Error
 	if err != nil {
@@ -143,12 +199,28 @@ func UpdateCourseComment(ctx context.Context, commentID int64, updates map[strin
 	return nil
 }
 
+// UpdateCourseCommentAsync 异步更新课程评论
+func UpdateCourseCommentAsync(ctx context.Context, commentID int64, updates map[string]interface{}) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateCourseComment(ctx, commentID, updates)
+	})
+}
+
 func DeleteCourseComment(ctx context.Context, commentID int64) error {
 	err := DB.WithContext(ctx).Table(constants.CourseCommentTableName).Where("comment_id = ?", commentID).Delete(&CourseComment{}).Error
 	if err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程评论失败: "+err.Error())
 	}
 	return nil
+}
+
+// DeleteCourseCommentAsync 异步删除课程评论
+func DeleteCourseCommentAsync(ctx context.Context, commentID int64) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return DeleteCourseComment(ctx, commentID)
+	})
 }
 
 func GetCourseCommentByID(ctx context.Context, commentID int64) (*CourseComment, error) {
@@ -215,6 +287,14 @@ func CreateResource(ctx context.Context, resource *Resource) error {
 	return nil
 }
 
+// CreateResourceAsync 异步创建资源
+func CreateResourceAsync(ctx context.Context, resource *Resource) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return CreateResource(ctx, resource)
+	})
+}
+
 // 更新资源
 func UpdateResource(ctx context.Context, resourceID int64, updates map[string]interface{}) error {
 	err := DB.WithContext(ctx).Table(constants.ResourceTableName).Where("resource_id = ?", resourceID).Updates(updates).Error
@@ -224,6 +304,14 @@ func UpdateResource(ctx context.Context, resourceID int64, updates map[string]in
 	return nil
 }
 
+// UpdateResourceAsync 异步更新资源
+func UpdateResourceAsync(ctx context.Context, resourceID int64, updates map[string]interface{}) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return UpdateResource(ctx, resourceID, updates)
+	})
+}
+
 // 删除资源
 func DeleteResource(ctx context.Context, resourceID int64) error {
 	err := DB.WithContext(ctx).Table(constants.ResourceTableName).Where("resource_id = ?", resourceID).Delete(&Resource{}).Error
@@ -231,4 +319,12 @@ func DeleteResource(ctx context.Context, resourceID int64) error {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除资源失败: "+err.Error())
 	}
 	return nil
+}
+
+// DeleteResourceAsync 异步删除资源
+func DeleteResourceAsync(ctx context.Context, resourceID int64) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return DeleteResource(ctx, resourceID)
+	})
 }
