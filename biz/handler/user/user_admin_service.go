@@ -4,6 +4,8 @@ package user
 
 import (
 	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
 	"context"
 
 	user "LearnShare/biz/model/user"
@@ -24,6 +26,15 @@ func AdminAddUser(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(user.AdminAddUserResp)
 
+	userID, err := service.NewUserAdminService(ctx, c).AdminAddUser(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.UserID = userID
+
 	pack.SendResponse(c, resp)
 }
 
@@ -39,6 +50,14 @@ func AdminUpdateUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.AdminUpdateUserResp)
+
+	err = service.NewUserAdminService(ctx, c).AdminUpdateUser(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 
 	pack.SendResponse(c, resp)
 }

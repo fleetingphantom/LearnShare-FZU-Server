@@ -3987,7 +3987,7 @@ type AdminAddUserReq struct {
 	Password string `thrift:"password,2,required" form:"password,required" json:"password,required" query:"password,required"`
 	Email    string `thrift:"email,3,required" form:"email,required" json:"email,required" query:"email,required"`
 	RoleID   int64  `thrift:"role_id,4,required" form:"role_id,required" json:"role_id,required" query:"role_id,required"`
-	Status   int64  `thrift:"status,5,required" form:"status,required" json:"status,required" query:"status,required"`
+	Status   string `thrift:"status,5,required" form:"status,required" json:"status,required" query:"status,required"`
 }
 
 func NewAdminAddUserReq() *AdminAddUserReq {
@@ -4013,7 +4013,7 @@ func (p *AdminAddUserReq) GetRoleID() (v int64) {
 	return p.RoleID
 }
 
-func (p *AdminAddUserReq) GetStatus() (v int64) {
+func (p *AdminAddUserReq) GetStatus() (v string) {
 	return p.Status
 }
 
@@ -4086,7 +4086,7 @@ func (p *AdminAddUserReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 5:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -4195,8 +4195,8 @@ func (p *AdminAddUserReq) ReadField4(iprot thrift.TProtocol) error {
 }
 func (p *AdminAddUserReq) ReadField5(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -4318,10 +4318,10 @@ WriteFieldEndError:
 }
 
 func (p *AdminAddUserReq) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.I64, 5); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.STRING, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Status); err != nil {
+	if err := oprot.WriteString(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -4559,7 +4559,7 @@ type AdminUpdateUserReq struct {
 	Avatar          []byte  `thrift:"avatar,7,optional" form:"avatar" json:"avatar,omitempty" query:"avatar"`
 	ReputationScore *int64  `thrift:"reputation_score,8,optional" form:"reputation_score" json:"reputation_score,omitempty" query:"reputation_score"`
 	RoleID          *int64  `thrift:"role_id,9,optional" form:"role_id" json:"role_id,omitempty" query:"role_id"`
-	Status          *int64  `thrift:"status,10,optional" form:"status" json:"status,omitempty" query:"status"`
+	Status          *string `thrift:"status,10,optional" form:"status" json:"status,omitempty" query:"status"`
 }
 
 func NewAdminUpdateUserReq() *AdminUpdateUserReq {
@@ -4645,9 +4645,9 @@ func (p *AdminUpdateUserReq) GetRoleID() (v int64) {
 	return *p.RoleID
 }
 
-var AdminUpdateUserReq_Status_DEFAULT int64
+var AdminUpdateUserReq_Status_DEFAULT string
 
-func (p *AdminUpdateUserReq) GetStatus() (v int64) {
+func (p *AdminUpdateUserReq) GetStatus() (v string) {
 	if !p.IsSetStatus() {
 		return AdminUpdateUserReq_Status_DEFAULT
 	}
@@ -4797,7 +4797,7 @@ func (p *AdminUpdateUserReq) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 10:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField10(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -4940,8 +4940,8 @@ func (p *AdminUpdateUserReq) ReadField9(iprot thrift.TProtocol) error {
 }
 func (p *AdminUpdateUserReq) ReadField10(iprot thrift.TProtocol) error {
 
-	var _field *int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field *string
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		_field = &v
@@ -5185,10 +5185,10 @@ WriteFieldEndError:
 
 func (p *AdminUpdateUserReq) writeField10(oprot thrift.TProtocol) (err error) {
 	if p.IsSetStatus() {
-		if err = oprot.WriteFieldBegin("status", thrift.I64, 10); err != nil {
+		if err = oprot.WriteFieldBegin("status", thrift.STRING, 10); err != nil {
 			goto WriteFieldBeginError
 		}
-		if err := oprot.WriteI64(*p.Status); err != nil {
+		if err := oprot.WriteString(*p.Status); err != nil {
 			return err
 		}
 		if err = oprot.WriteFieldEnd(); err != nil {

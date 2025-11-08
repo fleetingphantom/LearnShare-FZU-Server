@@ -181,11 +181,11 @@ func UploadFile(data *multipart.FileHeader, class string, targetId int64) (strin
 		return "", err
 	}
 
-	url, err := Upload(localPath, fileName, class, targetId)
+	link, err := Upload(localPath, fileName, class, targetId)
 	if err != nil {
 		return "", err
 	}
-	return url, nil
+	return link, nil
 }
 
 // DeleteByURL 根据文件外链删除七牛云上的文件

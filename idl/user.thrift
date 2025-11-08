@@ -129,7 +129,7 @@ struct AdminAddUserReq{
     required string password,
     required string email,
     required i64 role_id,
-    required i64 status,
+    required string status,
 }
 struct AdminAddUserResp{
     required model.BaseResp base_resp,
@@ -146,7 +146,7 @@ struct AdminUpdateUserReq{
     optional binary avatar,
     optional i64 reputation_score,
     optional i64 role_id,
-    optional i64 status,
+    optional string status,
 }
 struct AdminUpdateUserResp{
     required model.BaseResp base_resp,

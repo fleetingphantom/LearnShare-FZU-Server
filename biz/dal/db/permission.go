@@ -1,10 +1,9 @@
 package db
 
 import (
-	"context"
-
 	"LearnShare/pkg/constants"
 	"LearnShare/pkg/errno"
+	"context"
 )
 
 // GetRolePermissions 从数据库查询指定角色拥有的全部权限标识
@@ -19,4 +18,105 @@ func GetRolePermissions(ctx context.Context, roleID int64) ([]string, error) {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询角色权限失败: "+err.Error())
 	}
 	return permissions, nil
+}
+
+// GetAllPermissions 获取所有权限列表
+func GetAllPermissions(ctx context.Context) ([]*Permission, error) {
+	var permissions []*Permission
+	err := DB.WithContext(ctx).Table(constants.PermissionTableName).Find(&permissions).Error
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询权限列表失败: "+err.Error())
+	}
+
+	return permissions, nil
+}
+
+// GetAllRoles 获取所有角色列表（包含权限信息）
+func GetAllRoles(ctx context.Context) ([]*RoleWithPermissions, error) {
+	var roles []Role
+	err := DB.WithContext(ctx).Table(constants.RoleTableName).Find(&roles).Error
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询角色列表失败: "+err.Error())
+	}
+
+	var result []*RoleWithPermissions
+	for _, r := range roles {
+		// 查询该角色的所有权限
+		var rolePermissions []RolePermission
+		err = DB.WithContext(ctx).
+			Table(constants.RolePermissionTableName).
+			Where("role_id = ?", r.RoleID).
+			Find(&rolePermissions).Error
+		if err != nil {
+			return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询角色权限失败: "+err.Error())
+		}
+
+		// 获取权限详情
+		var permissions []Permission
+		for _, rp := range rolePermissions {
+			var p Permission
+			err = DB.WithContext(ctx).
+				Table(constants.PermissionTableName).
+				Where("permission_id = ?", rp.PermissionID).
+				First(&p).Error
+			if err != nil {
+				continue
+			}
+			permissions = append(permissions, Permission{
+				PermissionID:   p.PermissionID,
+				PermissionName: p.PermissionName,
+				Description:    p.Description,
+			})
+		}
+		result = append(result, &RoleWithPermissions{
+			RoleID:      r.RoleID,
+			RoleName:    r.RoleName,
+			Description: r.Description,
+			Permissions: permissions,
+		})
+
+	}
+	return result, nil
+}
+
+// CreateRole 创建新角色
+func CreateRole(ctx context.Context, roleName string, permissionIds []int64) (int64, error) {
+	// 开启事务
+	tx := DB.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 创建角色
+	role := &Role{
+		RoleName:    roleName,
+		Description: "",
+	}
+	err := tx.Table(constants.RoleTableName).Create(role).Error
+	if err != nil {
+		tx.Rollback()
+		return 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建角色失败: "+err.Error())
+	}
+
+	// 关联权限
+	for _, permissionID := range permissionIds {
+		rolePermission := &RolePermission{
+			RoleID:       role.RoleID,
+			PermissionID: permissionID,
+		}
+		err = tx.Table(constants.RolePermissionTableName).Create(rolePermission).Error
+		if err != nil {
+			tx.Rollback()
+			return 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "关联角色权限失败: "+err.Error())
+		}
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
+		return 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交事务失败: "+err.Error())
+	}
+
+	return role.RoleID, nil
 }

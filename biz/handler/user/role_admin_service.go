@@ -4,6 +4,8 @@ package user
 
 import (
 	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
 	"context"
 
 	user "LearnShare/biz/model/user"
@@ -24,6 +26,15 @@ func GetPermissionList(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(user.GetPermissionListResp)
 
+	permissions, err := service.NewRoleAdminService(ctx, c).GetPermissionList()
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.PermissionList = permissions
+
 	pack.SendResponse(c, resp)
 }
 
@@ -40,6 +51,15 @@ func GetRoleList(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(user.GetRoleListResp)
 
+	roles, err := service.NewRoleAdminService(ctx, c).GetRoleList()
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.RoleList = roles
+
 	pack.SendResponse(c, resp)
 }
 
@@ -55,6 +75,15 @@ func AddRole(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(user.AddRoleResp)
+
+	roleID, err := service.NewRoleAdminService(ctx, c).AddRole(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.RoleID = roleID
 
 	pack.SendResponse(c, resp)
 }

@@ -21,5 +21,5 @@ const (
 	ReviewTableName             = "reviews"
 	PermissionTableName         = "permissions"
 	RolePermissionTableName     = "role_permissions"
-	//RoleTableName               = "roles"
+	RoleTableName               = "roles"
 )

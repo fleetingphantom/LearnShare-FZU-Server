@@ -92,3 +92,61 @@ func GetUserByID(ctx context.Context, id int64) (*User, error) {
 	}
 	return &user, nil
 }
+
+// AdminCreateUser 管理员创建新用户
+func AdminCreateUser(ctx context.Context, username, passwordHash, email string, roleID int64, status string) (int64, error) {
+
+	user := &User{
+		Username:     username,
+		PasswordHash: passwordHash,
+		Email:        email,
+		RoleID:       roleID,
+		Status:       status,
+	}
+
+	err := DB.WithContext(ctx).Table(constants.UserTableName).Create(user).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return 0, errno.NewErrNo(errno.ServiceUserExist, "用户已存在")
+		}
+		return 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建用户失败: "+err.Error())
+	}
+	return user.UserID, nil
+}
+
+// AdminUpdateUser 管理员更新用户信息
+func AdminUpdateUser(ctx context.Context, userID int64, username, passwordHash, email, collegeID, majorID *string, roleID *int64, status *string) error {
+	updates := make(map[string]interface{})
+
+	if username != nil {
+		updates["username"] = *username
+	}
+	if passwordHash != nil {
+		updates["password_hash"] = *passwordHash
+	}
+	if email != nil {
+		updates["email"] = *email
+	}
+	if collegeID != nil {
+		updates["college_id"] = *collegeID
+	}
+	if majorID != nil {
+		updates["major_id"] = *majorID
+	}
+	if roleID != nil {
+		updates["role_id"] = *roleID
+	}
+	if status != nil {
+		updates["status"] = *status
+	}
+
+	if len(updates) == 0 {
+		return nil
+	}
+
+	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ?", userID).Updates(updates).Error
+	if err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户信息失败: "+err.Error())
+	}
+	return nil
+}

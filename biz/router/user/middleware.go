@@ -103,31 +103,31 @@ func _verifyemailMw() []app.HandlerFunc {
 }
 
 func _adminMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 管理员路由组，需要认证
+	return auth.Auth()
 }
 
 func _getpermissionlistMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 获取权限列表，需要 role.manage 权限
+	return []app.HandlerFunc{auth.RequirePermission("role.manage")}
 }
 
 func _getrolelistMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 获取角色列表，需要 role.manage 权限
+	return []app.HandlerFunc{auth.RequirePermission("role.manage")}
 }
 
 func _addroleMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 添加角色，需要 role.manage 权限
+	return []app.HandlerFunc{auth.RequirePermission("role.manage")}
 }
 
 func _adminadduserMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 管理员添加用户，需要 user.account.manage 权限
+	return []app.HandlerFunc{auth.RequirePermission("user.account.manage")}
 }
 
 func _adminupdateuserMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 管理员更新用户，需要 user.account.manage 权限
+	return []app.HandlerFunc{auth.RequirePermission("user.account.manage")}
 }

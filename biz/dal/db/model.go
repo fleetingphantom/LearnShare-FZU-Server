@@ -272,3 +272,59 @@ type Review struct {
 	ReviewedAt *time.Time `gorm:"column:reviewed_at"`
 	CreatedAt  time.Time  `gorm:"autoCreateTime;column:created_at"`
 }
+
+// Permission 权限表结构
+type Permission struct {
+	PermissionID   int64  `json:"permission_id" db:"permission_id"`
+	PermissionName string `json:"permission_name" db:"permission_name"`
+	Description    string `json:"description" db:"description"`
+}
+
+func (p Permission) ToPermissionModule() *module.Permission {
+	return &module.Permission{
+		PermissionId:   p.PermissionID,
+		PermissionName: p.PermissionName,
+		Description:    p.Description,
+	}
+}
+
+// Role 角色表结构
+type Role struct {
+	RoleID      int64  `json:"role_id" db:"role_id"`
+	RoleName    string `json:"role_name" db:"role_name"`
+	Description string `json:"description" db:"description"`
+}
+
+func (r Role) ToRoleModule() *module.Role {
+	return &module.Role{
+		RoleId:      r.RoleID,
+		RoleName:    r.RoleName,
+		Description: r.Description,
+	}
+}
+
+// RolePermission 角色权限关联表结构
+type RolePermission struct {
+	RoleID       int64 `json:"role_id" db:"role_id"`
+	PermissionID int64 `json:"permission_id" db:"permission_id"`
+}
+
+type RoleWithPermissions struct {
+	RoleID      int64        `json:"role_id" db:"role_id"`
+	RoleName    string       `json:"role_name" db:"role_name"`
+	Description string       `json:"description" db:"description"`
+	Permissions []Permission `json:"permissions" db:"-"`
+}
+
+func (r RoleWithPermissions) ToRoleModule() *module.Role {
+	role := &module.Role{
+		RoleId:      r.RoleID,
+		RoleName:    r.RoleName,
+		Description: r.Description,
+	}
+	for _, p := range r.Permissions {
+		role.Permissions = append(role.Permissions, p.ToPermissionModule())
+	}
+
+	return role
+}
