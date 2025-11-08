@@ -149,9 +149,9 @@ func (s *ResourceService) DeleteResourceRating(req *resource.DeleteResourceRatin
 		return errno.NewErrNo(errno.ServiceInvalidParameter, "评分ID无效")
 	}
 
-	// 调用数据库层删除评分
-	err := db.DeleteResourceRating(s.ctx, req.RatingID, userID)
-	if err != nil {
+	// 使用异步删除评分
+	errChan := db.DeleteResourceRatingAsync(s.ctx, req.RatingID, userID)
+	if err := <-errChan; err != nil {
 		return err
 	}
 
@@ -167,9 +167,9 @@ func (s *ResourceService) DeleteResourceComment(req *resource.DeleteResourceComm
 		return errno.NewErrNo(errno.ServiceInvalidParameter, "评论ID无效")
 	}
 
-	// 调用数据库层删除评论
-	err := db.DeleteResourceComment(s.ctx, req.CommentID, userID)
-	if err != nil {
+	// 使用异步删除评论
+	errChan := db.DeleteResourceCommentAsync(s.ctx, req.CommentID, userID)
+	if err := <-errChan; err != nil {
 		return err
 	}
 
@@ -194,9 +194,9 @@ func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error 
 	// 从上下文获取当前用户ID
 	userID := GetUidFormContext(s.c)
 
-	// 调用数据库层创建举报记录
-	err := db.CreateReview(s.ctx, userID, req.ResourceID, "resource", req.Reason)
-	if err != nil {
+	// 使用异步创建举报记录
+	errChan := db.CreateReviewAsync(s.ctx, userID, req.ResourceID, "resource", req.Reason)
+	if err := <-errChan; err != nil {
 		return err
 	}
 

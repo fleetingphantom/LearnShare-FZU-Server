@@ -142,9 +142,9 @@ func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) er
 		IsVisible:      true,
 	}
 
-	// 提交评分
-	err := db.SubmitCourseRating(s.ctx, rating)
-	if err != nil {
+	// 使用异步提交评分
+	errChan := db.SubmitCourseRatingAsync(s.ctx, rating)
+	if err := <-errChan; err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分失败: "+err.Error())
 	}
 
@@ -173,9 +173,9 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 		IsVisible: isVisible,
 	}
 
-	// 提交评论
-	err := db.SubmitCourseComment(s.ctx, comment)
-	if err != nil {
+	// 使用异步提交评论
+	errChan := db.SubmitCourseCommentAsync(s.ctx, comment)
+	if err := <-errChan; err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评论失败: "+err.Error())
 	}
 
@@ -183,9 +183,9 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 }
 
 func (s *CourseService) DeleteCourseComment(req *course.DeleteCourseCommentReq) error {
-	// 删除评论
-	err := db.DeleteCourseComment(s.ctx, req.CommentID)
-	if err != nil {
+	// 使用异步删除评论
+	errChan := db.DeleteCourseCommentAsync(s.ctx, req.CommentID)
+	if err := <-errChan; err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评论失败: "+err.Error())
 	}
 
@@ -193,9 +193,9 @@ func (s *CourseService) DeleteCourseComment(req *course.DeleteCourseCommentReq) 
 }
 
 func (s *CourseService) DeleteCourseRating(req *course.DeleteCourseRatingReq) error {
-	// 删除评分
-	err := db.DeleteCourseRating(s.ctx, req.RatingID)
-	if err != nil {
+	// 使用异步删除评分
+	errChan := db.DeleteCourseRatingAsync(s.ctx, req.RatingID)
+	if err := <-errChan; err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评分失败: "+err.Error())
 	}
 

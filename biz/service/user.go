@@ -120,8 +120,9 @@ func (s *UserService) VerifyEmail(req *user.VerifyEmailReq) error {
 		return errno.UserVerificationCodeInvalidError
 	}
 
-	err = db.UpdateUserStatues(s.ctx, userId, "active")
-	if err != nil {
+	// 使用异步更新用户状态
+	errChan := db.UpdateUserStatuesAsync(s.ctx, userId, "active")
+	if err := <-errChan; err != nil {
 		return err
 	}
 	return nil
@@ -140,8 +141,9 @@ func (s *UserService) UpdateEmail(req *user.UpdateEmailReq) error {
 		return errno.UserVerificationCodeInvalidError
 	}
 
-	err = db.UpdateUserEmail(s.ctx, int(userId), req.NewEmail)
-	if err != nil {
+	// 使用异步更新用户邮箱
+	errChan := db.UpdateUserEmailAsync(s.ctx, int(userId), req.NewEmail)
+	if err := <-errChan; err != nil {
 		return err
 	}
 	return nil
@@ -162,8 +164,9 @@ func (s *UserService) UpdatePassword(req *user.UpdatePasswordReq) error {
 		return err
 	}
 
-	err = db.UpdateUserPassword(s.ctx, userInfo.UserID, newPasswordHash)
-	if err != nil {
+	// 使用异步更新用户密码
+	errChan := db.UpdateUserPasswordAsync(s.ctx, userInfo.UserID, newPasswordHash)
+	if err := <-errChan; err != nil {
 		return err
 	}
 	return nil
@@ -176,8 +179,9 @@ func (s *UserService) UpdateMajor(req *user.UpdateMajorReq) error {
 		return err
 	}
 
-	err = db.UpdateMajorID(s.ctx, int(userInfo.UserID), int(req.NewMajorId))
-	if err != nil {
+	// 使用异步更新用户专业
+	errChan := db.UpdateMajorIDAsync(s.ctx, int(userInfo.UserID), int(req.NewMajorId))
+	if err := <-errChan; err != nil {
 		return err
 	}
 	return nil
@@ -191,8 +195,9 @@ func (s *UserService) UploadAvatar(data *multipart.FileHeader) error {
 		return err
 	}
 
-	err = db.UpdateAvatarURL(s.ctx, userId, url)
-	if err != nil {
+	// 使用异步更新用户头像
+	errChan := db.UpdateAvatarURLAsync(s.ctx, userId, url)
+	if err := <-errChan; err != nil {
 		return err
 	}
 	return nil
@@ -218,8 +223,9 @@ func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
 		return err
 	}
 
-	err = db.UpdateUserPassword(s.ctx, userInfo.UserID, newPasswordHash)
-	if err != nil {
+	// 使用异步更��用户密码
+	errChan := db.UpdateUserPasswordAsync(s.ctx, userInfo.UserID, newPasswordHash)
+	if err := <-errChan; err != nil {
 		return err
 	}
 	return nil
