@@ -25,6 +25,7 @@ var (
 type JwtCustomClaims struct {
 	UserId int64  `json:"userid"`
 	UUID   string `json:"uuid"`
+	RoleId int64  `json:"roleid"`
 }
 
 func AccessTokenJwt() {
@@ -44,6 +45,7 @@ func AccessTokenJwt() {
 					AccessTokenJwtMiddleware.IdentityKey: v.UserId,
 					constants.TokenType:                  "access",
 					constants.UUID:                       v.UUID,
+					constants.RoleID:                     v.RoleId,
 				}
 			}
 			return jwt.MapClaims{}
@@ -79,6 +81,7 @@ func AccessTokenJwt() {
 			claims := &JwtCustomClaims{
 				UserId: users.UserId,
 				UUID:   uuid.NewV1().String(),
+				RoleId: users.RoleId,
 			}
 			return claims, nil
 		},
@@ -104,6 +107,7 @@ func RefreshTokenJwt() {
 					AccessTokenJwtMiddleware.IdentityKey: v.UserId,
 					constants.TokenType:                  "refresh",
 					constants.UUID:                       v.UUID,
+					constants.RoleID:                     v.RoleId,
 				}
 			}
 			return jwt.MapClaims{}
@@ -129,10 +133,12 @@ func RefreshTokenJwt() {
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
 			userId := service.GetUidFormContext(c)
 			uuidStr := service.GetUuidFormContext(c)
+			roleId := service.GetRoleIdFormContext(c)
 
 			claims := &JwtCustomClaims{
 				UserId: userId,
 				UUID:   uuidStr,
+				RoleId: roleId,
 			}
 
 			return claims, nil
@@ -148,9 +154,11 @@ func GenerateAccessToken(c *app.RequestContext) {
 
 	userId := service.GetUidFormContext(c)
 	uuidStr := service.GetUuidFormContext(c)
+	roleId := service.GetRoleIdFormContext(c)
 	data := &JwtCustomClaims{
 		UserId: userId,
 		UUID:   uuidStr,
+		RoleId: roleId,
 	}
 
 	tokenString, _, _ := AccessTokenJwtMiddleware.TokenGenerator(data)
@@ -191,6 +199,7 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 	if identity != nil {
 		c.Set(constants.IdentityKey, identity.(*JwtCustomClaims).UserId)
 		c.Set(constants.UUID, identity.(*JwtCustomClaims).UUID)
+		c.Set(constants.RoleID, identity.(*JwtCustomClaims).RoleId)
 	}
 	if !AccessTokenJwtMiddleware.Authorizator(identity, ctx, c) {
 		return false
@@ -235,6 +244,7 @@ func IsRefreshTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 	if identity != nil {
 		c.Set(constants.IdentityKey, identity.(*JwtCustomClaims).UserId)
 		c.Set(constants.UUID, identity.(*JwtCustomClaims).UUID)
+		c.Set(constants.RoleID, identity.(*JwtCustomClaims).RoleId)
 	}
 	if !RefreshTokenJwtMiddleware.Authorizator(identity, ctx, c) {
 		return false
@@ -243,7 +253,7 @@ func IsRefreshTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 	return true
 }
 
-func Init() {
+func InitJWT() {
 	AccessTokenJwt()
 	RefreshTokenJwt()
 	errInit := AccessTokenJwtMiddleware.MiddlewareInit()

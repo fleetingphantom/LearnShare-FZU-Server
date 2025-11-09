@@ -10,6 +10,8 @@ import (
 	"LearnShare/pkg/utils"
 	"context"
 	"mime/multipart"
+	"strconv"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -174,9 +176,25 @@ func (s *UserService) UpdatePassword(req *user.UpdatePasswordReq) error {
 
 func (s *UserService) UpdateMajor(req *user.UpdateMajorReq) error {
 	userId := GetUidFormContext(s.c)
-	userInfo, err := db.GetUserByID(s.ctx, userId)
-	if err != nil {
-		return err
+	var (
+		userInfo *db.User
+		err      error
+	)
+
+	if redis.IsKeyExist(s.ctx, strconv.FormatInt(userId, 10)) {
+		userInfo, err = redis.GetUserInfoCache(s.ctx, strconv.FormatInt(userId, 10))
+		if err != nil {
+			return err
+		}
+	} else {
+		userInfo, err = db.GetUserByID(s.ctx, userId)
+		if err != nil {
+			return err
+		}
+		err = redis.SetUserInfoCache(s.ctx, strconv.FormatInt(userId, 10), userInfo, 12*time.Hour)
+		if err != nil {
+			return err
+		}
 	}
 
 	// 使用异步更新用户专业
@@ -197,7 +215,7 @@ func (s *UserService) UploadAvatar(data *multipart.FileHeader) error {
 
 	// 使用异步更新用户头像
 	errChan := db.UpdateAvatarURLAsync(s.ctx, userId, url)
-	if err := <-errChan; err != nil {
+	if err = <-errChan; err != nil {
 		return err
 	}
 	return nil
@@ -223,7 +241,7 @@ func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
 		return err
 	}
 
-	// 使用异步更��用户密码
+	// 使用异步更新用户密码
 	errChan := db.UpdateUserPasswordAsync(s.ctx, userInfo.UserID, newPasswordHash)
 	if err := <-errChan; err != nil {
 		return err
@@ -232,9 +250,25 @@ func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
 }
 
 func (s *UserService) GetUserInfo(req *user.GetUserInfoReq) (*module.User, error) {
-	userInfo, err := db.GetUserByID(s.ctx, req.UserID)
-	if err != nil {
-		return nil, err
+	var (
+		userInfo *db.User
+		err      error
+	)
+
+	if redis.IsKeyExist(s.ctx, strconv.FormatInt(req.UserID, 10)) {
+		userInfo, err = redis.GetUserInfoCache(s.ctx, strconv.FormatInt(req.UserID, 10))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		userInfo, err = db.GetUserByID(s.ctx, req.UserID)
+		if err != nil {
+			return nil, err
+		}
+		err = redis.SetUserInfoCache(s.ctx, strconv.FormatInt(req.UserID, 10), userInfo, 12*time.Hour)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return userInfo.ToUserModule(), nil
 }

@@ -10,6 +10,7 @@ import (
 	"log"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/hertz-contrib/pprof"
 )
 
 func Init() {
@@ -18,12 +19,15 @@ func Init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	middleware.Init()
+	middleware.InitJWT()
 }
 
 func main() {
 	Init()
 	h := server.Default(server.WithHostPorts(utils.GetServerAddress()))
+
+	// 注册 pprof 性能分析路由
+	pprof.Register(h)
 
 	register(h)
 	h.Spin()

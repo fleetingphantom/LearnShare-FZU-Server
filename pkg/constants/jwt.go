@@ -3,6 +3,6 @@ package constants
 const (
 	IdentityKey = "userid"
 	TokenType   = "type"
-	Permissions = "permissions"
+	RoleID      = "roleid"
 	UUID        = "uuid"
 )

@@ -41,7 +41,16 @@ func GetUuidFormContext(c *app.RequestContext) string {
 	uuid, _ := c.Get(constants.UUID)
 	uuidStr, ok := uuid.(string)
 	if !ok {
-		panic(errno.NewErrNo(errno.InternalServiceErrorCode, "无法转换为string类型"))
+		panic(errno.NewErrNo(errno.InternalServiceErrorCode, "无法转换为string类型 "))
 	}
 	return uuidStr
+}
+
+func GetRoleIdFormContext(c *app.RequestContext) int64 {
+	roleId, _ := c.Get(constants.RoleID)
+	roleIdInt, err := convertToInt64(roleId)
+	if err != nil {
+		panic(err)
+	}
+	return roleIdInt
 }

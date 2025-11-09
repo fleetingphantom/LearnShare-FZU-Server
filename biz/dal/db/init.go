@@ -4,11 +4,11 @@ import (
 	"LearnShare/pkg/constants"
 	"LearnShare/pkg/errno"
 	"LearnShare/pkg/utils"
-	"context"
 	"fmt"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 )
 
@@ -26,6 +26,7 @@ func Init() error {
 			PrepareStmt:            true,  // 在执行任何 SQL 时都会创建一个 prepared statement 并将其缓存，以提高后续的效率
 			SkipDefaultTransaction: false, // 不禁用默认事务(即单个创建、更新、删除时使用事务)
 			TranslateError:         true,  // 允许翻译错误
+			Logger:                 logger.Default.LogMode(logger.Warn),
 			NamingStrategy: schema.NamingStrategy{
 				SingularTable: false,
 			},
@@ -43,7 +44,6 @@ func Init() error {
 	sqlDB.SetMaxOpenConns(constants.MaxConnections)     // 最大连接数
 	sqlDB.SetConnMaxLifetime(constants.ConnMaxLifetime) // 最大可复用时间
 	sqlDB.SetConnMaxIdleTime(constants.ConnMaxIdleTime) // 最长保持空闲状态时间
-	DB = DB.WithContext(context.Background())
 
 	if err = sqlDB.Ping(); err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("数据库连通性检查失败: %v", err))

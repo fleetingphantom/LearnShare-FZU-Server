@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"LearnShare/biz/dal/db"
 	"LearnShare/pkg/errno"
 	"context"
 	"fmt"
@@ -71,4 +72,21 @@ func IsBlacklistToken(ctx context.Context, token string) (bool, error) {
 		return true, nil
 	}
 	return false, nil
+}
+
+func SetUserInfoCache(ctx context.Context, userId string, data *db.User, expiration time.Duration) error {
+	err := RDB.Set(ctx, userId, data, expiration).Err()
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "设置用户信息缓存失败: "+err.Error())
+	}
+	return nil
+}
+
+func GetUserInfoCache(ctx context.Context, userId string) (*db.User, error) {
+	var user db.User
+	err := RDB.Get(ctx, userId).Scan(&user)
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalRedisErrorCode, "获取用户信息缓存失败: "+err.Error())
+	}
+	return &user, nil
 }
