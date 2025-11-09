@@ -15,5 +15,6 @@ jobs:
         uses: Mattraks/delete-workflow-runs@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          repository: '2451965602/LearnShare-FZU-Server'
+          repository: ${{github.repository}}
           keep_minimum_runs: 6
+          retain_days: 0
