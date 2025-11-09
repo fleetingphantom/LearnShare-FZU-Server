@@ -40,7 +40,9 @@ func _downloadresourceMw() []app.HandlerFunc {
 
 func _reportresourceMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _resources0Mw() []app.HandlerFunc {
@@ -70,7 +72,9 @@ func _resource_commentsMw() []app.HandlerFunc {
 
 func _submitresourcecommentMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _resource_ratingsMw() []app.HandlerFunc {
@@ -80,12 +84,16 @@ func _resource_ratingsMw() []app.HandlerFunc {
 
 func _deleteresourceratingMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _submitresourceratingMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _resources_commentsMw() []app.HandlerFunc {
@@ -95,7 +103,9 @@ func _resources_commentsMw() []app.HandlerFunc {
 
 func _deleteresourcecommentMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _reportMw() []app.HandlerFunc {

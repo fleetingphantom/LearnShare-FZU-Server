@@ -3,6 +3,7 @@
 package user
 
 import (
+	"LearnShare/biz/middleware"
 	"LearnShare/biz/router/auth"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -24,13 +25,15 @@ func _authMw() []app.HandlerFunc {
 }
 
 func _logininMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 登录接口添加 Turnstile 验证
+	return []app.HandlerFunc{middleware.TurnstileMiddleware()}
 }
 
 func _loginoutMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _refreshtokenMw() []app.HandlerFunc {
@@ -50,7 +53,9 @@ func _usersMw() []app.HandlerFunc {
 
 func _uploadavatarMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _getuserinfoMw() []app.HandlerFunc {
@@ -64,12 +69,16 @@ func _meMw() []app.HandlerFunc {
 }
 
 func _updateemailMw() []app.HandlerFunc {
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _updatemajorMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _passwordMw() []app.HandlerFunc {
@@ -79,7 +88,9 @@ func _passwordMw() []app.HandlerFunc {
 
 func _updatepasswordMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _resetpasswordMw() []app.HandlerFunc {
@@ -93,18 +104,25 @@ func _emailMw() []app.HandlerFunc {
 }
 
 func _sendverifyemailMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	// 发送验证邮件接口添加 Turnstile 验证和频率限制
+	return []app.HandlerFunc{
+		middleware.TurnstileMiddleware(),
+		middleware.EmailRateLimitMiddleware(),
+	}
 }
 
 func _verifyemailMw() []app.HandlerFunc {
 	// your code...
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _adminMw() []app.HandlerFunc {
 	// 管理员路由组，需要认证
-	return auth.Auth()
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _getpermissionlistMw() []app.HandlerFunc {

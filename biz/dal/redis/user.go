@@ -90,3 +90,19 @@ func GetUserInfoCache(ctx context.Context, userId string) (*db.User, error) {
 	}
 	return &user, nil
 }
+
+// SetEmailRateLimit 设置邮件发送频率限制（同一IP 1分钟间隔）
+func SetEmailRateLimit(ctx context.Context, ip string) error {
+	key := fmt.Sprintf("email_rate_limit:%s", ip)
+	err := RDB.Set(ctx, key, "1", 1*time.Minute).Err()
+	if err != nil {
+		return errno.NewErrNo(errno.InternalRedisErrorCode, "设置邮件频率限制失败: "+err.Error())
+	}
+	return nil
+}
+
+// CheckEmailRateLimit 检查邮件发送频率限制
+func CheckEmailRateLimit(ctx context.Context, ip string) bool {
+	key := fmt.Sprintf("email_rate_limit:%s", ip)
+	return IsKeyExist(ctx, key)
+}

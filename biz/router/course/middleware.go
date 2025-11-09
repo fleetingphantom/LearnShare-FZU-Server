@@ -24,11 +24,15 @@ func _course_ratingsMw() []app.HandlerFunc {
 }
 
 func _deletecourseratingMw() []app.HandlerFunc {
-	return auth.Auth() // 删除课程评分需要认证
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _submitcourseratingMw() []app.HandlerFunc {
-	return auth.Auth() // 提交课程评分需要认证
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _coursesMw() []app.HandlerFunc {
@@ -47,7 +51,9 @@ func _getcoursecommentsMw() []app.HandlerFunc {
 }
 
 func _submitcoursecommentMw() []app.HandlerFunc {
-	return auth.Auth() // 提交课程评论需要认证
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _getcourseresourcelistMw() []app.HandlerFunc {
@@ -66,7 +72,9 @@ func _courses_commentsMw() []app.HandlerFunc {
 }
 
 func _deletecoursecommentMw() []app.HandlerFunc {
-	return auth.Auth() // 删除课程评论需要认证
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _course_commentsMw() []app.HandlerFunc {

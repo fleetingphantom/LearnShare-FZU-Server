@@ -13,6 +13,7 @@ var (
 	Smtp         *smtp
 	Verify       *verify
 	Server       *server
+	Turnstile    *turnstile
 	runtimeViper = viper.New()
 )
 
@@ -51,4 +52,5 @@ func configMapping() {
 	Smtp = &c.Smtp
 	Verify = &c.Verify
 	Server = &c.Server
+	Turnstile = &c.Turnstile
 }

@@ -44,11 +44,17 @@ type server struct {
 	Port int
 }
 
+type turnstile struct {
+	SecretKey string `mapstructure:"secret_key"`
+	Enabled   bool
+}
+
 type config struct {
-	MySQL  mySQL
-	Redis  redis
-	OSS    oss
-	Smtp   smtp   `mapstructure:"smtp"`
-	Verify verify `mapstructure:"verify"`
-	Server server
+	MySQL     mySQL
+	Redis     redis
+	OSS       oss
+	Smtp      smtp   `mapstructure:"smtp"`
+	Verify    verify `mapstructure:"verify"`
+	Server    server
+	Turnstile turnstile `mapstructure:"turnstile"`
 }

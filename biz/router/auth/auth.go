@@ -11,13 +11,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 )
 
-// Auth 返回需要挂载在路由上的中间件链。
-func Auth() []app.HandlerFunc {
-	return []app.HandlerFunc{DoubleTokenAuth()}
-}
-
-// DoubleTokenAuth 双 token 鉴权中间件。
-func DoubleTokenAuth() app.HandlerFunc {
+func AccessTokenAuth() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		// 1. 验证 access-token 是否有效
 		if !middleware.IsAccessTokenAvailable(ctx, c) {
