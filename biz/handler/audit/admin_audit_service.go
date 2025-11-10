@@ -3,44 +3,65 @@
 package audit
 
 import (
-	"LearnShare/biz/pack"
-	"context"
+    "LearnShare/biz/pack"
+    "LearnShare/biz/service"
+    "LearnShare/pkg/errno"
+    "context"
 
-	"LearnShare/biz/model/audit"
+    "LearnShare/biz/model/audit"
 
-	"github.com/cloudwego/hertz/pkg/app"
+    "github.com/cloudwego/hertz/pkg/app"
 )
 
 // GetResourceAuditList .
 // @router /api/admin/audit/resources [GET]
 func GetResourceAuditList(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req audit.GetResourceAuditListReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.BuildFailResponse(c, err)
-		return
-	}
+    var err error
+    var req audit.GetResourceAuditListReq
+    err = c.BindAndValidate(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	resp := new(audit.GetResourceAuditListResp)
+    resp := new(audit.GetResourceAuditListResp)
+    // 调用服务
+    reviews, err := service.NewAuditService(ctx, c).GetResourceAuditList(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	pack.SendResponse(c, resp)
+    // 构建响应
+    resp.BaseResp = pack.BuildBaseResp(errno.Success)
+    resp.ResourceReviewList = reviews
+
+    pack.SendResponse(c, resp)
 }
 
 // AuditResource .
 // @router /api/admin/audit/resources/:review_id [POST]
 func AuditResource(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req audit.AuditResourceReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.BuildFailResponse(c, err)
-		return
-	}
+    var err error
+    var req audit.AuditResourceReq
+    err = c.BindAndValidate(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	resp := new(audit.AuditResourceResp)
+    resp := new(audit.AuditResourceResp)
+    // 调用服务
+    err = service.NewAuditService(ctx, c).AuditResource(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	pack.SendResponse(c, resp)
+    // 构建响应
+    resp.BaseResp = pack.BuildBaseResp(errno.Success)
+
+    pack.SendResponse(c, resp)
 }
 
 // GetCourseAuditList .
