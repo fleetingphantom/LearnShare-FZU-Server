@@ -79,10 +79,16 @@ func AuditResourceReview(ctx context.Context, reviewID, reviewerID int64, action
         return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新举报状态失败: "+err.Error())
     }
 
-    // 审核通过则更新资源状态
+    // 根据审核结果更新资源状态
     if newStatus == "approved" {
         if err := tx.Table(constants.ResourceTableName).Where("resource_id = ?", review.TargetID).
-            Update("status", "low_quality").Error; err != nil {
+            Update("status", "banned").Error; err != nil {
+            tx.Rollback()
+            return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新资源状态失败: "+err.Error())
+        }
+    } else if newStatus == "rejected" {
+        if err := tx.Table(constants.ResourceTableName).Where("resource_id = ?", review.TargetID).
+            Update("status", "normal").Error; err != nil {
             tx.Rollback()
             return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新资源状态失败: "+err.Error())
         }
