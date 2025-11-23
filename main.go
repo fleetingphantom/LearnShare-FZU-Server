@@ -6,18 +6,26 @@ import (
 	"LearnShare/biz/dal"
 	"LearnShare/biz/middleware"
 	"LearnShare/config"
+	"LearnShare/pkg/logger"
 	"LearnShare/pkg/utils"
-	"log"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/hertz-contrib/cors"
 	"github.com/hertz-contrib/pprof"
 )
 
 func Init() {
 	config.Init()
+
+	// 初始化日志系统
+	if err := logger.Init(config.Logger.Dir, config.Logger.Level); err != nil {
+		logger.Fatalf("日志系统初始化失败: %v", err)
+	}
+	logger.Info("日志系统初始化成功")
+
 	err := dal.Init()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatalf("数据库初始化失败: %v", err)
 	}
 	middleware.InitJWT()
 }
@@ -26,9 +34,22 @@ func main() {
 	Init()
 	h := server.Default(server.WithHostPorts(utils.GetServerAddress()))
 
+	// 添加请求日志中间件
+	h.Use(middleware.RequestLogger())
+
+	h.Use(cors.New(cors.Config{
+		AllowOrigins:  []string{"https://*.yourang.top", "http://localhost:3000"},
+		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:  []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		ExposeHeaders: []string{"Access-Token", "Refresh-Token"},
+		MaxAge:        86400,
+		AllowWildcard: true,
+	}))
+
 	// 注册 pprof 性能分析路由
 	pprof.Register(h)
 
 	register(h)
+	logger.Infof("服务器启动成功，监听地址: %s", utils.GetServerAddress())
 	h.Spin()
 }

@@ -5,8 +5,8 @@ import (
 	"LearnShare/biz/middleware"
 	"LearnShare/config"
 	"LearnShare/pkg/errno"
+	"LearnShare/pkg/logger"
 	"context"
-	"log"
 
 	"github.com/cloudwego/hertz/pkg/app"
 )
@@ -26,7 +26,7 @@ func EmailRateLimitMiddleware() app.HandlerFunc {
 		// 设置限制标记，1分钟过期
 		err := redis.SetEmailRateLimit(ctx, clientIP)
 		if err != nil {
-			log.Println(err)
+			logger.Errorf("设置邮件频率限制失败: client_ip=%s error=%v", clientIP, err)
 		}
 
 		c.Next(ctx)

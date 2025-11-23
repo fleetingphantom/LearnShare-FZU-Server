@@ -11,13 +11,18 @@ require (
 	github.com/cloudwego/hertz v0.10.3
 	github.com/fsnotify/fsnotify v1.9.0
 	github.com/h2non/filetype v1.1.3
+	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/jwt v1.0.4
+	github.com/hertz-contrib/logger/zap v1.1.0
+	github.com/hertz-contrib/pprof v0.1.2
 	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/qiniu/go-sdk/v7 v7.25.4
 	github.com/redis/go-redis/v9 v9.16.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.21.0
-	golang.org/x/crypto v0.43.0
+	go.uber.org/zap v1.23.0
+	golang.org/x/crypto v0.45.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.1
@@ -42,7 +47,6 @@ require (
 	github.com/gofrs/flock v0.13.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.2 // indirect
 	github.com/google/pprof v0.0.0-20211214055906-6f57359322fd // indirect
-	github.com/hertz-contrib/pprof v0.1.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
@@ -59,12 +63,14 @@ require (
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/yuin/gopher-lua v1.1.1 // indirect
+	go.uber.org/atomic v1.7.0 // indirect
+	go.uber.org/multierr v1.6.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/arch v0.22.0 // indirect
 	golang.org/x/exp v0.0.0-20251023183803-a4bb9ffd2546 // indirect
-	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.37.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
+	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
 	modernc.org/fileutil v1.3.40 // indirect
 )

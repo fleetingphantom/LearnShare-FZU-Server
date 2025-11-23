@@ -49,6 +49,11 @@ type turnstile struct {
 	Enabled   bool
 }
 
+type logger struct {
+	Level string
+	Dir   string
+}
+
 type config struct {
 	MySQL     mySQL
 	Redis     redis
@@ -57,4 +62,5 @@ type config struct {
 	Verify    verify `mapstructure:"verify"`
 	Server    server
 	Turnstile turnstile `mapstructure:"turnstile"`
+	Logger    logger    `mapstructure:"logger"`
 }

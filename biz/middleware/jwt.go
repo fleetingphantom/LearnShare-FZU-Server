@@ -6,9 +6,9 @@ import (
 	"LearnShare/biz/service"
 	"LearnShare/pkg/constants"
 	"LearnShare/pkg/errno"
+	"LearnShare/pkg/logger"
 	"context"
 	"encoding/json"
-	"log"
 	"time"
 
 	"github.com/hertz-contrib/jwt"
@@ -87,7 +87,7 @@ func AccessTokenJwt() {
 		},
 	})
 	if err != nil {
-		log.Fatal("JWT 错误：" + err.Error())
+		logger.Fatalf("AccessToken JWT 初始化失败: %v", err)
 	}
 }
 
@@ -146,7 +146,7 @@ func RefreshTokenJwt() {
 		},
 	})
 	if err != nil {
-		log.Fatal("JWT 错误：" + err.Error())
+		logger.Fatalf("RefreshToken JWT 初始化失败: %v", err)
 	}
 }
 
@@ -259,11 +259,11 @@ func InitJWT() {
 	errInit := AccessTokenJwtMiddleware.MiddlewareInit()
 
 	if errInit != nil {
-		log.Fatal("AccessTokenJwtMiddleware.MiddlewareInit() 错误：" + errInit.Error())
+		logger.Fatalf("AccessTokenJwtMiddleware 初始化失败: %v", errInit)
 	}
 
 	errInit = RefreshTokenJwtMiddleware.MiddlewareInit()
 	if errInit != nil {
-		log.Fatal("RefreshTokenJwtMiddleware.MiddlewareInit() 错误：" + errInit.Error())
+		logger.Fatalf("RefreshTokenJwtMiddleware 初始化失败: %v", errInit)
 	}
 }
