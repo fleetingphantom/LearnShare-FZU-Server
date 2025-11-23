@@ -9,11 +9,6 @@ import (
 	"time"
 )
 
-// IsKeyExist 检查键是否存在
-func IsKeyExist(ctx context.Context, key string) bool {
-	return RDB.Exists(ctx, key).Val() == 1
-}
-
 // GetCodeCache 获取验证码缓存
 func GetCodeCache(ctx context.Context, key string) (code string, err error) {
 	value, err := RDB.Get(ctx, key).Result()

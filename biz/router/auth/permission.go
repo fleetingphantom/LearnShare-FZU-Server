@@ -1,7 +1,6 @@
 package auth
 
 import (
-	"LearnShare/biz/dal/db"
 	"LearnShare/biz/service"
 	"LearnShare/pkg/errno"
 	"context"
@@ -17,7 +16,8 @@ func RequirePermission(permissionName string) app.HandlerFunc {
 		roleId := service.GetRoleIdFormContext(c)
 
 		// 2. 获取该角色的所有权限
-		permissions, err := db.GetRolePermissions(ctx, roleId)
+
+		permissions, err := service.NewRoleAdminService(ctx, c).GetRolePermissions(roleId)
 		if err != nil {
 			fail(c, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询角色权限失败"))
 			return
@@ -26,7 +26,7 @@ func RequirePermission(permissionName string) app.HandlerFunc {
 		// 3. 检查是否拥有所需权限
 		hasPermission := false
 		for _, perm := range permissions {
-			if perm == permissionName {
+			if permissionName == perm {
 				hasPermission = true
 				break
 			}
@@ -49,7 +49,7 @@ func RequirePermissions(permissionNames ...string) app.HandlerFunc {
 		roleId := service.GetRoleIdFormContext(c)
 
 		// 2. 获取该角色的所有权限
-		permissions, err := db.GetRolePermissions(ctx, roleId)
+		permissions, err := service.NewRoleAdminService(ctx, c).GetRolePermissions(roleId)
 		if err != nil {
 			fail(c, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询角色权限失败"))
 			return
@@ -59,7 +59,7 @@ func RequirePermissions(permissionNames ...string) app.HandlerFunc {
 		hasPermission := false
 		for _, requiredPerm := range permissionNames {
 			for _, perm := range permissions {
-				if perm == requiredPerm {
+				if requiredPerm == perm {
 					hasPermission = true
 					break
 				}
@@ -75,38 +75,6 @@ func RequirePermissions(permissionNames ...string) app.HandlerFunc {
 		}
 
 		// 5. 放行
-		c.Next(ctx)
-	}
-}
-
-// RequireAllPermissions 返回需要全部权限的中间件（AND 逻辑，需要先经过 Auth 中间件）
-func RequireAllPermissions(permissionNames ...string) app.HandlerFunc {
-	return func(ctx context.Context, c *app.RequestContext) {
-		//1. 获取用户角色ID
-		roleId := service.GetRoleIdFormContext(c)
-
-		// 2. 获取该角色的所有权限
-		permissions, err := db.GetRolePermissions(ctx, roleId)
-		if err != nil {
-			fail(c, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询角色权限失败"))
-			return
-		}
-
-		// 3. 创建权限映射表
-		permMap := make(map[string]bool)
-		for _, perm := range permissions {
-			permMap[perm] = true
-		}
-
-		// 4. 检查是否拥有全部所需权限
-		for _, requiredPerm := range permissionNames {
-			if !permMap[requiredPerm] {
-				fail(c, errno.NewErrNo(errno.AuthNoOperatePermissionCode, "无权限访问"))
-				return
-			}
-		}
-
-		// 6. 放行
 		c.Next(ctx)
 	}
 }
