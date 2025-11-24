@@ -3,58 +3,78 @@
 package resource
 
 import (
-	"LearnShare/biz/pack"
-	"context"
+    "LearnShare/biz/pack"
+    "context"
 
-	"LearnShare/biz/model/resource"
+    "LearnShare/biz/model/resource"
+    "LearnShare/biz/service"
+    "LearnShare/pkg/errno"
 
-	"github.com/cloudwego/hertz/pkg/app"
+    "github.com/cloudwego/hertz/pkg/app"
 )
 
 // AdminDeleteResourceComment .
 // @router /api/admin/resource_comments/:comment_id [DELETE]
 func AdminDeleteResourceComment(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req resource.AdminDeleteResourceCommentReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.BuildFailResponse(c, err)
-		return
-	}
+    var err error
+    var req resource.AdminDeleteResourceCommentReq
+    err = c.BindAndValidate(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	resp := new(resource.AdminDeleteResourceCommentResp)
+    resp := new(resource.AdminDeleteResourceCommentResp)
 
-	pack.SendResponse(c, resp)
+    if err = service.NewResourceService(ctx, c).AdminDeleteResourceComment(&req); err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
+
+    resp.BaseResp = pack.BuildBaseResp(errno.Success)
+    pack.SendResponse(c, resp)
 }
 
 // AdminDeleteResourceRating .
 // @router /api/admin/resource_ratings/:rating_id [DELETE]
 func AdminDeleteResourceRating(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req resource.AdminDeleteResourceRatingReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.BuildFailResponse(c, err)
-		return
-	}
+    var err error
+    var req resource.AdminDeleteResourceRatingReq
+    err = c.BindAndValidate(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	resp := new(resource.AdminDeleteResourceRatingResp)
+    resp := new(resource.AdminDeleteResourceRatingResp)
 
-	pack.SendResponse(c, resp)
+    if err = service.NewResourceService(ctx, c).AdminDeleteResourceRating(&req); err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
+
+    resp.BaseResp = pack.BuildBaseResp(errno.Success)
+    pack.SendResponse(c, resp)
 }
 
 // AdminDeleteResource .
 // @router /api/admin/resources/:resource_id [DELETE]
 func AdminDeleteResource(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req resource.AdminDeleteResourceReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.BuildFailResponse(c, err)
-		return
-	}
+    var err error
+    var req resource.AdminDeleteResourceReq
+    err = c.BindAndValidate(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	resp := new(resource.AdminDeleteResourceResp)
+    resp := new(resource.AdminDeleteResourceResp)
 
-	pack.SendResponse(c, resp)
+    if err = service.NewResourceService(ctx, c).AdminDeleteResource(&req); err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
+
+    resp.BaseResp = pack.BuildBaseResp(errno.Success)
+    pack.SendResponse(c, resp)
 }

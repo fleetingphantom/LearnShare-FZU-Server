@@ -129,23 +129,27 @@ func _resource_id0Mw() []app.HandlerFunc {
 }
 
 func _adminMw() []app.HandlerFunc {
-	// your code...
-	return nil
+    return []app.HandlerFunc{
+        auth.AccessTokenAuth(),
+    }
 }
 
 func _admindeleteresourcecommentMw() []app.HandlerFunc {
-	// your code...
-	return nil
+    return []app.HandlerFunc{
+        auth.RequirePermission("resource.comment.moderate"),
+    }
 }
 
 func _admindeleteresourceratingMw() []app.HandlerFunc {
-	// your code...
-	return nil
+    return []app.HandlerFunc{
+        auth.RequirePermission("resource.rating.moderate"),
+    }
 }
 
 func _admindeleteresourceMw() []app.HandlerFunc {
-	// your code...
-	return nil
+    return []app.HandlerFunc{
+        auth.RequirePermission("resource.manage_all"),
+    }
 }
 
 func _resource_comments0Mw() []app.HandlerFunc {

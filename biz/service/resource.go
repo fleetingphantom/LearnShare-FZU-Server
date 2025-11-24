@@ -1,14 +1,14 @@
 package service
 
 import (
-	"LearnShare/biz/dal/db"
-	model "LearnShare/biz/model/module"
-	"LearnShare/biz/model/resource"
-	"LearnShare/pkg/errno"
+    "LearnShare/biz/dal/db"
+    model "LearnShare/biz/model/module"
+    "LearnShare/biz/model/resource"
+    "LearnShare/pkg/errno"
 
-	"context"
+    "context"
 
-	"github.com/cloudwego/hertz/pkg/app"
+    "github.com/cloudwego/hertz/pkg/app"
 )
 
 // ResourceService 封装了资源相关的服务
@@ -200,5 +200,37 @@ func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error 
 		return err
 	}
 
-	return nil
+    return nil
+}
+
+// AdminDeleteResource 管理员硬删除资源
+func (s *ResourceService) AdminDeleteResource(req *resource.AdminDeleteResourceReq) error {
+    if req.ResourceID <= 0 {
+        return errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+    }
+
+    if err := db.AdminDeleteResource(s.ctx, req.ResourceID); err != nil {
+        return err
+    }
+    return nil
+}
+
+func (s *ResourceService) AdminDeleteResourceComment(req *resource.AdminDeleteResourceCommentReq) error {
+    if req.CommentID <= 0 {
+        return errno.NewErrNo(errno.ServiceInvalidParameter, "评论ID无效")
+    }
+    if err := db.AdminDeleteResourceComment(s.ctx, req.CommentID); err != nil {
+        return err
+    }
+    return nil
+}
+
+func (s *ResourceService) AdminDeleteResourceRating(req *resource.AdminDeleteResourceRatingReq) error {
+    if req.RatingID <= 0 {
+        return errno.NewErrNo(errno.ServiceInvalidParameter, "评分ID无效")
+    }
+    if err := db.AdminDeleteResourceRating(s.ctx, req.RatingID); err != nil {
+        return err
+    }
+    return nil
 }
