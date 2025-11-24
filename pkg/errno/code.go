@@ -22,6 +22,9 @@ const (
 	AuthNoOperatePermissionCode                // 没有操作权限
 	AuthMissingTokenCode                       // 缺少 token
 	IllegalOperatorCode                        // 不合格的操作(比如传入 payment status时传入了一个不存在的 status)
+	TurnstileMissingTokenCode                  // Turnstile 缺少 token
+	TurnstileInvalidTokenCode                  // Turnstile 无效 token
+
 )
 
 // 500xx: 内部错误，Internal 打头
@@ -54,6 +57,7 @@ const (
 	ServiceInvalidEmail
 	ServiceInvalidCode
 	ServiceInvalidParameter
+	ServiceEmailSendLimit
 
 	ErrRecordNotFound
 	UserLogOut

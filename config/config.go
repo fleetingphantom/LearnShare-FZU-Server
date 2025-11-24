@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/bytedance/gopkg/util/logger"
+	logs "github.com/bytedance/gopkg/util/logger"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
@@ -14,6 +14,7 @@ var (
 	Verify       *verify
 	Server       *server
 	Turnstile    *turnstile
+	Logger       *logger
 	runtimeViper = viper.New()
 )
 
@@ -25,7 +26,7 @@ func Init() {
 	runtimeViper.SetConfigType("yaml")
 
 	if err := runtimeViper.ReadInConfig(); err != nil {
-		logger.Fatal("config.Init: 未找到配置文件")
+		logs.Fatal("config.Init: 未找到配置文件")
 	}
 
 	configMapping()
@@ -33,7 +34,7 @@ func Init() {
 	// 设置持续监听
 	runtimeViper.OnConfigChange(func(e fsnotify.Event) {
 		// 我们无法确定监听到配置变更时是否已经初始化完毕，所以此处需要做一个判断
-		logger.Infof("config: notice config changed: %v\n", e.String())
+		logs.Infof("config: notice config changed: %v\n", e.String())
 		configMapping() // 重新映射配置
 	})
 	runtimeViper.WatchConfig()
@@ -44,7 +45,7 @@ func configMapping() {
 	c := new(config)
 	if err := runtimeViper.Unmarshal(&c); err != nil {
 		// 由于这个函数会在配置重载时被再次触发，所以需要判断日志记录方式
-		logger.Fatalf("config.configMapping: 配置反序列化失败: %v", err)
+		logs.Fatalf("config.configMapping: 配置反序列化失败: %v", err)
 	}
 	Mysql = &c.MySQL
 	Redis = &c.Redis
@@ -53,4 +54,5 @@ func configMapping() {
 	Verify = &c.Verify
 	Server = &c.Server
 	Turnstile = &c.Turnstile
+	Logger = &c.Logger
 }

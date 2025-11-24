@@ -35,3 +35,6 @@ _testmain.go
 *.local.yml
 dumped_hertz_remote_config.json
 /config/config.yaml
+
+# 日志文件
+/logs/
