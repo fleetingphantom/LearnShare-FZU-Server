@@ -166,10 +166,21 @@ func UploadFile(data *multipart.FileHeader, class string, targetId int64) (strin
 	if class == "avatar" {
 		allowedTypes = []string{"image/jpeg", "image/png", "image/gif", "image/webp"}
 	} else if class == "resource" {
-		allowedTypes = []string{"application/pdf"}
+		allowedTypes = []string{
+			"application/pdf",
+			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+			"application/zip",
+		}
 	}
 	if err := IsFile(data, allowedTypes); err != nil {
 		return "", errno.NewErrNo(errno.ParamVerifyErrorCode, "不支持的文件类型")
+	}
+
+	if class == "resource" {
+		if data.Size > 3*1024*1024 {
+			return "", errno.NewErrNo(errno.ParamVerifyErrorCode, "文件大小超过限制")
+		}
 	}
 
 	// 使用系统临时目录，避免写入项目目录

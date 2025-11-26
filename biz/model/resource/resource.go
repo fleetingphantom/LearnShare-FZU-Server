@@ -721,7 +721,7 @@ func (p *SearchResourceResp) String() string {
 
 // 上传资源请求
 type UploadResourceReq struct {
-	FileData    []byte   `thrift:"fileData,1,required" form:"fileData,required" json:"fileData,required" query:"fileData,required"`
+	File        []byte   `thrift:"file,1,required" form:"file,required" json:"file,required" query:"file,required"`
 	Title       string   `thrift:"title,2,required" form:"title,required" json:"title,required" query:"title,required"`
 	Description *string  `thrift:"description,3,optional" form:"description" json:"description,omitempty" query:"description"`
 	CourseID    int64    `thrift:"course_id,4,required" form:"course_id,required" json:"course_id,required" query:"course_id,required"`
@@ -735,8 +735,8 @@ func NewUploadResourceReq() *UploadResourceReq {
 func (p *UploadResourceReq) InitDefault() {
 }
 
-func (p *UploadResourceReq) GetFileData() (v []byte) {
-	return p.FileData
+func (p *UploadResourceReq) GetFile() (v []byte) {
+	return p.File
 }
 
 func (p *UploadResourceReq) GetTitle() (v string) {
@@ -766,7 +766,7 @@ func (p *UploadResourceReq) GetTags() (v []string) {
 }
 
 var fieldIDToName_UploadResourceReq = map[int16]string{
-	1: "fileData",
+	1: "file",
 	2: "title",
 	3: "description",
 	4: "course_id",
@@ -785,7 +785,7 @@ func (p *UploadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetFileData bool = false
+	var issetFile bool = false
 	var issetTitle bool = false
 	var issetCourseID bool = false
 
@@ -808,7 +808,7 @@ func (p *UploadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetFileData = true
+				issetFile = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -859,7 +859,7 @@ func (p *UploadResourceReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetFileData {
+	if !issetFile {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -899,7 +899,7 @@ func (p *UploadResourceReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = []byte(v)
 	}
-	p.FileData = _field
+	p.File = _field
 	return nil
 }
 func (p *UploadResourceReq) ReadField2(iprot thrift.TProtocol) error {
@@ -1004,10 +1004,10 @@ WriteStructEndError:
 }
 
 func (p *UploadResourceReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("fileData", thrift.STRING, 1); err != nil {
+	if err = oprot.WriteFieldBegin("file", thrift.STRING, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteBinary([]byte(p.FileData)); err != nil {
+	if err := oprot.WriteBinary([]byte(p.File)); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
