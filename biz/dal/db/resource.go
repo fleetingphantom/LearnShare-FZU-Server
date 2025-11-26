@@ -1,13 +1,14 @@
 package db
 
 import (
-	"LearnShare/pkg/constants"
-	"LearnShare/pkg/errno"
-	"context"
-	"errors"
-	"time"
+    "LearnShare/pkg/constants"
+    "LearnShare/pkg/errno"
+    "context"
+    "errors"
+    "fmt"
+    "time"
 
-	"gorm.io/gorm"
+    "gorm.io/gorm"
 )
 
 func SearchResources(ctx context.Context, keyword *string, tagID, courseID *int64, sortBy *string, pageNum, pageSize int) ([]*Resource, int64, error) {
@@ -368,10 +369,140 @@ func DeleteResourceComment(ctx context.Context, commentID, userID int64) error {
 
 // DeleteResourceCommentAsync 异步删除资源评论
 func DeleteResourceCommentAsync(ctx context.Context, commentID, userID int64) chan error {
-	pool := GetAsyncPool()
-	return pool.Submit(func() error {
-		return DeleteResourceComment(ctx, commentID, userID)
-	})
+    pool := GetAsyncPool()
+    return pool.Submit(func() error {
+        return DeleteResourceComment(ctx, commentID, userID)
+    })
+}
+
+// AdminDeleteResourceComment 管理员删除资源评论（不限制用户）
+func AdminDeleteResourceComment(ctx context.Context, commentID int64) error {
+    ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+    defer cancel()
+
+    tx := DB.WithContext(ctxWithTimeout).Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
+
+    var comment ResourceComment
+    if err := tx.Table(constants.ResourceCommentTableName).Where("comment_id = ?", commentID).First(&comment).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            tx.Rollback()
+            return errno.NewErrNo(errno.InternalDatabaseErrorCode, "记录未找到")
+        }
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询评论失败: "+err.Error())
+    }
+
+    if err := tx.Table(constants.ResourceCommentTableName).Where("comment_id = ?", commentID).Delete(&ResourceComment{}).Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评论失败: "+err.Error())
+    }
+
+    if err := tx.Commit().Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交删除事务失败: "+err.Error())
+    }
+    return nil
+}
+
+// AdminDeleteResourceRating 管理员删除资源评分（不限制用户）并重算平均分
+func AdminDeleteResourceRating(ctx context.Context, ratingID int64) error {
+    ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+    defer cancel()
+
+    tx := DB.WithContext(ctxWithTimeout).Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
+
+    var rating ResourceRating
+    if err := tx.Table(constants.ResourceRatingTableName).Where("rating_id = ?", ratingID).First(&rating).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            tx.Rollback()
+            return errno.NewErrNo(errno.InternalDatabaseErrorCode, "记录未找到")
+        }
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询评分失败: "+err.Error())
+    }
+
+    if err := tx.Table(constants.ResourceRatingTableName).Where("rating_id = ?", ratingID).Delete(&ResourceRating{}).Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除评分失败: "+err.Error())
+    }
+
+    var avgResult struct {
+        AverageRating float64 `gorm:"column:average_rating"`
+        RatingCount   int64   `gorm:"column:rating_count"`
+    }
+    if err := tx.Table(constants.ResourceRatingTableName).
+        Select("AVG(recommendation) as average_rating, COUNT(*) as rating_count").
+        Where("resource_id = ? AND is_visible = ?", rating.ResourceID, true).
+        Scan(&avgResult).Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "计算资源平均评分失败: "+err.Error())
+    }
+
+    if err := tx.Table(constants.ResourceTableName).
+        Where("resource_id = ?", rating.ResourceID).
+        Updates(map[string]interface{}{
+            "average_rating": avgResult.AverageRating,
+            "rating_count":   avgResult.RatingCount,
+        }).Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新资源评分信息失败: "+err.Error())
+    }
+
+    if err := tx.Commit().Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交删除评分事务失败: "+err.Error())
+    }
+    return nil
+}
+// AdminDeleteResource 管理员硬删除资源，并清理关联引用
+func AdminDeleteResource(ctx context.Context, resourceID int64) error {
+    ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+    defer cancel()
+
+    tx := DB.WithContext(ctxWithTimeout).Begin()
+    defer func() {
+        if r := recover(); r != nil {
+            tx.Rollback()
+        }
+    }()
+
+    var res Resource
+    if err := tx.Table(constants.ResourceTableName).Where("resource_id = ?", resourceID).First(&res).Error; err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            tx.Rollback()
+            return errno.NewErrNo(errno.InternalDatabaseErrorCode, "记录未找到")
+        }
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源失败: "+err.Error())
+    }
+
+    if err := tx.Table(constants.ResourceTableName).Where("resource_id = ?", resourceID).Delete(&Resource{}).Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除资源失败: "+err.Error())
+    }
+
+    // 清理 favorites 的孤儿记录（非外键约束，需要手动清理）
+    if err := tx.Table(constants.FavoriteTableName).Where("target_type = ? AND target_id = ?", "resource", resourceID).Delete(nil).Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("清理收藏引用失败: %v", err))
+    }
+
+    if err := tx.Commit().Error; err != nil {
+        tx.Rollback()
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交删除事务失败: "+err.Error())
+    }
+
+    return nil
 }
 
 // CreateReview 创建一个新的举报（审核）
