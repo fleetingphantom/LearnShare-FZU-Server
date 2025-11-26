@@ -19,7 +19,7 @@ struct SearchResourceResp {
 
 // 上传资源请求
 struct UploadResourceReq {
-    1: required binary fileData, 
+    1: required binary file, 
     2: required string title,  
     3: optional string description,
     4: required i64 course_id, 

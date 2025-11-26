@@ -529,3 +529,27 @@ func CreateReviewAsync(ctx context.Context, creatorID int64, targetID int64, tar
 		return CreateReview(ctx, creatorID, targetID, targetType, reason)
 	})
 }
+
+func GetOrCreateTag(ctx context.Context, tagName string) (*ResourceTag, error) {
+    var tag ResourceTag
+    err := DB.WithContext(ctx).Table("tags").Where("tag_name = ?", tagName).First(&tag).Error
+    if err != nil {
+        if errors.Is(err, gorm.ErrRecordNotFound) {
+            tag = ResourceTag{TagName: tagName}
+            if e := DB.WithContext(ctx).Table("tags").Create(&tag).Error; e != nil {
+                return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "创建标签失败: "+e.Error())
+            }
+        } else {
+            return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询标签失败: "+err.Error())
+        }
+    }
+    return &tag, nil
+}
+
+func LinkResourceTag(ctx context.Context, resourceID, tagID int64) error {
+    mapping := ResourceTagMapping{ResourceID: resourceID, TagID: tagID}
+    if err := DB.WithContext(ctx).Table(constants.ResourceTagMappingTableName).Create(&mapping).Error; err != nil {
+        return errno.NewErrNo(errno.InternalDatabaseErrorCode, "关联资源标签失败: "+err.Error())
+    }
+    return nil
+}

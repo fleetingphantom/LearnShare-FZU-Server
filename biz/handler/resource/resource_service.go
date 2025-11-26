@@ -52,15 +52,35 @@ func SearchResources(ctx context.Context, c *app.RequestContext) {
 // @router /api/resources [POST]
 func UploadResource(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req resource.UploadResourceReq
-	err = c.BindAndValidate(&req)
+	type uploadForm struct {
+		Title       string   `form:"title,required"`
+		Description *string  `form:"description"`
+		CourseID    int64    `form:"course_id,required"`
+		Tags        []string `form:"tags"`
+	}
+	var frm uploadForm
+	err = c.BindAndValidate(&frm)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
 	}
 
+	file, err := c.FormFile("file")
+	if err != nil {
+		pack.BuildFailResponse(c, errno.ParamVerifyError.WithError(err))
+		return
+	}
+
 	resp := new(resource.UploadResourceResp)
+
+	r, err := service.NewResourceService(ctx, c).UploadResource(file, frm.Title, frm.Description, frm.CourseID, frm.Tags)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
 	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.Resource = r
 
 	pack.SendResponse(c, resp)
 }

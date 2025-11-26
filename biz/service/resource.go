@@ -1,14 +1,19 @@
 package service
 
 import (
-    "LearnShare/biz/dal/db"
-    model "LearnShare/biz/model/module"
-    "LearnShare/biz/model/resource"
-    "LearnShare/pkg/errno"
+	"LearnShare/biz/dal/db"
+	model "LearnShare/biz/model/module"
+	"LearnShare/biz/model/resource"
+	"LearnShare/pkg/errno"
+	"LearnShare/pkg/oss"
+	"path/filepath"
+	"strings"
+	"unicode/utf8"
 
-    "context"
+	"context"
+	"mime/multipart"
 
-    "github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/app"
 )
 
 // ResourceService 封装了资源相关的服务
@@ -200,37 +205,119 @@ func (s *ResourceService) ReportResource(req *resource.ReportResourceReq) error 
 		return err
 	}
 
-    return nil
+	return nil
 }
 
 // AdminDeleteResource 管理员硬删除资源
 func (s *ResourceService) AdminDeleteResource(req *resource.AdminDeleteResourceReq) error {
-    if req.ResourceID <= 0 {
-        return errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
-    }
+	if req.ResourceID <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+	}
 
-    if err := db.AdminDeleteResource(s.ctx, req.ResourceID); err != nil {
-        return err
-    }
-    return nil
+	if err := db.AdminDeleteResource(s.ctx, req.ResourceID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ResourceService) AdminDeleteResourceComment(req *resource.AdminDeleteResourceCommentReq) error {
-    if req.CommentID <= 0 {
-        return errno.NewErrNo(errno.ServiceInvalidParameter, "评论ID无效")
-    }
-    if err := db.AdminDeleteResourceComment(s.ctx, req.CommentID); err != nil {
-        return err
-    }
-    return nil
+	if req.CommentID <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "评论ID无效")
+	}
+	if err := db.AdminDeleteResourceComment(s.ctx, req.CommentID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (s *ResourceService) AdminDeleteResourceRating(req *resource.AdminDeleteResourceRatingReq) error {
-    if req.RatingID <= 0 {
-        return errno.NewErrNo(errno.ServiceInvalidParameter, "评分ID无效")
-    }
-    if err := db.AdminDeleteResourceRating(s.ctx, req.RatingID); err != nil {
-        return err
-    }
-    return nil
+	if req.RatingID <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "评分ID无效")
+	}
+	if err := db.AdminDeleteResourceRating(s.ctx, req.RatingID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *ResourceService) UploadResource(file *multipart.FileHeader, title string, description *string, courseID int64, tags []string) (*model.Resource, error) {
+	if title == "" {
+		return nil, errno.ParamVerifyError
+	}
+	if courseID <= 0 {
+		return nil, errno.ParamVerifyError
+	}
+	if utf8.RuneCountInString(title) > 255 {
+		return nil, errno.ParamVerifyError
+	}
+	if description != nil {
+		if utf8.RuneCountInString(*description) > 500 {
+			return nil, errno.ParamVerifyError
+		}
+	}
+	for _, t := range tags {
+		if strings.TrimSpace(t) == "" {
+			continue
+		}
+		if utf8.RuneCountInString(strings.TrimSpace(t)) > 50 {
+			return nil, errno.ParamVerifyError
+		}
+	}
+
+	userID := GetUidFormContext(s.c)
+
+	link, err := oss.UploadFile(file, "resource", courseID)
+	if err != nil {
+		return nil, err
+	}
+
+	ext := strings.TrimPrefix(strings.ToLower(filepath.Ext(file.Filename)), ".")
+	switch ext {
+	case "pdf", "docx", "pptx", "zip":
+	default:
+		return nil, errno.ParamVerifyError
+	}
+
+	res := &db.Resource{
+		ResourceName: title,
+		Description: func() string {
+			if description != nil {
+				return *description
+			}
+			return ""
+		}(),
+		FilePath:   link,
+		FileType:   ext,
+		FileSize:   file.Size,
+		UploaderID: userID,
+		CourseID:   courseID,
+		Status:     "normal",
+	}
+
+	errChan := db.CreateResourceAsync(s.ctx, res)
+	if err = <-errChan; err != nil {
+		return nil, err
+	}
+
+	if len(tags) > 0 {
+		for _, name := range tags {
+			name = strings.TrimSpace(name)
+			if name == "" {
+				continue
+			}
+			tag, e := db.GetOrCreateTag(s.ctx, name)
+			if e != nil {
+				return nil, e
+			}
+			if e = db.LinkResourceTag(s.ctx, res.ResourceID, tag.TagID); e != nil {
+				return nil, e
+			}
+		}
+	}
+
+	r, e := db.GetResourceByID(s.ctx, res.ResourceID)
+	if e != nil {
+		return nil, e
+	}
+	return r.ToResourceModule(), nil
 }
