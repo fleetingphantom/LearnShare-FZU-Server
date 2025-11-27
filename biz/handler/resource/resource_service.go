@@ -88,18 +88,25 @@ func UploadResource(ctx context.Context, c *app.RequestContext) {
 // DownloadResource .
 // @router /api/resources/{resource_id}/download [GET]
 func DownloadResource(ctx context.Context, c *app.RequestContext) {
-	var err error
-	var req resource.DownloadResourceReq
-	err = c.BindAndValidate(&req)
-	if err != nil {
-		pack.BuildFailResponse(c, err)
-		return
-	}
+    var err error
+    var req resource.DownloadResourceReq
+    err = c.BindAndValidate(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	resp := new(resource.DownloadResourceResp)
-	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+    resp := new(resource.DownloadResourceResp)
+    url, err := service.NewResourceService(ctx, c).DownloadResource(&req)
+    if err != nil {
+        pack.BuildFailResponse(c, err)
+        return
+    }
 
-	pack.SendResponse(c, resp)
+    resp.BaseResp = pack.BuildBaseResp(errno.Success)
+    resp.DownloadUrl = url
+
+    pack.SendResponse(c, resp)
 }
 
 // ReportResource .

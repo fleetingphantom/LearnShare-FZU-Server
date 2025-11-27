@@ -35,8 +35,9 @@ func _getresourceMw() []app.HandlerFunc {
 }
 
 func _downloadresourceMw() []app.HandlerFunc {
-	// your code...
-	return nil
+    return []app.HandlerFunc{
+        auth.AccessTokenAuth(),
+    }
 }
 
 func _reportresourceMw() []app.HandlerFunc {

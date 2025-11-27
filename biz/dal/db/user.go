@@ -190,3 +190,20 @@ func AdminUpdateUser(ctx context.Context, userID int64, username, passwordHash, 
 	}
 	return nil
 }
+
+// IncrementUserReputation 增加用户信誉分
+func IncrementUserReputation(ctx context.Context, userID int64, delta int64) error {
+	err := DB.WithContext(ctx).Table(constants.UserTableName).Where("user_id = ? AND reputation_score < 100", userID).Update("reputation_score", gorm.Expr("reputation_score + ?", delta)).Error
+	if err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新用户信誉分失败: "+err.Error())
+	}
+	return nil
+}
+
+// IncrementUserReputationAsync 异步增加用户信誉分
+func IncrementUserReputationAsync(ctx context.Context, userID int64, delta int64) chan error {
+	pool := GetAsyncPool()
+	return pool.Submit(func() error {
+		return IncrementUserReputation(ctx, userID, delta)
+	})
+}
