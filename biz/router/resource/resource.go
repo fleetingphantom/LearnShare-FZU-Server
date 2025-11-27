@@ -52,6 +52,8 @@ func Register(r *server.Hertz) {
 		{
 			_resource_comments0 := _api.Group("/resource_comments", _resource_comments0Mw()...)
 			_resource_comments0.DELETE("/:comment_id", append(_deleteresourcecommentMw(), resource.DeleteResourceComment)...)
+			_comment_id := _resource_comments0.Group("/:comment_id", _comment_idMw()...)
+			_comment_id.POST("/likes", append(_reactresourcecommentMw(), resource.ReactResourceComment)...)
 			_resource_comments0.POST("/:resource_id", append(_submitresourcecommentMw(), resource.SubmitResourceComment)...)
 		}
 		{

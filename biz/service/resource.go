@@ -5,6 +5,7 @@ import (
 	model "LearnShare/biz/model/module"
 	"LearnShare/biz/model/resource"
 	"LearnShare/pkg/errno"
+	"LearnShare/pkg/logger"
 	"LearnShare/pkg/oss"
 	"path/filepath"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"mime/multipart"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"gorm.io/gorm"
 )
 
 // ResourceService 封装了资源相关的服务
@@ -68,6 +70,35 @@ func (s *ResourceService) GetResource(req *resource.GetResourceReq) (*model.Reso
 	}
 
 	return resourcedata.ToResourceModule(), nil
+}
+
+func (s *ResourceService) DownloadResource(req *resource.DownloadResourceReq) (string, error) {
+	if req.ResourceID <= 0 {
+		return "", errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+	}
+
+	r, err := db.GetResourceByID(s.ctx, req.ResourceID)
+	if err != nil {
+		return "", err
+	}
+
+	userID := GetUidFormContext(s.c)
+
+	errChan := db.UpdateResourceAsync(s.ctx, req.ResourceID, map[string]interface{}{
+		"download_count": gorm.Expr("download_count + 1"),
+	})
+	if err = <-errChan; err != nil {
+		return "", err
+	}
+
+	repErrChan := db.IncrementUserReputationAsync(s.ctx, r.UploaderID, 1)
+	if e := <-repErrChan; e != nil {
+		return "", e
+	}
+
+	logger.Infof("user %d downloaded resource %d", userID, req.ResourceID)
+
+	return r.FilePath, nil
 }
 
 // GetResourceComments 执行获取资源评论列表
@@ -320,4 +351,21 @@ func (s *ResourceService) UploadResource(file *multipart.FileHeader, title strin
 		return nil, e
 	}
 	return r.ToResourceModule(), nil
+}
+
+func (s *ResourceService) ReactResourceComment(commentID int64, action string) error {
+	if commentID <= 0 {
+		return errno.ParamVerifyError
+	}
+	switch action {
+	case "like", "dislike", "cancel_like", "cancel_dislike":
+	default:
+		return errno.ParamVerifyError.WithMessage("操作类型无效")
+	}
+	userID := GetUidFormContext(s.c)
+	errChan := db.ReactResourceCommentAsync(s.ctx, userID, commentID, action)
+	if err := <-errChan; err != nil {
+		return err
+	}
+	return nil
 }
