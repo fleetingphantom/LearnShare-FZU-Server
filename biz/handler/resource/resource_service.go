@@ -88,25 +88,25 @@ func UploadResource(ctx context.Context, c *app.RequestContext) {
 // DownloadResource .
 // @router /api/resources/{resource_id}/download [GET]
 func DownloadResource(ctx context.Context, c *app.RequestContext) {
-    var err error
-    var req resource.DownloadResourceReq
-    err = c.BindAndValidate(&req)
-    if err != nil {
-        pack.BuildFailResponse(c, err)
-        return
-    }
+	var err error
+	var req resource.DownloadResourceReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
-    resp := new(resource.DownloadResourceResp)
-    url, err := service.NewResourceService(ctx, c).DownloadResource(&req)
-    if err != nil {
-        pack.BuildFailResponse(c, err)
-        return
-    }
+	resp := new(resource.DownloadResourceResp)
+	url, err := service.NewResourceService(ctx, c).DownloadResource(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 
-    resp.BaseResp = pack.BuildBaseResp(errno.Success)
-    resp.DownloadUrl = url
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.DownloadUrl = url
 
-    pack.SendResponse(c, resp)
+	pack.SendResponse(c, resp)
 }
 
 // ReportResource .
@@ -291,6 +291,29 @@ func GetResourceComments(ctx context.Context, c *app.RequestContext) {
 	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 	resp.Comments = comments
 	resp.Total = int32(total)
+
+	pack.SendResponse(c, resp)
+}
+
+// ReactResourceComment .
+// @router /api/resource_comments/:comment_id/likes [POST]
+func ReactResourceComment(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req resource.SubmitResourceCommentReactionReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := new(resource.SubmitResourceCommentReactionResp)
+
+	if e := service.NewResourceService(ctx, c).ReactResourceComment(req.CommentID, req.Action); e != nil {
+		pack.BuildFailResponse(c, e)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 
 	pack.SendResponse(c, resp)
 }

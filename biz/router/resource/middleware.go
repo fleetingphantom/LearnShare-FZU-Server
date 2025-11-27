@@ -35,9 +35,9 @@ func _getresourceMw() []app.HandlerFunc {
 }
 
 func _downloadresourceMw() []app.HandlerFunc {
-    return []app.HandlerFunc{
-        auth.AccessTokenAuth(),
-    }
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _reportresourceMw() []app.HandlerFunc {
@@ -162,4 +162,15 @@ func _resource_comments0Mw() []app.HandlerFunc {
 func _resource_ratings0Mw() []app.HandlerFunc {
 	// your code...
 	return nil
+}
+
+func _comment_idMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _reactresourcecommentMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }

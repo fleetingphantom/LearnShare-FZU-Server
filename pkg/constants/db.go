@@ -18,6 +18,7 @@ const (
 	ResourceTagMappingTableName = "resource_tags"
 	ResourceCommentTableName    = "resource_comments"
 	ResourceRatingTableName     = "resource_ratings"
+	ResourceCommentReactionTableName = "resource_comment_reactions"
 	ReviewTableName             = "reviews"
 	PermissionTableName         = "permissions"
 	RolePermissionTableName     = "role_permissions"

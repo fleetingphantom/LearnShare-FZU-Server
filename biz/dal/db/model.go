@@ -235,6 +235,14 @@ type ResourceRating struct {
 	Resource Resource `gorm:"foreignKey:ResourceID;references:ResourceID"`
 }
 
+type ResourceCommentReaction struct {
+    ReactionID int64     `gorm:"primaryKey;autoIncrement"`
+    UserID     int64     `gorm:"not null"`
+    CommentID  int64     `gorm:"not null"`
+    Reaction   string    `gorm:"type:enum('like','dislike');not null"`
+    CreatedAt  time.Time `gorm:"autoCreateTime"`
+}
+
 // ToResourceCommentModule 将db.ResourceComment转换为model.ResourceComment
 func (c ResourceComment) ToResourceCommentModule() *module.ResourceComment {
 	var parentId int64

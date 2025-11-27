@@ -277,6 +277,23 @@ CREATE TABLE `resource_comments` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源评论表';
 
 -- ----------------------------
+-- 资源评论反应表 (resource_comment_reactions)
+-- ----------------------------
+DROP TABLE IF EXISTS `resource_comment_reactions`;
+CREATE TABLE `resource_comment_reactions` (
+                                     `reaction_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+                                     `user_id` INT UNSIGNED NOT NULL,
+                                     `comment_id` INT UNSIGNED NOT NULL,
+                                     `reaction` ENUM('like','dislike') NOT NULL,
+                                     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                     PRIMARY KEY (`reaction_id`),
+                                     UNIQUE KEY `uk_rcr_user_comment` (`user_id`,`comment_id`),
+                                     KEY `idx_rcr_comment_reaction` (`comment_id`,`reaction`),
+                                     CONSTRAINT `fk_rcr_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE,
+                                     CONSTRAINT `fk_rcr_comment` FOREIGN KEY (`comment_id`) REFERENCES `resource_comments` (`comment_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC COMMENT='资源评论反应表';
+
+-- ----------------------------
 -- 信誉分记录表 (reputation_records) - 调整 change_score 为 SMALLINT
 -- ----------------------------
 DROP TABLE IF EXISTS `reputation_records`;

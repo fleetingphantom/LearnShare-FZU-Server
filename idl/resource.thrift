@@ -114,6 +114,15 @@ struct GetResourceCommentsResp {
     3: required i32 total,
 }
 
+struct SubmitResourceCommentReactionReq {
+    1: required i64 comment_id (api.path="comment_id"),
+    2: required string action (api.body="action"),
+}
+
+struct SubmitResourceCommentReactionResp {
+    1: required model.BaseResp baseResp,
+}
+
 // 资源服务
 service ResourceService {
     SearchResourceResp searchResources(1: SearchResourceReq req)(api.get="/api/resources/search"),
@@ -130,6 +139,8 @@ service ResourceService {
     SubmitResourceCommentResp submitResourceComment(1: SubmitResourceCommentReq req)(api.post="/api/resource_comments/:resource_id"),
     DeleteResourceCommentResp deleteResourceComment(1: DeleteResourceCommentReq req)(api.delete="/api/resource_comments/:comment_id"),
     GetResourceCommentsResp getResourceComments(1: GetResourceCommentsReq req)(api.get="/api/resource/:resource_id/comment"),
+
+    SubmitResourceCommentReactionResp reactResourceComment(1: SubmitResourceCommentReactionReq req)(api.post="/api/resource_comments/:comment_id/likes"),
 }
 
 struct AdminDeleteResourceCommentReq{
@@ -160,5 +171,3 @@ service AdminResourceService {
     AdminDeleteResourceResp AdminDeleteResource(1:AdminDeleteResourceReq req)(api.delete="/api/admin/resources/:resource_id"),
 
 }
-
-
