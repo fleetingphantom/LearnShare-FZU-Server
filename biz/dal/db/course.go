@@ -4,6 +4,10 @@ import (
 	"LearnShare/pkg/constants"
 	"LearnShare/pkg/errno"
 	"context"
+	"errors"
+	"fmt"
+	"gorm.io/gorm"
+	"time"
 )
 
 func CreateCourse(ctx context.Context, courseName string, teacherID, majorID int64, credit float64, grade, description string) error {
@@ -327,4 +331,159 @@ func DeleteResourceAsync(ctx context.Context, resourceID int64) chan error {
 	return pool.Submit(func() error {
 		return DeleteResource(ctx, resourceID)
 	})
+}
+
+// AdminDeleteCourse 管理员硬删除课程，并清理所有关联数据
+func AdminDeleteCourse(ctx context.Context, courseID int64) error {
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	tx := DB.WithContext(ctxWithTimeout).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 1. 检查课程是否存在
+	var course Course
+	if err := tx.Table(constants.CourseTableName).Where("course_id = ?", courseID).First(&course).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tx.Rollback()
+			return errno.NewErrNo(errno.InternalDatabaseErrorCode, "课程记录未找到")
+		}
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程失败: "+err.Error())
+	}
+
+	// 2. 删除课程下的所有资源（假设资源表有 course_id 外键）
+	if err := tx.Table(constants.ResourceTableName).Where("course_id = ?", courseID).Delete(&Resource{}).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程资源失败: "+err.Error())
+	}
+
+	// 3. 删除课程的所有评分
+	if err := tx.Table(constants.CourseRatingTableName).Where("course_id = ?", courseID).Delete(&CourseRating{}).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程评分失败: "+err.Error())
+	}
+
+	// 4. 删除课程的所有评论
+	if err := tx.Table(constants.CourseCommentTableName).Where("course_id = ?", courseID).Delete(&CourseComment{}).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程评论失败: "+err.Error())
+	}
+
+	// 5. 删除课程收藏记录（favorites 表，target_type = 'course'）
+	if err := tx.Table(constants.FavoriteTableName).Where("target_type = ? AND target_id = ?", "course", courseID).Delete(nil).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, fmt.Sprintf("清理课程收藏引用失败: %v", err))
+	}
+
+	// 6. 最终删除课程本身
+	if err := tx.Table(constants.CourseTableName).Where("course_id = ?", courseID).Delete(&Course{}).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程失败: "+err.Error())
+	}
+
+	// 提交事务
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交删除课程事务失败: "+err.Error())
+	}
+
+	return nil
+}
+
+// AdminDeleteCourseComment 管理员删除课程评论（不限制用户）
+func AdminDeleteCourseComment(ctx context.Context, commentID int64) error {
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	tx := DB.WithContext(ctxWithTimeout).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	var comment CourseComment
+	if err := tx.Table(constants.CourseCommentTableName).Where("comment_id = ?", commentID).First(&comment).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tx.Rollback()
+			return errno.NewErrNo(errno.InternalDatabaseErrorCode, "课程评论记录未找到")
+		}
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程评论失败: "+err.Error())
+	}
+
+	if err := tx.Table(constants.CourseCommentTableName).Where("comment_id = ?", commentID).Delete(&CourseComment{}).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程评论失败: "+err.Error())
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交删除课程评论事务失败: "+err.Error())
+	}
+	return nil
+}
+
+// AdminDeleteCourseRating 管理员删除课程评分（不限制用户）并重算课程平均分
+func AdminDeleteCourseRating(ctx context.Context, ratingID int64) error {
+	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	tx := DB.WithContext(ctxWithTimeout).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	var rating CourseRating
+	if err := tx.Table(constants.CourseRatingTableName).Where("rating_id = ?", ratingID).First(&rating).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tx.Rollback()
+			return errno.NewErrNo(errno.InternalDatabaseErrorCode, "课程评分记录未找到")
+		}
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程评分失败: "+err.Error())
+	}
+
+	// 删除评分
+	if err := tx.Table(constants.CourseRatingTableName).Where("rating_id = ?", ratingID).Delete(&CourseRating{}).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "删除课程评分失败: "+err.Error())
+	}
+
+	// 重新计算该课程的平均分和评分人数
+	var avgResult struct {
+		AverageRating float64 `gorm:"column:average_rating"`
+		RatingCount   int64   `gorm:"column:rating_count"`
+	}
+	if err := tx.Table(constants.CourseRatingTableName).
+		Select("AVG(rating) as average_rating, COUNT(*) as rating_count").
+		Where("course_id = ? AND is_visible = ?", rating.CourseID, true).
+		Scan(&avgResult).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "计算课程平均评分失败: "+err.Error())
+	}
+
+	// 更新课程表中的评分字段（假设 Course 表有 average_rating 和 rating_count 字段）
+	if err := tx.Table(constants.CourseTableName).
+		Where("course_id = ?", rating.CourseID).
+		Updates(map[string]interface{}{
+			"average_rating": avgResult.AverageRating,
+			"rating_count":   avgResult.RatingCount,
+		}).Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "更新课程评分信息失败: "+err.Error())
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交删除课程评分事务失败: "+err.Error())
+	}
+	return nil
 }

@@ -201,3 +201,41 @@ func (s *CourseService) DeleteCourseRating(req *course.DeleteCourseRatingReq) er
 
 	return nil
 }
+
+// AdminDeleteCourse 管理员硬删除课程（包括关联资源、评论、评分等）
+func (s *CourseService) AdminDeleteCourse(req *course.AdminDeleteCourseReq) error {
+	if req.CourseID <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "课程ID无效")
+	}
+
+	// 调用数据库层执行硬删除（需确保 db.AdminDeleteCourse 已实现级联删除或事务清理）
+	if err := db.AdminDeleteCourse(s.ctx, req.CourseID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// AdminDeleteCourseComment 管理员硬删除课程评论
+func (s *CourseService) AdminDeleteCourseComment(req *course.AdminDeleteCourseCommentReq) error {
+	if req.CommentID <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "评论ID无效")
+	}
+
+	if err := db.AdminDeleteCourseComment(s.ctx, req.CommentID); err != nil {
+		return err
+	}
+	return nil
+}
+
+// AdminDeleteCourseRating 管理员硬删除课程评分
+func (s *CourseService) AdminDeleteCourseRating(req *course.AdminDeleteCourseRatingReq) error {
+	if req.RatingID <= 0 {
+		return errno.NewErrNo(errno.ServiceInvalidParameter, "评分ID无效")
+	}
+
+	if err := db.AdminDeleteCourseRating(s.ctx, req.RatingID); err != nil {
+		return err
+	}
+	return nil
+}
