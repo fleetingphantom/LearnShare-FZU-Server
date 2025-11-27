@@ -38,7 +38,7 @@ struct GetCourseResourceListReq {
 
 struct GetCourseResourceListResp {
   required model.BaseResp baseResponse;
-  optional list<model.Resource> resources; 
+  optional list<model.Resource> resources;
 }
 
 
@@ -52,7 +52,7 @@ struct GetCourseCommentsReq {
 
 struct GetCourseCommentsResp {
   required model.BaseResp baseResponse;
-  optional list<model.CourseComment> comments;
+  optional list<model.CourseCommentWithUser> comments;
 }
 
 

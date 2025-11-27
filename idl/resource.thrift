@@ -110,7 +110,7 @@ struct GetResourceCommentsReq {
 
 struct GetResourceCommentsResp {
     1: required model.BaseResp baseResp,
-    2: required list<model.ResourceComment> comments,
+    2: required list<model.ResourceCommentWithUser> comments,
     3: required i32 total,
 }
 

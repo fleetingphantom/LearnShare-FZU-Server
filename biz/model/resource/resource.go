@@ -4074,9 +4074,9 @@ func (p *GetResourceCommentsReq) String() string {
 }
 
 type GetResourceCommentsResp struct {
-	BaseResp *module.BaseResp          `thrift:"baseResp,1,required" form:"baseResp,required" json:"baseResp,required" query:"baseResp,required"`
-	Comments []*module.ResourceComment `thrift:"comments,2,required,list<module.ResourceComment>" form:"comments,required" json:"comments,required" query:"comments,required"`
-	Total    int32                     `thrift:"total,3,required" form:"total,required" json:"total,required" query:"total,required"`
+	BaseResp *module.BaseResp                  `thrift:"baseResp,1,required" form:"baseResp,required" json:"baseResp,required" query:"baseResp,required"`
+	Comments []*module.ResourceCommentWithUser `thrift:"comments,2,required,list<module.ResourceCommentWithUser>" form:"comments,required" json:"comments,required" query:"comments,required"`
+	Total    int32                             `thrift:"total,3,required" form:"total,required" json:"total,required" query:"total,required"`
 }
 
 func NewGetResourceCommentsResp() *GetResourceCommentsResp {
@@ -4095,7 +4095,7 @@ func (p *GetResourceCommentsResp) GetBaseResp() (v *module.BaseResp) {
 	return p.BaseResp
 }
 
-func (p *GetResourceCommentsResp) GetComments() (v []*module.ResourceComment) {
+func (p *GetResourceCommentsResp) GetComments() (v []*module.ResourceCommentWithUser) {
 	return p.Comments
 }
 
@@ -4220,8 +4220,8 @@ func (p *GetResourceCommentsResp) ReadField2(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	_field := make([]*module.ResourceComment, 0, size)
-	values := make([]module.ResourceComment, size)
+	_field := make([]*module.ResourceCommentWithUser, 0, size)
+	values := make([]module.ResourceCommentWithUser, size)
 	for i := 0; i < size; i++ {
 		_elem := &values[i]
 		_elem.InitDefault()

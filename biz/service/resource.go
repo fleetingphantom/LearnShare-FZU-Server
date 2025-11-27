@@ -102,7 +102,7 @@ func (s *ResourceService) DownloadResource(req *resource.DownloadResourceReq) (s
 }
 
 // GetResourceComments 执行获取资源评论列表
-func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceComment, int64, error) {
+func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceCommentWithUser, int64, error) {
 	// 验证资源ID
 	if req.ResourceID <= 0 {
 		return nil, 0, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
@@ -122,9 +122,9 @@ func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsR
 		return nil, 0, err
 	}
 
-	var modelComments []*model.ResourceComment
+	var modelComments []*model.ResourceCommentWithUser
 	for _, comment := range comments {
-		modelComments = append(modelComments, comment.ToResourceCommentModule())
+		modelComments = append(modelComments, comment.ToResourceCommentWithUserModule())
 	}
 
 	return modelComments, total, nil

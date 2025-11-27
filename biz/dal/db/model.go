@@ -2,6 +2,7 @@ package db
 
 import (
 	"LearnShare/biz/model/module"
+	"context"
 	"time"
 )
 
@@ -199,6 +200,29 @@ func (c CourseComment) ToCourseCommentModule() *module.CourseComment {
 	}
 }
 
+func (c CourseComment) ToCourseCommentWithUserModule() *module.CourseCommentWithUser {
+
+	user, err := GetUserByID(context.Background(), c.UserID)
+	if err != nil {
+		user = &User{
+			UserID:   0,
+			Username: "未知用户",
+		}
+	}
+
+	return &module.CourseCommentWithUser{
+		CommentId: c.CommentID,
+		User:      user.ToUserModule(),
+		CourseId:  c.CourseID,
+		Content:   c.Content,
+		ParentId:  c.ParentID,
+		Likes:     0, // 必须：Thrift required字段
+		IsVisible: c.IsVisible,
+		Status:    0,                  // 必须：Thrift required字段
+		CreatedAt: c.CreatedAt.Unix(), // 必须：时间戳转换
+	}
+}
+
 type ResourceTagMapping struct {
 	ResourceID int64 `gorm:"primaryKey;table:resource_tags"`
 	TagID      int64 `gorm:"primaryKey"`
@@ -236,11 +260,11 @@ type ResourceRating struct {
 }
 
 type ResourceCommentReaction struct {
-    ReactionID int64     `gorm:"primaryKey;autoIncrement"`
-    UserID     int64     `gorm:"not null"`
-    CommentID  int64     `gorm:"not null"`
-    Reaction   string    `gorm:"type:enum('like','dislike');not null"`
-    CreatedAt  time.Time `gorm:"autoCreateTime"`
+	ReactionID int64     `gorm:"primaryKey;autoIncrement"`
+	UserID     int64     `gorm:"not null"`
+	CommentID  int64     `gorm:"not null"`
+	Reaction   string    `gorm:"type:enum('like','dislike');not null"`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
 }
 
 // ToResourceCommentModule 将db.ResourceComment转换为model.ResourceComment
@@ -256,6 +280,36 @@ func (c ResourceComment) ToResourceCommentModule() *module.ResourceComment {
 	return &module.ResourceComment{
 		CommentId:  c.CommentID,
 		UserId:     c.UserID,
+		ResourceId: c.ResourceID,
+		Content:    c.Content,
+		ParentId:   parentId,
+		Likes:      c.Likes,
+		IsVisible:  c.IsVisible,
+		Status:     status,
+		CreatedAt:  c.CreatedAt.Unix(),
+	}
+}
+
+func (c ResourceComment) ToResourceCommentWithUserModule() *module.ResourceCommentWithUser {
+	var parentId int64
+	if c.ParentID != nil {
+		parentId = *c.ParentID
+	}
+
+	var status module.ResourceCommentStatus
+	status, _ = module.ResourceCommentStatusFromString(c.Status)
+
+	user, err := GetUserByID(context.Background(), c.UserID)
+	if err != nil {
+		user = &User{
+			UserID:   0,
+			Username: "未知用户",
+		}
+	}
+
+	return &module.ResourceCommentWithUser{
+		CommentId:  c.CommentID,
+		User:       user.ToUserModule(),
 		ResourceId: c.ResourceID,
 		Content:    c.Content,
 		ParentId:   parentId,

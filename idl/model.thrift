@@ -57,6 +57,17 @@ struct CourseComment{
     required i64 createdAt,
 }
 
+struct CourseCommentWithUser{
+    required i64 commentId,
+    required User user,
+    required i64 courseId,
+    required string content,
+    required i64 parentId,
+    required i64 likes,
+    required bool isVisible,
+    required i64 status,
+    required i64 createdAt,
+}
 
 struct ResourceTag {
     required i64 tagId,
@@ -99,6 +110,18 @@ struct ResourceRating{
 struct ResourceComment{
     required i64 commentId,
     required i64 userId,
+    required i64 resourceId,
+    required string content,
+    required i64 parentId,
+    required i64 likes,
+    required bool isVisible,
+    required ResourceCommentStatus status,
+    required i64 createdAt,
+}
+
+struct ResourceCommentWithUser{
+    required i64 commentId,
+    required User user,
     required i64 resourceId,
     required string content,
     required i64 parentId,
