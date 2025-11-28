@@ -577,6 +577,7 @@ func CreateReviewAsync(ctx context.Context, creatorID int64, targetID int64, tar
 	})
 }
 
+// GetOrCreateTag 获取或创建单个标签
 func GetOrCreateTag(ctx context.Context, tagName string) (*ResourceTag, error) {
 	var tag ResourceTag
 	err := DB.WithContext(ctx).Table("tags").Where("tag_name = ?", tagName).First(&tag).Error
@@ -593,11 +594,107 @@ func GetOrCreateTag(ctx context.Context, tagName string) (*ResourceTag, error) {
 	return &tag, nil
 }
 
+// GetOrCreateTagsBatch 批量获取或创建标签（优化：减少数据库往返）
+func GetOrCreateTagsBatch(ctx context.Context, tagNames []string) ([]*ResourceTag, error) {
+	if len(tagNames) == 0 {
+		return []*ResourceTag{}, nil
+	}
+
+	// 先去重
+	uniqueNames := make(map[string]bool)
+	for _, name := range tagNames {
+		if trimmed := name; trimmed != "" {
+			uniqueNames[trimmed] = true
+		}
+	}
+
+	var uniqueList []string
+	for name := range uniqueNames {
+		uniqueList = append(uniqueList, name)
+	}
+
+	// 查询已存在的标签
+	var existingTags []ResourceTag
+	err := DB.WithContext(ctx).Table("tags").Where("tag_name IN (?)", uniqueList).Find(&existingTags).Error
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "批量查询标签失败: "+err.Error())
+	}
+
+	// 建立已存在标签的映射
+	existingMap := make(map[string]*ResourceTag)
+	for i := range existingTags {
+		existingMap[existingTags[i].TagName] = &existingTags[i]
+	}
+
+	// 找出需要创建的新标签
+	var newTags []*ResourceTag
+	for _, name := range uniqueList {
+		if _, exists := existingMap[name]; !exists {
+			newTags = append(newTags, &ResourceTag{TagName: name})
+		}
+	}
+
+	// 批量创建新标签
+	if len(newTags) > 0 {
+		if err := DB.WithContext(ctx).Table("tags").CreateInBatches(newTags, 50).Error; err != nil {
+			// 如果是重复键错误，说明有其他并发操作，可以忽略
+			if !errors.Is(err, gorm.ErrDuplicatedKey) {
+				return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "批量创建标签失败: "+err.Error())
+			}
+		}
+	}
+
+	// 重新查询所有标签以确保数据完整性
+	var allTags []ResourceTag
+	err = DB.WithContext(ctx).Table("tags").Where("tag_name IN (?)", uniqueList).Find(&allTags).Error
+	if err != nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "重新查询标签失败: "+err.Error())
+	}
+
+	// 转换为指针数组
+	result := make([]*ResourceTag, len(allTags))
+	for i := range allTags {
+		result[i] = &allTags[i]
+	}
+
+	return result, nil
+}
+
+// LinkResourceTag 关联单个资源标签
 func LinkResourceTag(ctx context.Context, resourceID, tagID int64) error {
 	mapping := ResourceTagMapping{ResourceID: resourceID, TagID: tagID}
 	if err := DB.WithContext(ctx).Table(constants.ResourceTagMappingTableName).Create(&mapping).Error; err != nil {
 		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "关联资源标签失败: "+err.Error())
 	}
+	return nil
+}
+
+// LinkResourceTagsBatch 批量关联资源标签（优化：减少数据库往返）
+func LinkResourceTagsBatch(ctx context.Context, resourceID int64, tagIDs []int64) error {
+	if len(tagIDs) == 0 {
+		return nil
+	}
+
+	mappings := make([]ResourceTagMapping, 0, len(tagIDs))
+	for _, tagID := range tagIDs {
+		if tagID > 0 {
+			mappings = append(mappings, ResourceTagMapping{
+				ResourceID: resourceID,
+				TagID:      tagID,
+			})
+		}
+	}
+
+	if len(mappings) == 0 {
+		return nil
+	}
+
+	// 批量插入，忽略重复键错误
+	err := DB.WithContext(ctx).Table(constants.ResourceTagMappingTableName).CreateInBatches(mappings, 100).Error
+	if err != nil && !errors.Is(err, gorm.ErrDuplicatedKey) {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "批量关联资源标签失败: "+err.Error())
+	}
+
 	return nil
 }
 

@@ -238,8 +238,8 @@ func GetCourseCommentsByCourseID(ctx context.Context, courseID int64, sortBy str
 	var rows []CommentUserRow
 
 	query := DB.WithContext(ctx).Table(constants.CourseCommentTableName+" AS c").Select(
-		"c.comment_id, c.course_id, c.content, c.parent_id, c.is_visible, c.created_at, c.updated_at, "+
-			"u.user_id AS u_user_id, u.username AS u_username, u.email AS u_email, u.college_id AS u_college_id, u.major_id AS u_major_id, u.avatar_url AS u_avatar_url, u.reputation_score AS u_reputation_score, u.role_id AS u_role_id, u.status AS u_status, u.created_at AS u_created_at, u.updated_at AS u_updated_at",
+		"c.comment_id, c.course_id, c.content, c.parent_id, c.is_visible, c.created_at, c.updated_at,c.likes,c.status,"+
+			"u.user_id AS u_user_id, u.username AS u_username, u.email AS u_email, u.college_id AS u_college_id, u.major_id AS u_major_id, u.avatar_url AS u_avatar_url, u.reputation_score AS u_reputation_score, u.role_id AS u_role_id, u.status AS u_status, u.created_at AS u_created_at, u.updated_at AS u_updated_at,u.status AS u_status",
 	).Joins("LEFT JOIN "+constants.UserTableName+" u ON c.user_id = u.user_id").Where("c.course_id = ? AND c.is_visible = ?", courseID, true)
 
 	// 排序方式
@@ -279,7 +279,7 @@ func GetCourseCommentsByCourseID(ctx context.Context, courseID int64, sortBy str
 				AvatarURL:       r.AvatarURL,
 				ReputationScore: derefInt64(r.ReputationScore),
 				RoleID:          derefInt64(r.RoleID),
-				Status:          derefString(r.Status),
+				Status:          r.Status,
 			}
 		}
 
@@ -290,6 +290,8 @@ func GetCourseCommentsByCourseID(ctx context.Context, courseID int64, sortBy str
 			Content:   r.Content,
 			ParentID:  r.ParentID,
 			IsVisible: r.IsVisible,
+			Likes:     r.Likes,
+			Status:    r.Status,
 			CreatedAt: r.CreatedAt,
 			UpdatedAt: r.UpdatedAt,
 		}
@@ -327,7 +329,8 @@ func GetCourseResources(ctx context.Context, courseID int64, resourceType, statu
 		query = query.Where("status = ?", status)
 	}
 
-	err := query.Order("created_at DESC").Limit(pageSize).Offset(pageSize * (pageNum - 1)).Find(&resources).Error
+	// 使用 Preload 预加载 Tags，避免 N+1 查询问题
+	err := query.Order("created_at DESC").Limit(pageSize).Offset(pageSize * (pageNum - 1)).Preload("Tags").Find(&resources).Error
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询课程资源列表失败: "+err.Error())
 	}

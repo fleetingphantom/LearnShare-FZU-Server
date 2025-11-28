@@ -53,7 +53,7 @@ struct CourseComment{
     required i64 parentId,
     required i64 likes,
     required bool isVisible,
-    required i64 status,
+    required string status,
     required i64 createdAt,
 }
 
@@ -65,7 +65,7 @@ struct CourseCommentWithUser{
     required i64 parentId,
     required i64 likes,
     required bool isVisible,
-    required i64 status,
+    required string status,
     required i64 createdAt,
 }
 

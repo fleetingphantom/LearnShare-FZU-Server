@@ -206,8 +206,10 @@ type CourseComment struct {
 	CourseID  int64     `json:"course_id" db:"course_id"`
 	UserID    int64     `json:"user_id" db:"user_id"`
 	Content   string    `json:"content" db:"content"`
+	Likes     int64     `json:"likes" db:"likes"`
 	ParentID  int64     `json:"parent_id" db:"parent_id"`
 	IsVisible bool      `json:"is_visible" db:"is_visible"`
+	Status    string    `json:"status" db:"status"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -219,9 +221,9 @@ func (c CourseComment) ToCourseCommentModule() *module.CourseComment {
 		CourseId:  c.CourseID,
 		Content:   c.Content,
 		ParentId:  c.ParentID,
-		Likes:     0, // 必须：Thrift required字段
+		Likes:     c.Likes, // 必须：Thrift required字段
 		IsVisible: c.IsVisible,
-		Status:    0,                  // 必须：Thrift required字段
+		Status:    c.Status,           // 必须：Thrift required字段
 		CreatedAt: c.CreatedAt.Unix(), // 必须：时间戳转换
 	}
 }
@@ -230,6 +232,8 @@ type CommentUserRow struct {
 	CommentID int64     `gorm:"column:comment_id"`
 	CourseID  int64     `gorm:"column:course_id"`
 	Content   string    `gorm:"column:content"`
+	Likes     int64     `json:"likes" db:"likes"`
+	Status    string    `json:"status" db:"status"`
 	ParentID  int64     `gorm:"column:parent_id"`
 	IsVisible bool      `gorm:"column:is_visible"`
 	CreatedAt time.Time `gorm:"column:created_at"`
@@ -243,16 +247,18 @@ type CommentUserRow struct {
 	AvatarURL       *string `gorm:"column:u_avatar_url"`
 	ReputationScore *int64  `gorm:"column:u_reputation_score"`
 	RoleID          *int64  `gorm:"column:u_role_id"`
-	Status          *string `gorm:"column:u_status"`
+	UserStatus      *string `gorm:"column:u_status"`
 }
 
 type CourseCommentWithuser struct {
 	CommentID int64     `json:"comment_id" db:"comment_id"`
 	CourseID  int64     `json:"course_id" db:"course_id"`
 	User      User      `json:"user" db:"-"`
+	Likes     int64     `json:"likes" db:"likes"`
 	Content   string    `json:"content" db:"content"`
 	ParentID  int64     `json:"parent_id" db:"parent_id"`
 	IsVisible bool      `json:"is_visible" db:"is_visible"`
+	Status    string    `json:"status" db:"status"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -265,9 +271,9 @@ func (c CourseCommentWithuser) ToCourseCommentWithUserModule() *module.CourseCom
 		CourseId:  c.CourseID,
 		Content:   c.Content,
 		ParentId:  c.ParentID,
-		Likes:     0, // 必须：Thrift required字段
+		Likes:     c.Likes, // 必须：Thrift required字段
 		IsVisible: c.IsVisible,
-		Status:    0,                  // 必须：Thrift required字段
+		Status:    c.Status,           // 必须：Thrift required字段
 		CreatedAt: c.CreatedAt.Unix(), // 必须：时间戳转换
 	}
 }
