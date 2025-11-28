@@ -19,9 +19,9 @@ func _apiMw() []app.HandlerFunc {
 }
 
 func _adminMw() []app.HandlerFunc {
-    return []app.HandlerFunc{
-        auth.AccessTokenAuth(),
-    }
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _auditMw() []app.HandlerFunc {
@@ -65,13 +65,43 @@ func _resourcesMw() []app.HandlerFunc {
 }
 
 func _getresourceauditlistMw() []app.HandlerFunc {
-    return []app.HandlerFunc{
-        auth.RequirePermission("review.handle"),
-    }
+	return []app.HandlerFunc{
+		auth.RequirePermission("review.handle"),
+	}
 }
 
 func _auditresourceMw() []app.HandlerFunc {
-    return []app.HandlerFunc{
-        auth.RequirePermission("review.handle"),
-    }
+	return []app.HandlerFunc{
+		auth.RequirePermission("review.handle"),
+	}
+}
+
+func _course_commentsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _auditcoursecommentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_commentsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _auditresourcecommentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getcoursecommentauditlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getresourcecommentauditlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
 }
