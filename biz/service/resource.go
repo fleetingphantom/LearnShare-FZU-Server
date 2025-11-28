@@ -331,26 +331,36 @@ func (s *ResourceService) UploadResource(file *multipart.FileHeader, title strin
 	}
 
 	if len(tags) > 0 {
-		for _, name := range tags {
-			name = strings.TrimSpace(name)
-			if name == "" {
-				continue
-			}
-			tag, e := db.GetOrCreateTag(s.ctx, name)
-			if e != nil {
-				return nil, e
-			}
-			if e = db.LinkResourceTag(s.ctx, res.ResourceID, tag.TagID); e != nil {
-				return nil, e
-			}
+		// 使用批量操作优化标签处理
+		tagsData, e := db.GetOrCreateTagsBatch(s.ctx, tags)
+		if e != nil {
+			return nil, e
+		}
+
+		// 提取所有 tagID
+		tagIDs := make([]int64, len(tags))
+		for i, tag := range tagsData {
+			tagIDs[i] = tag.TagID
+		}
+
+		// 批量关联标签
+		if e = db.LinkResourceTagsBatch(s.ctx, res.ResourceID, tagIDs); e != nil {
+			return nil, e
 		}
 	}
 
-	r, e := db.GetResourceByID(s.ctx, res.ResourceID)
-	if e != nil {
-		return nil, e
+	// 直接构建返回结果，避免重复查询
+	var tagsResp []*model.ResourceTag
+	if res.Tags != nil {
+		for _, t := range res.Tags {
+			tagsResp = append(tagsResp, t.ToResourceTagModule())
+		}
 	}
-	return r.ToResourceModule(), nil
+
+	resp := res.ToResourceModule()
+	resp.Tags = tagsResp
+
+	return resp, nil
 }
 
 func (s *ResourceService) ReactResourceComment(commentID int64, action string) error {

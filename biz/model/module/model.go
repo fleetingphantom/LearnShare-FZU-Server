@@ -2144,7 +2144,7 @@ type CourseComment struct {
 	ParentId  int64  `thrift:"parentId,5,required" form:"parentId,required" json:"parentId,required" query:"parentId,required"`
 	Likes     int64  `thrift:"likes,6,required" form:"likes,required" json:"likes,required" query:"likes,required"`
 	IsVisible bool   `thrift:"isVisible,7,required" form:"isVisible,required" json:"isVisible,required" query:"isVisible,required"`
-	Status    int64  `thrift:"status,8,required" form:"status,required" json:"status,required" query:"status,required"`
+	Status    string `thrift:"status,8,required" form:"status,required" json:"status,required" query:"status,required"`
 	CreatedAt int64  `thrift:"createdAt,9,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
 }
 
@@ -2183,7 +2183,7 @@ func (p *CourseComment) GetIsVisible() (v bool) {
 	return p.IsVisible
 }
 
-func (p *CourseComment) GetStatus() (v int64) {
+func (p *CourseComment) GetStatus() (v string) {
 	return p.Status
 }
 
@@ -2295,7 +2295,7 @@ func (p *CourseComment) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 8:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -2466,8 +2466,8 @@ func (p *CourseComment) ReadField7(iprot thrift.TProtocol) error {
 }
 func (p *CourseComment) ReadField8(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -2667,10 +2667,10 @@ WriteFieldEndError:
 }
 
 func (p *CourseComment) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.I64, 8); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.STRING, 8); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Status); err != nil {
+	if err := oprot.WriteString(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2716,7 +2716,7 @@ type CourseCommentWithUser struct {
 	ParentId  int64  `thrift:"parentId,5,required" form:"parentId,required" json:"parentId,required" query:"parentId,required"`
 	Likes     int64  `thrift:"likes,6,required" form:"likes,required" json:"likes,required" query:"likes,required"`
 	IsVisible bool   `thrift:"isVisible,7,required" form:"isVisible,required" json:"isVisible,required" query:"isVisible,required"`
-	Status    int64  `thrift:"status,8,required" form:"status,required" json:"status,required" query:"status,required"`
+	Status    string `thrift:"status,8,required" form:"status,required" json:"status,required" query:"status,required"`
 	CreatedAt int64  `thrift:"createdAt,9,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
 }
 
@@ -2760,7 +2760,7 @@ func (p *CourseCommentWithUser) GetIsVisible() (v bool) {
 	return p.IsVisible
 }
 
-func (p *CourseCommentWithUser) GetStatus() (v int64) {
+func (p *CourseCommentWithUser) GetStatus() (v string) {
 	return p.Status
 }
 
@@ -2876,7 +2876,7 @@ func (p *CourseCommentWithUser) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 8:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -3044,8 +3044,8 @@ func (p *CourseCommentWithUser) ReadField7(iprot thrift.TProtocol) error {
 }
 func (p *CourseCommentWithUser) ReadField8(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -3245,10 +3245,10 @@ WriteFieldEndError:
 }
 
 func (p *CourseCommentWithUser) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.I64, 8); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.STRING, 8); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.Status); err != nil {
+	if err := oprot.WriteString(p.Status); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
