@@ -2,7 +2,6 @@ package db
 
 import (
 	"LearnShare/biz/model/module"
-	"context"
 	"time"
 )
 
@@ -29,6 +28,8 @@ func (u User) ToUserModule() *module.User {
 		ReputationScore: u.ReputationScore,
 		RoleId:          u.RoleID,
 		Status:          u.Status,
+		CreatedAt:       u.CreatedAt.Unix(),
+		UpdatedAt:       u.UpdatedAt.Unix(),
 	}
 
 	if u.AvatarURL != nil {
@@ -147,6 +148,31 @@ func (t ResourceTag) ToResourceTagModule() *module.ResourceTag {
 	}
 }
 
+type ResourceCommentrow struct {
+	CommentID  int64     `gorm:"column:comment_id"`
+	UserID     int64     `gorm:"column:user_id"`
+	ResourceID int64     `gorm:"column:resource_id"`
+	Content    string    `gorm:"column:content"`
+	ParentID   *int64    `gorm:"column:parent_id"`
+	Likes      int64     `gorm:"column:likes"`
+	IsVisible  bool      `gorm:"column:is_visible"`
+	Status     string    `gorm:"column:status"`
+	CreatedAt  time.Time `gorm:"column:created_at"`
+
+	UUserID          *int64     `gorm:"column:u_user_id"`
+	UUsername        *string    `gorm:"column:u_username"`
+	UPasswordHash    *string    `gorm:"column:u_password_hash"`
+	UEmail           *string    `gorm:"column:u_email"`
+	UCollegeID       *int64     `gorm:"column:u_college_id"`
+	UMajorID         *int64     `gorm:"column:u_major_id"`
+	UAvatarURL       *string    `gorm:"column:u_avatar_url"`
+	UReputationScore *int64     `gorm:"column:u_reputation_score"`
+	URoleID          *int64     `gorm:"column:u_role_id"`
+	UStatus          *string    `gorm:"column:u_status"`
+	UCreatedAt       *time.Time `gorm:"column:u_created_at"`
+	UUpdatedAt       *time.Time `gorm:"column:u_updated_at"`
+}
+
 // CourseRating 课程评分
 type CourseRating struct {
 	RatingID       int64     `json:"rating_id" db:"rating_id"`
@@ -200,19 +226,42 @@ func (c CourseComment) ToCourseCommentModule() *module.CourseComment {
 	}
 }
 
-func (c CourseComment) ToCourseCommentWithUserModule() *module.CourseCommentWithUser {
+type CommentUserRow struct {
+	CommentID int64     `gorm:"column:comment_id"`
+	CourseID  int64     `gorm:"column:course_id"`
+	Content   string    `gorm:"column:content"`
+	ParentID  int64     `gorm:"column:parent_id"`
+	IsVisible bool      `gorm:"column:is_visible"`
+	CreatedAt time.Time `gorm:"column:created_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at"`
 
-	user, err := GetUserByID(context.Background(), c.UserID)
-	if err != nil {
-		user = &User{
-			UserID:   0,
-			Username: "未知用户",
-		}
-	}
+	UserID          *int64  `gorm:"column:u_user_id"`
+	Username        *string `gorm:"column:u_username"`
+	Email           *string `gorm:"column:u_email"`
+	CollegeID       *int64  `gorm:"column:u_college_id"`
+	MajorID         *int64  `gorm:"column:u_major_id"`
+	AvatarURL       *string `gorm:"column:u_avatar_url"`
+	ReputationScore *int64  `gorm:"column:u_reputation_score"`
+	RoleID          *int64  `gorm:"column:u_role_id"`
+	Status          *string `gorm:"column:u_status"`
+}
+
+type CourseCommentWithuser struct {
+	CommentID int64     `json:"comment_id" db:"comment_id"`
+	CourseID  int64     `json:"course_id" db:"course_id"`
+	User      User      `json:"user" db:"-"`
+	Content   string    `json:"content" db:"content"`
+	ParentID  int64     `json:"parent_id" db:"parent_id"`
+	IsVisible bool      `json:"is_visible" db:"is_visible"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
+}
+
+func (c CourseCommentWithuser) ToCourseCommentWithUserModule() *module.CourseCommentWithUser {
 
 	return &module.CourseCommentWithUser{
 		CommentId: c.CommentID,
-		User:      user.ToUserModule(),
+		User:      c.User.ToUserModule(),
 		CourseId:  c.CourseID,
 		Content:   c.Content,
 		ParentId:  c.ParentID,
@@ -290,7 +339,22 @@ func (c ResourceComment) ToResourceCommentModule() *module.ResourceComment {
 	}
 }
 
-func (c ResourceComment) ToResourceCommentWithUserModule() *module.ResourceCommentWithUser {
+type ResourceCommentWithUser struct {
+	CommentID  int64     `gorm:"primaryKey;autoIncrement"`
+	UserID     int64     `gorm:"not null"`
+	ResourceID int64     `gorm:"not null"`
+	Content    string    `gorm:"type:text;not null"`
+	ParentID   *int64    `gorm:"default:NULL"`
+	Likes      int64     `gorm:"default:0"`
+	IsVisible  bool      `gorm:"default:true"`
+	Status     string    `gorm:"type:enum('normal','deleted_by_user','deleted_by_admin');default:'normal'"`
+	CreatedAt  time.Time `gorm:"autoCreateTime"`
+
+	// 关联用户信息
+	User User `gorm:"foreignKey:UserID;references:UserID"`
+}
+
+func (c ResourceCommentWithUser) ToResourceCommentWithUserModule() *module.ResourceCommentWithUser {
 	var parentId int64
 	if c.ParentID != nil {
 		parentId = *c.ParentID
@@ -299,17 +363,9 @@ func (c ResourceComment) ToResourceCommentWithUserModule() *module.ResourceComme
 	var status module.ResourceCommentStatus
 	status, _ = module.ResourceCommentStatusFromString(c.Status)
 
-	user, err := GetUserByID(context.Background(), c.UserID)
-	if err != nil {
-		user = &User{
-			UserID:   0,
-			Username: "未知用户",
-		}
-	}
-
 	return &module.ResourceCommentWithUser{
 		CommentId:  c.CommentID,
-		User:       user.ToUserModule(),
+		User:       c.User.ToUserModule(),
 		ResourceId: c.ResourceID,
 		Content:    c.Content,
 		ParentId:   parentId,
@@ -407,6 +463,13 @@ func (r Role) ToRoleModule() *module.Role {
 type RolePermission struct {
 	RoleID       int64 `json:"role_id" db:"role_id"`
 	PermissionID int64 `json:"permission_id" db:"permission_id"`
+}
+
+type RolePermRow struct {
+	RoleID                int64   `gorm:"column:role_id"`
+	PermissionID          *int64  `gorm:"column:permission_id"`
+	PermissionName        *string `gorm:"column:permission_name"`
+	PermissionDescription *string `gorm:"column:permission_description"`
 }
 
 type RoleWithPermissions struct {

@@ -76,45 +76,91 @@ func GetResourceByID(ctx context.Context, resourceID int64) (*Resource, error) {
 }
 
 // GetResourceComments 获取资源评论列表
-func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, pageNum, pageSize int) ([]*ResourceComment, int64, error) {
+func GetResourceComments(ctx context.Context, resourceID int64, sortBy *string, pageNum, pageSize int) ([]*ResourceCommentWithUser, int64, error) {
 	// 添加超时控制
 	ctxWithTimeout, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	var comments []*ResourceComment
+	// 先统计总数
 	var total int64
-
-	// 使用 Model(&ResourceComment{}) 以便 GORM 识别关联关系；
-	// 不在 Count 阶段使用 Preload，避免"model value required when using preload"报错。
-	base := DB.WithContext(ctxWithTimeout).Model(&ResourceComment{}).
+	base := DB.WithContext(ctxWithTimeout).Table(constants.ResourceCommentTableName).Model(&ResourceComment{}).
 		Where("resource_id = ?", resourceID).
 		Where("is_visible = ?", true).
 		Where("status = ?", "normal")
 
-	// 先统计总数（不需要排序与预加载）
 	if err := base.Count(&total).Error; err != nil {
 		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "统计资源评论数量失败: "+err.Error())
 	}
 
-	// 根据排序参数设置查询顺序（仅用于数据查询阶段）
+	// 使用联表查询，一次性获取评论与用户信息
+
+	var rows []ResourceCommentrow
+
+	query := DB.WithContext(ctxWithTimeout).Table(constants.ResourceCommentTableName+" AS c").Select(
+		"c.comment_id, c.user_id, c.resource_id, c.content, c.parent_id, c.likes, c.is_visible, c.status, c.created_at, "+
+			"u.user_id AS u_user_id, u.username AS u_username, u.email AS u_email, u.college_id AS u_college_id, u.major_id AS u_major_id, u.avatar_url AS u_avatar_url, u.reputation_score AS u_reputation_score, u.role_id AS u_role_id, u.status AS u_status, u.created_at AS u_created_at, u.updated_at AS u_updated_at",
+	).Joins("LEFT JOIN "+constants.UserTableName+" u ON c.user_id = u.user_id").Where("c.resource_id = ? AND c.is_visible = ? AND c.status = ?", resourceID, true, "normal")
+
+	// 排序
 	switch {
 	case sortBy != nil && *sortBy == "hottest":
-		base = base.Order("likes DESC, created_at DESC")
+		query = query.Order("c.likes DESC, c.created_at DESC")
 	default:
-		// latest 或默认
-		base = base.Order("created_at DESC")
+		query = query.Order("c.created_at DESC")
 	}
 
-	// 获取分页数据（此处再进行关联预加载）
-	err := base.Offset((pageNum - 1) * pageSize).
-		Limit(pageSize).
-		Preload("User").
-		Find(&comments).Error
+	err := query.Offset((pageNum - 1) * pageSize).Limit(pageSize).Scan(&rows).Error
 	if err != nil {
 		return nil, 0, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询资源评论列表失败: "+err.Error())
 	}
 
-	return comments, total, nil
+	if len(rows) == 0 {
+		return []*ResourceCommentWithUser{}, total, nil
+	}
+
+	// 映射为目标结构
+	result := make([]*ResourceCommentWithUser, 0, len(rows))
+	for _, r := range rows {
+		var user User
+		if r.UUserID == nil {
+			user = User{UserID: 0, Username: "未知用户"}
+		} else {
+			user = User{
+				UserID:          *r.UUserID,
+				Username:        derefString(r.UUsername),
+				PasswordHash:    derefString(r.UPasswordHash),
+				Email:           derefString(r.UEmail),
+				CollegeID:       r.UCollegeID,
+				MajorID:         r.UMajorID,
+				AvatarURL:       r.UAvatarURL,
+				ReputationScore: derefInt64(r.UReputationScore),
+				RoleID:          derefInt64(r.URoleID),
+				Status:          derefString(r.UStatus),
+			}
+			if r.UCreatedAt != nil {
+				user.CreatedAt = *r.UCreatedAt
+			}
+			if r.UUpdatedAt != nil {
+				user.UpdatedAt = *r.UUpdatedAt
+			}
+		}
+
+		cc := &ResourceCommentWithUser{
+			CommentID:  r.CommentID,
+			UserID:     r.UserID,
+			ResourceID: r.ResourceID,
+			Content:    r.Content,
+			ParentID:   r.ParentID,
+			Likes:      r.Likes,
+			IsVisible:  r.IsVisible,
+			Status:     r.Status,
+			CreatedAt:  r.CreatedAt,
+			User:       user,
+		}
+		result = append(result, cc)
+	}
+
+	return result, total, nil
 }
 
 // SubmitResourceRating 提交资源评分
