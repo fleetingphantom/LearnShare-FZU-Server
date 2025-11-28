@@ -43,74 +43,57 @@ func GetAllRoles(ctx context.Context) ([]*RoleWithPermissions, error) {
 		return []*RoleWithPermissions{}, nil
 	}
 
-	// 收集所有角色ID
+	// 收集所有角色ID（用于限制 JOIN 查询范围，保持结果顺序由 roles 决定）
 	roleIDs := make([]int64, len(roles))
 	for i, r := range roles {
 		roleIDs[i] = r.RoleID
 	}
 
-	// 批量查询所有角色的权限关联
-	var rolePermissions []RolePermission
+	var rows []RolePermRow
 	err = DB.WithContext(ctx).
-		Table(constants.RolePermissionTableName).
-		Where("role_id IN ?", roleIDs).
-		Find(&rolePermissions).Error
+		Table(constants.RoleTableName+" AS r").
+		Select("r.role_id, p.permission_id, p.permission_name, p.description AS permission_description").
+		Joins("LEFT JOIN "+constants.RolePermissionTableName+" rp ON r.role_id = rp.role_id").
+		Joins("LEFT JOIN "+constants.PermissionTableName+" p ON rp.permission_id = p.permission_id").
+		Where("r.role_id IN ?", roleIDs).
+		Scan(&rows).Error
 	if err != nil {
 		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询角色权限失败: "+err.Error())
 	}
 
-	// 收集所有权限ID
-	permissionIDSet := make(map[int64]bool)
-	for _, rp := range rolePermissions {
-		permissionIDSet[rp.PermissionID] = true
-	}
-
-	permissionIDs := make([]int64, 0, len(permissionIDSet))
-	for id := range permissionIDSet {
-		permissionIDs = append(permissionIDs, id)
-	}
-
-	// 批量查询所有权限详情
-	var permissions []Permission
-	if len(permissionIDs) > 0 {
-		err = DB.WithContext(ctx).
-			Table(constants.PermissionTableName).
-			Where("permission_id IN ?", permissionIDs).
-			Find(&permissions).Error
-		if err != nil {
-			return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询权限详情失败: "+err.Error())
+	// 将查询结果按角色聚合
+	rolePermMap := make(map[int64][]Permission, len(roles))
+	for _, r := range rows {
+		if r.PermissionID == nil {
+			// 角色可能没有任何权限关联，跳过
+			continue
 		}
-	}
-
-	// 构建权限ID到权限对象的映射
-	permissionMap := make(map[int64]Permission)
-	for _, p := range permissions {
-		permissionMap[p.PermissionID] = p
-	}
-
-	// 构建角色ID到权限列表的映射
-	rolePermMap := make(map[int64][]Permission)
-	for _, rp := range rolePermissions {
-		if p, ok := permissionMap[rp.PermissionID]; ok {
-			rolePermMap[rp.RoleID] = append(rolePermMap[rp.RoleID], Permission{
-				PermissionID:   p.PermissionID,
-				PermissionName: p.PermissionName,
-				Description:    p.Description,
-			})
+		perm := Permission{
+			PermissionID:   *r.PermissionID,
+			PermissionName: "",
+			Description:    "",
 		}
+		if r.PermissionName != nil {
+			perm.PermissionName = *r.PermissionName
+		}
+		if r.PermissionDescription != nil {
+			perm.Description = *r.PermissionDescription
+		}
+		rolePermMap[r.RoleID] = append(rolePermMap[r.RoleID], perm)
 	}
 
-	// 组装最终结果
+	// 按原始 roles 顺序组装最终结果
 	result := make([]*RoleWithPermissions, len(roles))
 	for i, r := range roles {
+		perms := rolePermMap[r.RoleID]
+		if perms == nil {
+			perms = []Permission{}
+		}
 		result[i] = &RoleWithPermissions{
 			RoleID:      r.RoleID,
 			RoleName:    r.RoleName,
 			Description: r.Description,
-			Permissions: rolePermMap[r.RoleID],
-		}
-		if result[i].Permissions == nil {
-			result[i].Permissions = []Permission{}
+			Permissions: perms,
 		}
 	}
 

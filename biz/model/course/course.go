@@ -1943,8 +1943,8 @@ func (p *GetCourseCommentsReq) String() string {
 }
 
 type GetCourseCommentsResp struct {
-	BaseResponse *module.BaseResp        `thrift:"baseResponse,1,required" form:"baseResponse,required" json:"baseResponse,required" query:"baseResponse,required"`
-	Comments     []*module.CourseComment `thrift:"comments,2,optional,list<module.CourseComment>" form:"comments" json:"comments,omitempty" query:"comments"`
+	BaseResponse *module.BaseResp                `thrift:"baseResponse,1,required" form:"baseResponse,required" json:"baseResponse,required" query:"baseResponse,required"`
+	Comments     []*module.CourseCommentWithUser `thrift:"comments,2,optional,list<module.CourseCommentWithUser>" form:"comments" json:"comments,omitempty" query:"comments"`
 }
 
 func NewGetCourseCommentsResp() *GetCourseCommentsResp {
@@ -1963,9 +1963,9 @@ func (p *GetCourseCommentsResp) GetBaseResponse() (v *module.BaseResp) {
 	return p.BaseResponse
 }
 
-var GetCourseCommentsResp_Comments_DEFAULT []*module.CourseComment
+var GetCourseCommentsResp_Comments_DEFAULT []*module.CourseCommentWithUser
 
-func (p *GetCourseCommentsResp) GetComments() (v []*module.CourseComment) {
+func (p *GetCourseCommentsResp) GetComments() (v []*module.CourseCommentWithUser) {
 	if !p.IsSetComments() {
 		return GetCourseCommentsResp_Comments_DEFAULT
 	}
@@ -2070,8 +2070,8 @@ func (p *GetCourseCommentsResp) ReadField2(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	_field := make([]*module.CourseComment, 0, size)
-	values := make([]module.CourseComment, size)
+	_field := make([]*module.CourseCommentWithUser, 0, size)
+	values := make([]module.CourseCommentWithUser, size)
 	for i := 0; i < size; i++ {
 		_elem := &values[i]
 		_elem.InitDefault()

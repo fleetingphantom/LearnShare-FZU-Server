@@ -17,11 +17,11 @@ import (
 func Init() {
 	config.Init()
 
-	// 初始化日志系统
-	//if err := logger.Init(config.Logger.Dir, config.Logger.Level); err != nil {
-	//	logger.Fatalf("日志系统初始化失败: %v", err)
-	//}
-	//logger.Info("日志系统初始化成功")
+	//初始化日志系统
+	if err := logger.Init(config.Logger.Dir, config.Logger.Level); err != nil {
+		logger.Fatalf("日志系统初始化失败: %v", err)
+	}
+	logger.Info("日志系统初始化成功")
 
 	err := dal.Init()
 	if err != nil {
@@ -35,7 +35,7 @@ func main() {
 	h := server.Default(server.WithHostPorts(utils.GetServerAddress()))
 
 	// 添加请求日志中间件
-	//h.Use(middleware.RequestLogger())
+	h.Use(middleware.RequestLogger())
 
 	h.Use(cors.New(cors.Config{
 		AllowOrigins:  []string{"https://*.yourang.top", "http://localhost:3000"},

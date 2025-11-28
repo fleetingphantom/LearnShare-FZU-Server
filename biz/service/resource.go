@@ -5,6 +5,7 @@ import (
 	model "LearnShare/biz/model/module"
 	"LearnShare/biz/model/resource"
 	"LearnShare/pkg/errno"
+	"LearnShare/pkg/logger"
 	"LearnShare/pkg/oss"
 	"path/filepath"
 	"strings"
@@ -14,6 +15,7 @@ import (
 	"mime/multipart"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"gorm.io/gorm"
 )
 
 // ResourceService 封装了资源相关的服务
@@ -70,8 +72,37 @@ func (s *ResourceService) GetResource(req *resource.GetResourceReq) (*model.Reso
 	return resourcedata.ToResourceModule(), nil
 }
 
+func (s *ResourceService) DownloadResource(req *resource.DownloadResourceReq) (string, error) {
+	if req.ResourceID <= 0 {
+		return "", errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
+	}
+
+	r, err := db.GetResourceByID(s.ctx, req.ResourceID)
+	if err != nil {
+		return "", err
+	}
+
+	userID := GetUidFormContext(s.c)
+
+	errChan := db.UpdateResourceAsync(s.ctx, req.ResourceID, map[string]interface{}{
+		"download_count": gorm.Expr("download_count + 1"),
+	})
+	if err = <-errChan; err != nil {
+		return "", err
+	}
+
+	repErrChan := db.IncrementUserReputationAsync(s.ctx, r.UploaderID, 1)
+	if e := <-repErrChan; e != nil {
+		return "", e
+	}
+
+	logger.Infof("user %d downloaded resource %d", userID, req.ResourceID)
+
+	return r.FilePath, nil
+}
+
 // GetResourceComments 执行获取资源评论列表
-func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceComment, int64, error) {
+func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsReq) ([]*model.ResourceCommentWithUser, int64, error) {
 	// 验证资源ID
 	if req.ResourceID <= 0 {
 		return nil, 0, errno.NewErrNo(errno.ServiceInvalidParameter, "资源ID无效")
@@ -91,9 +122,9 @@ func (s *ResourceService) GetResourceComments(req *resource.GetResourceCommentsR
 		return nil, 0, err
 	}
 
-	var modelComments []*model.ResourceComment
+	var modelComments []*model.ResourceCommentWithUser
 	for _, comment := range comments {
-		modelComments = append(modelComments, comment.ToResourceCommentModule())
+		modelComments = append(modelComments, comment.ToResourceCommentWithUserModule())
 	}
 
 	return modelComments, total, nil
@@ -300,24 +331,51 @@ func (s *ResourceService) UploadResource(file *multipart.FileHeader, title strin
 	}
 
 	if len(tags) > 0 {
-		for _, name := range tags {
-			name = strings.TrimSpace(name)
-			if name == "" {
-				continue
-			}
-			tag, e := db.GetOrCreateTag(s.ctx, name)
-			if e != nil {
-				return nil, e
-			}
-			if e = db.LinkResourceTag(s.ctx, res.ResourceID, tag.TagID); e != nil {
-				return nil, e
-			}
+		// 使用批量操作优化标签处理
+		tagsData, e := db.GetOrCreateTagsBatch(s.ctx, tags)
+		if e != nil {
+			return nil, e
+		}
+
+		// 提取所有 tagID
+		tagIDs := make([]int64, len(tags))
+		for i, tag := range tagsData {
+			tagIDs[i] = tag.TagID
+		}
+
+		// 批量关联标签
+		if e = db.LinkResourceTagsBatch(s.ctx, res.ResourceID, tagIDs); e != nil {
+			return nil, e
 		}
 	}
 
-	r, e := db.GetResourceByID(s.ctx, res.ResourceID)
-	if e != nil {
-		return nil, e
+	// 直接构建返回结果，避免重复查询
+	var tagsResp []*model.ResourceTag
+	if res.Tags != nil {
+		for _, t := range res.Tags {
+			tagsResp = append(tagsResp, t.ToResourceTagModule())
+		}
 	}
-	return r.ToResourceModule(), nil
+
+	resp := res.ToResourceModule()
+	resp.Tags = tagsResp
+
+	return resp, nil
+}
+
+func (s *ResourceService) ReactResourceComment(commentID int64, action string) error {
+	if commentID <= 0 {
+		return errno.ParamVerifyError
+	}
+	switch action {
+	case "like", "dislike", "cancel_like", "cancel_dislike":
+	default:
+		return errno.ParamVerifyError.WithMessage("操作类型无效")
+	}
+	userID := GetUidFormContext(s.c)
+	errChan := db.ReactResourceCommentAsync(s.ctx, userID, commentID, action)
+	if err := <-errChan; err != nil {
+		return err
+	}
+	return nil
 }

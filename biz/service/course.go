@@ -98,7 +98,7 @@ func (s *CourseService) GetCourseResourceList(req *course.GetCourseResourceListR
 	return resourceModules, nil
 }
 
-func (s *CourseService) GetCourseComments(req *course.GetCourseCommentsReq) ([]*module.CourseComment, error) {
+func (s *CourseService) GetCourseComments(req *course.GetCourseCommentsReq) ([]*module.CourseCommentWithUser, error) {
 	// SortBy 是普通 string 类型，不是指针
 	sortBy := req.SortBy
 	if sortBy == "" {
@@ -119,9 +119,9 @@ func (s *CourseService) GetCourseComments(req *course.GetCourseCommentsReq) ([]*
 	}
 
 	// 转换为module.CourseComment列表
-	var commentModules []*module.CourseComment
+	var commentModules []*module.CourseCommentWithUser
 	for _, c := range comments {
-		commentModules = append(commentModules, c.ToCourseCommentModule())
+		commentModules = append(commentModules, c.ToCourseCommentWithUserModule())
 	}
 
 	return commentModules, nil

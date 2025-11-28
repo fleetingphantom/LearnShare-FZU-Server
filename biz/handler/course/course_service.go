@@ -107,7 +107,7 @@ func GetCourseComments(ctx context.Context, c *app.RequestContext) {
 	resp := new(course.GetCourseCommentsResp)
 
 	// Call service
-	dara, err := service.NewCourseService(ctx, c).GetCourseComments(&req)
+	data, err := service.NewCourseService(ctx, c).GetCourseComments(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
@@ -115,7 +115,7 @@ func GetCourseComments(ctx context.Context, c *app.RequestContext) {
 
 	// Build response
 	resp.BaseResponse = pack.BuildBaseResp(errno.Success)
-	resp.Comments = dara
+	resp.Comments = data
 
 	pack.SendResponse(c, resp)
 }

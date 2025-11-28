@@ -1,0 +1,196 @@
+├─biz
+│  ├─dal
+│  │  │  init.go
+│  │  │
+│  │  ├─db
+│  │  │      async.go
+│  │  │      ASYNC_USAGE.md
+│  │  │      course.go
+│  │  │      course_test.go
+│  │  │      favorite.go
+│  │  │      init.go
+│  │  │      model.go
+│  │  │      permission.go
+│  │  │      resource.go
+│  │  │      resource_test.go
+│  │  │      review.go
+│  │  │      school_struct.go
+│  │  │      user.go
+│  │  │      user_test.go
+│  │  │
+│  │  └─redis
+│  │          init.go
+│  │          permission.go
+│  │          redis.go
+│  │          user.go
+│  │          user_test.go
+│  │
+│  ├─handler
+│  │  │  ping.go
+│  │  │
+│  │  ├─audit
+│  │  │      admin_audit_service.go
+│  │  │
+│  │  ├─course
+│  │  │      admin_course_service.go
+│  │  │      course_service.go
+│  │  │      course_service_test.go
+│  │  │
+│  │  ├─favorite
+│  │  │      favorite_service.go
+│  │  │
+│  │  ├─resource
+│  │  │      admin_resource_service.go
+│  │  │      resource_service.go
+│  │  │
+│  │  ├─school_struct
+│  │  │      admin_school_structure_service.go
+│  │  │      school_struct_service.go
+│  │  │
+│  │  └─user
+│  │          role_admin_service.go
+│  │          user_admin_service.go
+│  │          user_service.go
+│  │
+│  ├─middleware
+│  │      jwt.go
+│  │      logger.go
+│  │      turnstile.go
+│  │
+│  ├─model
+│  │  ├─audit
+│  │  │      audit.go
+│  │  │
+│  │  ├─course
+│  │  │      course.go
+│  │  │
+│  │  ├─favorite
+│  │  │      favorite.go
+│  │  │
+│  │  ├─module
+│  │  │      model.go
+│  │  │
+│  │  ├─resource
+│  │  │      resource.go
+│  │  │
+│  │  ├─school_struct
+│  │  │      school_struct.go
+│  │  │
+│  │  └─user
+│  │          user.go
+│  │
+│  ├─pack
+│  │      pack.go
+│  │      user.go
+│  │
+│  ├─router
+│  │  │  register.go
+│  │  │
+│  │  ├─audit
+│  │  │      audit.go
+│  │  │      middleware.go
+│  │  │
+│  │  ├─auth
+│  │  │      auth.go
+│  │  │      jwt.go
+│  │  │      permission.go
+│  │  │      security.go
+│  │  │
+│  │  ├─course
+│  │  │      course.go
+│  │  │      middleware.go
+│  │  │
+│  │  ├─favorite
+│  │  │      favorite.go
+│  │  │      middleware.go
+│  │  │
+│  │  ├─module
+│  │  │      middleware.go
+│  │  │      model.go
+│  │  │
+│  │  ├─resource
+│  │  │      middleware.go
+│  │  │      middleware_test.go
+│  │  │      resource.go
+│  │  │
+│  │  ├─school_struct
+│  │  │      middleware.go
+│  │  │      school_struct.go
+│  │  │
+│  │  └─user
+│  │          middleware.go
+│  │          middleware_test.go
+│  │          user.go
+│  │
+│  └─service
+│          audit.go
+│          course.go
+│          course_test.go
+│          favorite.go
+│          resource.go
+│          resource_test.go
+│          role_admin.go
+│          school_struct.go
+│          service.go
+│          service_test.go
+│          user.go
+│          user_admin.go
+│          user_test.go
+│
+├─config
+│  │  config.example.yaml
+│  │  config.go
+│  │  config.yaml
+│  │  type.go
+│  │
+│  └─sql
+│          init.sql
+│          test_data.sql
+│
+├─docker
+│  │  docker-compose-env.yml
+│  │  docker-compose.yml
+│  │
+│  └─env
+│          mysql.env
+│          redis.env
+│
+├─idl
+│      audit.thrift
+│      course.thrift
+│      favorite.thrift
+│      model.thrift
+│      resource.thrift
+│      school_struct.thrift
+│      user.thrift
+│
+├─logs
+│      app.log
+│      error.log
+│
+├─pkg
+│  ├─constants
+│  │      db.go
+│  │      jwt.go
+│  │      permissions.go
+│  │      service.go
+│  │
+│  ├─errno
+│  │      code.go
+│  │      default.go
+│  │      errno.go
+│  │
+│  ├─logger
+│  │      logger.go
+│  │
+│  ├─oss
+│  │      oss.go
+│  │
+│  └─utils
+│          encrypt.go
+│          mail.go
+│          utils.go
+│          verify.go
+│
+└─script
+        bootstrap.sh

@@ -17,6 +17,7 @@ TRUNCATE TABLE `reviews`;
 TRUNCATE TABLE `favorites`;
 TRUNCATE TABLE `reputation_records`;
 TRUNCATE TABLE `resource_comments`;
+TRUNCATE TABLE `resource_comment_reactions`;
 TRUNCATE TABLE `resource_ratings`;
 TRUNCATE TABLE `course_comments`;
 TRUNCATE TABLE `course_ratings`;
