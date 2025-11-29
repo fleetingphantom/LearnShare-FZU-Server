@@ -40,7 +40,7 @@ func GetResourceAuditList(ctx context.Context, c *app.RequestContext) {
 }
 
 // AuditResource .
-// @router /api/admin/audit/resources/:review_id [PUT]
+// @router /api/admin/audit/resources/:review_id [POST]
 func AuditResource(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req audit.AuditResourceReq
@@ -182,6 +182,12 @@ func GetResourceCommentAuditList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	resp := new(audit.GetResourceCommentAuditListResp)
+	list, err := service.NewAuditService(ctx, c).GetResourceCommentAuditList(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
 	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.CommentAuditList = list
 	pack.SendResponse(c, resp)
 }

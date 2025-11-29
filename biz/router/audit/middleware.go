@@ -92,8 +92,9 @@ func _resource_commentsMw() []app.HandlerFunc {
 }
 
 func _auditresourcecommentMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		auth.RequirePermission("review.handle"),
+	}
 }
 
 func _getcoursecommentauditlistMw() []app.HandlerFunc {
@@ -102,6 +103,7 @@ func _getcoursecommentauditlistMw() []app.HandlerFunc {
 }
 
 func _getresourcecommentauditlistMw() []app.HandlerFunc {
-	// your code...
-	return nil
+	return []app.HandlerFunc{
+		auth.RequirePermission("review.handle"),
+	}
 }
