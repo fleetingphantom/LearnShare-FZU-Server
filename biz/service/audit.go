@@ -64,6 +64,26 @@ func (s *AuditService) AuditResource(req *audit.AuditResourceReq) error {
 	return nil
 }
 
+// GetResourceCommentAuditList 获取待审核的资源评论列表
+func (s *AuditService) GetResourceCommentAuditList(req *audit.GetResourceCommentAuditListReq) ([]*model.ResourceComment, error) {
+	if req.PageNum <= 0 {
+		req.PageNum = 1
+	}
+	if req.PageSize <= 0 || req.PageSize > 100 {
+		req.PageSize = 20
+	}
+
+	comments, err := db.GetPendingResourceComments(s.ctx, int(req.PageNum), int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+	var modules []*model.ResourceComment
+	for _, c := range comments {
+		modules = append(modules, c.ToResourceCommentModule())
+	}
+	return modules, nil
+}
+
 func (s *AuditService) AuditCourseComment(req *audit.AuditCourseCommentReq) error {
 	if req.ReviewID <= 0 {
 		return errno.NewErrNo(errno.ServiceInvalidParameter, "审核记录ID无效")
@@ -80,6 +100,10 @@ func (s *AuditService) AuditResourceComment(req *audit.AuditResourceCommentReq) 
 	}
 	if req.Action != "approve" && req.Action != "reject" {
 		return errno.NewErrNo(errno.ServiceInvalidParameter, "操作类型无效")
+	}
+	reviewerID := GetUidFormContext(s.c)
+	if err := db.AuditResourceCommentReview(s.ctx, req.ReviewID, reviewerID, req.Action); err != nil {
+		return err
 	}
 	return nil
 }
