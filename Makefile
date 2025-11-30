@@ -43,3 +43,7 @@ build:
 .PHONY: run
 run:
 	@docker compose -f ./docker/docker-compose.yml up -d
+
+.PHONY: stop
+run:
+	@docker compose -f ./docker/docker-compose.yml down
