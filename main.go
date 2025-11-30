@@ -41,7 +41,7 @@ func main() {
 	h.Use(middleware.SlowQueryLogger(1000))
 
 	h.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"https://*.yourang.top", "http://localhost:3000"},
+		AllowOrigins:  []string{"http://*.yourang.top", "http://localhost:8081"},
 		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:  []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
 		ExposeHeaders: []string{"Access-Token", "Refresh-Token"},
