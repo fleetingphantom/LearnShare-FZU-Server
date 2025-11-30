@@ -40,7 +40,7 @@ func GetResourceAuditList(ctx context.Context, c *app.RequestContext) {
 }
 
 // AuditResource .
-// @router /api/admin/audit/resources/:review_id [PUT]
+// @router /api/admin/audit/resources/:review_id [POST]
 func AuditResource(ctx context.Context, c *app.RequestContext) {
 	var err error
 	var req audit.AuditResourceReq
@@ -112,18 +112,82 @@ func GetCommentAuditList(ctx context.Context, c *app.RequestContext) {
 	pack.SendResponse(c, resp)
 }
 
-// AuditComment .
-// @router /api/admin/audit/comments/:review_id [POST]
-func AuditComment(ctx context.Context, c *app.RequestContext) {
+// AuditCourseComment .
+// @router /api/admin/audit/course_comments/:review_id [POST]
+func AuditCourseComment(ctx context.Context, c *app.RequestContext) {
 	var err error
-	var req audit.AuditCommentReq
+	var req audit.AuditCourseCommentReq
 	err = c.BindAndValidate(&req)
 	if err != nil {
 		pack.BuildFailResponse(c, err)
 		return
 	}
 
-	resp := new(audit.AuditCommentResp)
+	resp := new(audit.AuditCourseCommentResp)
+	err = service.NewAuditService(ctx, c).AuditCourseComment(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
+}
 
+// AuditResourceComment .
+// @router /api/admin/audit/resource_comments/:review_id [POST]
+func AuditResourceComment(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req audit.AuditResourceCommentReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := new(audit.AuditResourceCommentResp)
+	err = service.NewAuditService(ctx, c).AuditResourceComment(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
+}
+
+// GetCourseCommentAuditList .
+// @router /api/admin/audit/course_comments [GET]
+func GetCourseCommentAuditList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req audit.GetCourseCommentAuditListReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := new(audit.GetCourseCommentAuditListResp)
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	pack.SendResponse(c, resp)
+}
+
+// GetResourceCommentAuditList .
+// @router /api/admin/audit/resource_comments [GET]
+func GetResourceCommentAuditList(ctx context.Context, c *app.RequestContext) {
+	var err error
+	var req audit.GetResourceCommentAuditListReq
+	err = c.BindAndValidate(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp := new(audit.GetResourceCommentAuditListResp)
+	list, err := service.NewAuditService(ctx, c).GetResourceCommentAuditList(&req)
+	if err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
+	resp.CommentAuditList = list
 	pack.SendResponse(c, resp)
 }

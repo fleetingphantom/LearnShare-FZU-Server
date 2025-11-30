@@ -4,6 +4,8 @@ package course
 
 import (
 	"LearnShare/biz/pack"
+	"LearnShare/biz/service"
+	"LearnShare/pkg/errno"
 	"context"
 
 	"LearnShare/biz/model/course"
@@ -24,6 +26,13 @@ func AdminDeleteCourseComment(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(course.AdminDeleteCourseCommentResp)
 
+	// 调用 service 层逻辑
+	if err = service.NewCourseService(ctx, c).AdminDeleteCourseComment(&req); err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -40,6 +49,13 @@ func AdminDeleteCourseRating(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(course.AdminDeleteCourseRatingResp)
 
+	// 调用 service 层逻辑
+	if err = service.NewCourseService(ctx, c).AdminDeleteCourseRating(&req); err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }
 
@@ -56,5 +72,12 @@ func AdminDeleteCourse(ctx context.Context, c *app.RequestContext) {
 
 	resp := new(course.AdminDeleteCourseResp)
 
+	// 调用 service 层逻辑
+	if err = service.NewCourseService(ctx, c).AdminDeleteCourse(&req); err != nil {
+		pack.BuildFailResponse(c, err)
+		return
+	}
+
+	resp.BaseResp = pack.BuildBaseResp(errno.Success)
 	pack.SendResponse(c, resp)
 }

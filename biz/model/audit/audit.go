@@ -438,9 +438,8 @@ func (p *GetResourceAuditListResp) String() string {
 }
 
 type AuditResourceReq struct {
-	ReviewID int64 `thrift:"review_id,1,required" json:"review_id,required" path:"review_id,required"`
-	// "approve" or "reject"
-	Action string `thrift:"action,2,required" form:"action,required" json:"action,required" query:"action,required"`
+	ReviewID int64  `thrift:"review_id,1,required" json:"review_id,required" path:"review_id,required"`
+	Action   string `thrift:"action,2,required" form:"action,required" json:"action,required" query:"action,required"`
 }
 
 func NewAuditResourceReq() *AuditResourceReq {
@@ -1222,9 +1221,8 @@ func (p *GetCourseAuditListResp) String() string {
 }
 
 type AuditCourseReq struct {
-	CourseID int64 `thrift:"course_id,1,required" json:"course_id,required" path:"course_id,required"`
-	// "approve" or "reject"
-	Action string `thrift:"action,2,required" form:"action,required" json:"action,required" query:"action,required"`
+	ReviewID int64  `thrift:"review_id,1,required" json:"review_id,required" path:"review_id,required"`
+	Action   string `thrift:"action,2,required" form:"action,required" json:"action,required" query:"action,required"`
 }
 
 func NewAuditCourseReq() *AuditCourseReq {
@@ -1234,8 +1232,8 @@ func NewAuditCourseReq() *AuditCourseReq {
 func (p *AuditCourseReq) InitDefault() {
 }
 
-func (p *AuditCourseReq) GetCourseID() (v int64) {
-	return p.CourseID
+func (p *AuditCourseReq) GetReviewID() (v int64) {
+	return p.ReviewID
 }
 
 func (p *AuditCourseReq) GetAction() (v string) {
@@ -1243,7 +1241,7 @@ func (p *AuditCourseReq) GetAction() (v string) {
 }
 
 var fieldIDToName_AuditCourseReq = map[int16]string{
-	1: "course_id",
+	1: "review_id",
 	2: "action",
 }
 
@@ -1251,7 +1249,7 @@ func (p *AuditCourseReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetCourseID bool = false
+	var issetReviewID bool = false
 	var issetAction bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
@@ -1273,7 +1271,7 @@ func (p *AuditCourseReq) Read(iprot thrift.TProtocol) (err error) {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCourseID = true
+				issetReviewID = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -1299,7 +1297,7 @@ func (p *AuditCourseReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetCourseID {
+	if !issetReviewID {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
@@ -1334,7 +1332,7 @@ func (p *AuditCourseReq) ReadField1(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.CourseID = _field
+	p.ReviewID = _field
 	return nil
 }
 func (p *AuditCourseReq) ReadField2(iprot thrift.TProtocol) error {
@@ -1382,10 +1380,10 @@ WriteStructEndError:
 }
 
 func (p *AuditCourseReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("course_id", thrift.I64, 1); err != nil {
+	if err = oprot.WriteFieldBegin("review_id", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CourseID); err != nil {
+	if err := oprot.WriteI64(p.ReviewID); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2005,38 +2003,38 @@ func (p *GetCommentAuditListResp) String() string {
 
 }
 
-type AuditCommentReq struct {
-	CommentID int64 `thrift:"comment_id,1,required" json:"comment_id,required" path:"comment_id,required"`
-	// "approve" or "reject"
-	Action string `thrift:"action,2,required" form:"action,required" json:"action,required" query:"action,required"`
+// 获取待审核课程评论列表
+type GetCourseCommentAuditListReq struct {
+	PageNum  int32 `thrift:"page_num,1,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
+	PageSize int32 `thrift:"page_size,2,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
 }
 
-func NewAuditCommentReq() *AuditCommentReq {
-	return &AuditCommentReq{}
+func NewGetCourseCommentAuditListReq() *GetCourseCommentAuditListReq {
+	return &GetCourseCommentAuditListReq{}
 }
 
-func (p *AuditCommentReq) InitDefault() {
+func (p *GetCourseCommentAuditListReq) InitDefault() {
 }
 
-func (p *AuditCommentReq) GetCommentID() (v int64) {
-	return p.CommentID
+func (p *GetCourseCommentAuditListReq) GetPageNum() (v int32) {
+	return p.PageNum
 }
 
-func (p *AuditCommentReq) GetAction() (v string) {
-	return p.Action
+func (p *GetCourseCommentAuditListReq) GetPageSize() (v int32) {
+	return p.PageSize
 }
 
-var fieldIDToName_AuditCommentReq = map[int16]string{
-	1: "comment_id",
-	2: "action",
+var fieldIDToName_GetCourseCommentAuditListReq = map[int16]string{
+	1: "page_num",
+	2: "page_size",
 }
 
-func (p *AuditCommentReq) Read(iprot thrift.TProtocol) (err error) {
+func (p *GetCourseCommentAuditListReq) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
-	var issetCommentID bool = false
-	var issetAction bool = false
+	var issetPageNum bool = false
+	var issetPageSize bool = false
 
 	if _, err = iprot.ReadStructBegin(); err != nil {
 		goto ReadStructBeginError
@@ -2053,20 +2051,20 @@ func (p *AuditCommentReq) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetCommentID = true
+				issetPageNum = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
-				issetAction = true
+				issetPageSize = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
@@ -2083,12 +2081,12 @@ func (p *AuditCommentReq) Read(iprot thrift.TProtocol) (err error) {
 		goto ReadStructEndError
 	}
 
-	if !issetCommentID {
+	if !issetPageNum {
 		fieldId = 1
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetAction {
+	if !issetPageSize {
 		fieldId = 2
 		goto RequiredFieldNotSetError
 	}
@@ -2098,7 +2096,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AuditCommentReq[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetCourseCommentAuditListReq[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -2107,35 +2105,35 @@ ReadFieldEndError:
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_AuditCommentReq[fieldId]))
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_GetCourseCommentAuditListReq[fieldId]))
 }
 
-func (p *AuditCommentReq) ReadField1(iprot thrift.TProtocol) error {
+func (p *GetCourseCommentAuditListReq) ReadField1(iprot thrift.TProtocol) error {
 
-	var _field int64
-	if v, err := iprot.ReadI64(); err != nil {
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		_field = v
 	}
-	p.CommentID = _field
+	p.PageNum = _field
 	return nil
 }
-func (p *AuditCommentReq) ReadField2(iprot thrift.TProtocol) error {
+func (p *GetCourseCommentAuditListReq) ReadField2(iprot thrift.TProtocol) error {
 
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
 		return err
 	} else {
 		_field = v
 	}
-	p.Action = _field
+	p.PageSize = _field
 	return nil
 }
 
-func (p *AuditCommentReq) Write(oprot thrift.TProtocol) (err error) {
+func (p *GetCourseCommentAuditListReq) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("AuditCommentReq"); err != nil {
+	if err = oprot.WriteStructBegin("GetCourseCommentAuditListReq"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -2165,11 +2163,11 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *AuditCommentReq) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("comment_id", thrift.I64, 1); err != nil {
+func (p *GetCourseCommentAuditListReq) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CommentID); err != nil {
+	if err := oprot.WriteI32(p.PageNum); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2182,7 +2180,864 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *AuditCommentReq) writeField2(oprot thrift.TProtocol) (err error) {
+func (p *GetCourseCommentAuditListReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.PageSize); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *GetCourseCommentAuditListReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetCourseCommentAuditListReq(%+v)", *p)
+
+}
+
+type GetCourseCommentAuditListResp struct {
+	BaseResp         *module.BaseResp        `thrift:"base_resp,1,required" form:"base_resp,required" json:"base_resp,required" query:"base_resp,required"`
+	CommentAuditList []*module.CourseComment `thrift:"comment_audit_list,2,required,list<module.CourseComment>" form:"comment_audit_list,required" json:"comment_audit_list,required" query:"comment_audit_list,required"`
+}
+
+func NewGetCourseCommentAuditListResp() *GetCourseCommentAuditListResp {
+	return &GetCourseCommentAuditListResp{}
+}
+
+func (p *GetCourseCommentAuditListResp) InitDefault() {
+}
+
+var GetCourseCommentAuditListResp_BaseResp_DEFAULT *module.BaseResp
+
+func (p *GetCourseCommentAuditListResp) GetBaseResp() (v *module.BaseResp) {
+	if !p.IsSetBaseResp() {
+		return GetCourseCommentAuditListResp_BaseResp_DEFAULT
+	}
+	return p.BaseResp
+}
+
+func (p *GetCourseCommentAuditListResp) GetCommentAuditList() (v []*module.CourseComment) {
+	return p.CommentAuditList
+}
+
+var fieldIDToName_GetCourseCommentAuditListResp = map[int16]string{
+	1: "base_resp",
+	2: "comment_audit_list",
+}
+
+func (p *GetCourseCommentAuditListResp) IsSetBaseResp() bool {
+	return p.BaseResp != nil
+}
+
+func (p *GetCourseCommentAuditListResp) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetBaseResp bool = false
+	var issetCommentAuditList bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetBaseResp = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.LIST {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetCommentAuditList = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetBaseResp {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetCommentAuditList {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetCourseCommentAuditListResp[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_GetCourseCommentAuditListResp[fieldId]))
+}
+
+func (p *GetCourseCommentAuditListResp) ReadField1(iprot thrift.TProtocol) error {
+	_field := module.NewBaseResp()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.BaseResp = _field
+	return nil
+}
+func (p *GetCourseCommentAuditListResp) ReadField2(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return err
+	}
+	_field := make([]*module.CourseComment, 0, size)
+	values := make([]module.CourseComment, size)
+	for i := 0; i < size; i++ {
+		_elem := &values[i]
+		_elem.InitDefault()
+
+		if err := _elem.Read(iprot); err != nil {
+			return err
+		}
+
+		_field = append(_field, _elem)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return err
+	}
+	p.CommentAuditList = _field
+	return nil
+}
+
+func (p *GetCourseCommentAuditListResp) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetCourseCommentAuditListResp"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *GetCourseCommentAuditListResp) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("base_resp", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.BaseResp.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *GetCourseCommentAuditListResp) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("comment_audit_list", thrift.LIST, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.CommentAuditList)); err != nil {
+		return err
+	}
+	for _, v := range p.CommentAuditList {
+		if err := v.Write(oprot); err != nil {
+			return err
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *GetCourseCommentAuditListResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetCourseCommentAuditListResp(%+v)", *p)
+
+}
+
+// 获取待审核资源评论列表
+type GetResourceCommentAuditListReq struct {
+	PageNum  int32 `thrift:"page_num,1,required" form:"page_num,required" json:"page_num,required" query:"page_num,required"`
+	PageSize int32 `thrift:"page_size,2,required" form:"page_size,required" json:"page_size,required" query:"page_size,required"`
+}
+
+func NewGetResourceCommentAuditListReq() *GetResourceCommentAuditListReq {
+	return &GetResourceCommentAuditListReq{}
+}
+
+func (p *GetResourceCommentAuditListReq) InitDefault() {
+}
+
+func (p *GetResourceCommentAuditListReq) GetPageNum() (v int32) {
+	return p.PageNum
+}
+
+func (p *GetResourceCommentAuditListReq) GetPageSize() (v int32) {
+	return p.PageSize
+}
+
+var fieldIDToName_GetResourceCommentAuditListReq = map[int16]string{
+	1: "page_num",
+	2: "page_size",
+}
+
+func (p *GetResourceCommentAuditListReq) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetPageNum bool = false
+	var issetPageSize bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetPageNum = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetPageSize = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetPageNum {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetPageSize {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetResourceCommentAuditListReq[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_GetResourceCommentAuditListReq[fieldId]))
+}
+
+func (p *GetResourceCommentAuditListReq) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.PageNum = _field
+	return nil
+}
+func (p *GetResourceCommentAuditListReq) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.PageSize = _field
+	return nil
+}
+
+func (p *GetResourceCommentAuditListReq) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetResourceCommentAuditListReq"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *GetResourceCommentAuditListReq) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("page_num", thrift.I32, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.PageNum); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *GetResourceCommentAuditListReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.PageSize); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *GetResourceCommentAuditListReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetResourceCommentAuditListReq(%+v)", *p)
+
+}
+
+type GetResourceCommentAuditListResp struct {
+	BaseResp         *module.BaseResp          `thrift:"base_resp,1,required" form:"base_resp,required" json:"base_resp,required" query:"base_resp,required"`
+	CommentAuditList []*module.ResourceComment `thrift:"comment_audit_list,2,required,list<module.ResourceComment>" form:"comment_audit_list,required" json:"comment_audit_list,required" query:"comment_audit_list,required"`
+}
+
+func NewGetResourceCommentAuditListResp() *GetResourceCommentAuditListResp {
+	return &GetResourceCommentAuditListResp{}
+}
+
+func (p *GetResourceCommentAuditListResp) InitDefault() {
+}
+
+var GetResourceCommentAuditListResp_BaseResp_DEFAULT *module.BaseResp
+
+func (p *GetResourceCommentAuditListResp) GetBaseResp() (v *module.BaseResp) {
+	if !p.IsSetBaseResp() {
+		return GetResourceCommentAuditListResp_BaseResp_DEFAULT
+	}
+	return p.BaseResp
+}
+
+func (p *GetResourceCommentAuditListResp) GetCommentAuditList() (v []*module.ResourceComment) {
+	return p.CommentAuditList
+}
+
+var fieldIDToName_GetResourceCommentAuditListResp = map[int16]string{
+	1: "base_resp",
+	2: "comment_audit_list",
+}
+
+func (p *GetResourceCommentAuditListResp) IsSetBaseResp() bool {
+	return p.BaseResp != nil
+}
+
+func (p *GetResourceCommentAuditListResp) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetBaseResp bool = false
+	var issetCommentAuditList bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetBaseResp = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.LIST {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetCommentAuditList = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetBaseResp {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetCommentAuditList {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_GetResourceCommentAuditListResp[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_GetResourceCommentAuditListResp[fieldId]))
+}
+
+func (p *GetResourceCommentAuditListResp) ReadField1(iprot thrift.TProtocol) error {
+	_field := module.NewBaseResp()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.BaseResp = _field
+	return nil
+}
+func (p *GetResourceCommentAuditListResp) ReadField2(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return err
+	}
+	_field := make([]*module.ResourceComment, 0, size)
+	values := make([]module.ResourceComment, size)
+	for i := 0; i < size; i++ {
+		_elem := &values[i]
+		_elem.InitDefault()
+
+		if err := _elem.Read(iprot); err != nil {
+			return err
+		}
+
+		_field = append(_field, _elem)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return err
+	}
+	p.CommentAuditList = _field
+	return nil
+}
+
+func (p *GetResourceCommentAuditListResp) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetResourceCommentAuditListResp"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *GetResourceCommentAuditListResp) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("base_resp", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.BaseResp.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *GetResourceCommentAuditListResp) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("comment_audit_list", thrift.LIST, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.CommentAuditList)); err != nil {
+		return err
+	}
+	for _, v := range p.CommentAuditList {
+		if err := v.Write(oprot); err != nil {
+			return err
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *GetResourceCommentAuditListResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("GetResourceCommentAuditListResp(%+v)", *p)
+
+}
+
+type AuditCourseCommentReq struct {
+	ReviewID int64  `thrift:"review_id,1,required" json:"review_id,required" path:"review_id,required"`
+	Action   string `thrift:"action,2,required" form:"action,required" json:"action,required" query:"action,required"`
+}
+
+func NewAuditCourseCommentReq() *AuditCourseCommentReq {
+	return &AuditCourseCommentReq{}
+}
+
+func (p *AuditCourseCommentReq) InitDefault() {
+}
+
+func (p *AuditCourseCommentReq) GetReviewID() (v int64) {
+	return p.ReviewID
+}
+
+func (p *AuditCourseCommentReq) GetAction() (v string) {
+	return p.Action
+}
+
+var fieldIDToName_AuditCourseCommentReq = map[int16]string{
+	1: "review_id",
+	2: "action",
+}
+
+func (p *AuditCourseCommentReq) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetReviewID bool = false
+	var issetAction bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetReviewID = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetAction = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetReviewID {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetAction {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AuditCourseCommentReq[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_AuditCourseCommentReq[fieldId]))
+}
+
+func (p *AuditCourseCommentReq) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.ReviewID = _field
+	return nil
+}
+func (p *AuditCourseCommentReq) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Action = _field
+	return nil
+}
+
+func (p *AuditCourseCommentReq) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AuditCourseCommentReq"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AuditCourseCommentReq) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("review_id", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.ReviewID); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AuditCourseCommentReq) writeField2(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("action", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -2199,43 +3054,43 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
 }
 
-func (p *AuditCommentReq) String() string {
+func (p *AuditCourseCommentReq) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AuditCommentReq(%+v)", *p)
+	return fmt.Sprintf("AuditCourseCommentReq(%+v)", *p)
 
 }
 
-type AuditCommentResp struct {
+type AuditCourseCommentResp struct {
 	BaseResp *module.BaseResp `thrift:"base_resp,1,required" form:"base_resp,required" json:"base_resp,required" query:"base_resp,required"`
 }
 
-func NewAuditCommentResp() *AuditCommentResp {
-	return &AuditCommentResp{}
+func NewAuditCourseCommentResp() *AuditCourseCommentResp {
+	return &AuditCourseCommentResp{}
 }
 
-func (p *AuditCommentResp) InitDefault() {
+func (p *AuditCourseCommentResp) InitDefault() {
 }
 
-var AuditCommentResp_BaseResp_DEFAULT *module.BaseResp
+var AuditCourseCommentResp_BaseResp_DEFAULT *module.BaseResp
 
-func (p *AuditCommentResp) GetBaseResp() (v *module.BaseResp) {
+func (p *AuditCourseCommentResp) GetBaseResp() (v *module.BaseResp) {
 	if !p.IsSetBaseResp() {
-		return AuditCommentResp_BaseResp_DEFAULT
+		return AuditCourseCommentResp_BaseResp_DEFAULT
 	}
 	return p.BaseResp
 }
 
-var fieldIDToName_AuditCommentResp = map[int16]string{
+var fieldIDToName_AuditCourseCommentResp = map[int16]string{
 	1: "base_resp",
 }
 
-func (p *AuditCommentResp) IsSetBaseResp() bool {
+func (p *AuditCourseCommentResp) IsSetBaseResp() bool {
 	return p.BaseResp != nil
 }
 
-func (p *AuditCommentResp) Read(iprot thrift.TProtocol) (err error) {
+func (p *AuditCourseCommentResp) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -2287,7 +3142,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AuditCommentResp[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AuditCourseCommentResp[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -2296,10 +3151,10 @@ ReadFieldEndError:
 ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 RequiredFieldNotSetError:
-	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_AuditCommentResp[fieldId]))
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_AuditCourseCommentResp[fieldId]))
 }
 
-func (p *AuditCommentResp) ReadField1(iprot thrift.TProtocol) error {
+func (p *AuditCourseCommentResp) ReadField1(iprot thrift.TProtocol) error {
 	_field := module.NewBaseResp()
 	if err := _field.Read(iprot); err != nil {
 		return err
@@ -2308,9 +3163,9 @@ func (p *AuditCommentResp) ReadField1(iprot thrift.TProtocol) error {
 	return nil
 }
 
-func (p *AuditCommentResp) Write(oprot thrift.TProtocol) (err error) {
+func (p *AuditCourseCommentResp) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("AuditCommentResp"); err != nil {
+	if err = oprot.WriteStructBegin("AuditCourseCommentResp"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -2336,7 +3191,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *AuditCommentResp) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *AuditCourseCommentResp) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("base_resp", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -2353,11 +3208,366 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *AuditCommentResp) String() string {
+func (p *AuditCourseCommentResp) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AuditCommentResp(%+v)", *p)
+	return fmt.Sprintf("AuditCourseCommentResp(%+v)", *p)
+
+}
+
+type AuditResourceCommentReq struct {
+	ReviewID int64  `thrift:"review_id,1,required" json:"review_id,required" path:"review_id,required"`
+	Action   string `thrift:"action,2,required" form:"action,required" json:"action,required" query:"action,required"`
+}
+
+func NewAuditResourceCommentReq() *AuditResourceCommentReq {
+	return &AuditResourceCommentReq{}
+}
+
+func (p *AuditResourceCommentReq) InitDefault() {
+}
+
+func (p *AuditResourceCommentReq) GetReviewID() (v int64) {
+	return p.ReviewID
+}
+
+func (p *AuditResourceCommentReq) GetAction() (v string) {
+	return p.Action
+}
+
+var fieldIDToName_AuditResourceCommentReq = map[int16]string{
+	1: "review_id",
+	2: "action",
+}
+
+func (p *AuditResourceCommentReq) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetReviewID bool = false
+	var issetAction bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.I64 {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetReviewID = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 2:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField2(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetAction = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetReviewID {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+
+	if !issetAction {
+		fieldId = 2
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AuditResourceCommentReq[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_AuditResourceCommentReq[fieldId]))
+}
+
+func (p *AuditResourceCommentReq) ReadField1(iprot thrift.TProtocol) error {
+
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.ReviewID = _field
+	return nil
+}
+func (p *AuditResourceCommentReq) ReadField2(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Action = _field
+	return nil
+}
+
+func (p *AuditResourceCommentReq) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AuditResourceCommentReq"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+		if err = p.writeField2(oprot); err != nil {
+			fieldId = 2
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AuditResourceCommentReq) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("review_id", thrift.I64, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.ReviewID); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AuditResourceCommentReq) writeField2(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("action", thrift.STRING, 2); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Action); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *AuditResourceCommentReq) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AuditResourceCommentReq(%+v)", *p)
+
+}
+
+type AuditResourceCommentResp struct {
+	BaseResp *module.BaseResp `thrift:"base_resp,1,required" form:"base_resp,required" json:"base_resp,required" query:"base_resp,required"`
+}
+
+func NewAuditResourceCommentResp() *AuditResourceCommentResp {
+	return &AuditResourceCommentResp{}
+}
+
+func (p *AuditResourceCommentResp) InitDefault() {
+}
+
+var AuditResourceCommentResp_BaseResp_DEFAULT *module.BaseResp
+
+func (p *AuditResourceCommentResp) GetBaseResp() (v *module.BaseResp) {
+	if !p.IsSetBaseResp() {
+		return AuditResourceCommentResp_BaseResp_DEFAULT
+	}
+	return p.BaseResp
+}
+
+var fieldIDToName_AuditResourceCommentResp = map[int16]string{
+	1: "base_resp",
+}
+
+func (p *AuditResourceCommentResp) IsSetBaseResp() bool {
+	return p.BaseResp != nil
+}
+
+func (p *AuditResourceCommentResp) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+	var issetBaseResp bool = false
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+				issetBaseResp = true
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	if !issetBaseResp {
+		fieldId = 1
+		goto RequiredFieldNotSetError
+	}
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AuditResourceCommentResp[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+RequiredFieldNotSetError:
+	return thrift.NewTProtocolExceptionWithType(thrift.INVALID_DATA, fmt.Errorf("required field %s is not set", fieldIDToName_AuditResourceCommentResp[fieldId]))
+}
+
+func (p *AuditResourceCommentResp) ReadField1(iprot thrift.TProtocol) error {
+	_field := module.NewBaseResp()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.BaseResp = _field
+	return nil
+}
+
+func (p *AuditResourceCommentResp) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AuditResourceCommentResp"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AuditResourceCommentResp) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("base_resp", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.BaseResp.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AuditResourceCommentResp) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AuditResourceCommentResp(%+v)", *p)
 
 }
 
@@ -2372,7 +3582,13 @@ type AdminAuditService interface {
 
 	GetCommentAuditList(ctx context.Context, req *GetCommentAuditListReq) (r *GetCommentAuditListResp, err error)
 
-	AuditComment(ctx context.Context, req *AuditCommentReq) (r *AuditCommentResp, err error)
+	GetCourseCommentAuditList(ctx context.Context, req *GetCourseCommentAuditListReq) (r *GetCourseCommentAuditListResp, err error)
+
+	GetResourceCommentAuditList(ctx context.Context, req *GetResourceCommentAuditListReq) (r *GetResourceCommentAuditListResp, err error)
+
+	AuditCourseComment(ctx context.Context, req *AuditCourseCommentReq) (r *AuditCourseCommentResp, err error)
+
+	AuditResourceComment(ctx context.Context, req *AuditResourceCommentReq) (r *AuditResourceCommentResp, err error)
 }
 
 type AdminAuditServiceClient struct {
@@ -2446,11 +3662,38 @@ func (p *AdminAuditServiceClient) GetCommentAuditList(ctx context.Context, req *
 	}
 	return _result.GetSuccess(), nil
 }
-func (p *AdminAuditServiceClient) AuditComment(ctx context.Context, req *AuditCommentReq) (r *AuditCommentResp, err error) {
-	var _args AdminAuditServiceAuditCommentArgs
+func (p *AdminAuditServiceClient) GetCourseCommentAuditList(ctx context.Context, req *GetCourseCommentAuditListReq) (r *GetCourseCommentAuditListResp, err error) {
+	var _args AdminAuditServiceGetCourseCommentAuditListArgs
 	_args.Req = req
-	var _result AdminAuditServiceAuditCommentResult
-	if err = p.Client_().Call(ctx, "AuditComment", &_args, &_result); err != nil {
+	var _result AdminAuditServiceGetCourseCommentAuditListResult
+	if err = p.Client_().Call(ctx, "GetCourseCommentAuditList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AdminAuditServiceClient) GetResourceCommentAuditList(ctx context.Context, req *GetResourceCommentAuditListReq) (r *GetResourceCommentAuditListResp, err error) {
+	var _args AdminAuditServiceGetResourceCommentAuditListArgs
+	_args.Req = req
+	var _result AdminAuditServiceGetResourceCommentAuditListResult
+	if err = p.Client_().Call(ctx, "GetResourceCommentAuditList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AdminAuditServiceClient) AuditCourseComment(ctx context.Context, req *AuditCourseCommentReq) (r *AuditCourseCommentResp, err error) {
+	var _args AdminAuditServiceAuditCourseCommentArgs
+	_args.Req = req
+	var _result AdminAuditServiceAuditCourseCommentResult
+	if err = p.Client_().Call(ctx, "AuditCourseComment", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+func (p *AdminAuditServiceClient) AuditResourceComment(ctx context.Context, req *AuditResourceCommentReq) (r *AuditResourceCommentResp, err error) {
+	var _args AdminAuditServiceAuditResourceCommentArgs
+	_args.Req = req
+	var _result AdminAuditServiceAuditResourceCommentResult
+	if err = p.Client_().Call(ctx, "AuditResourceComment", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -2481,7 +3724,10 @@ func NewAdminAuditServiceProcessor(handler AdminAuditService) *AdminAuditService
 	self.AddToProcessorMap("GetCourseAuditList", &adminAuditServiceProcessorGetCourseAuditList{handler: handler})
 	self.AddToProcessorMap("AuditCourse", &adminAuditServiceProcessorAuditCourse{handler: handler})
 	self.AddToProcessorMap("GetCommentAuditList", &adminAuditServiceProcessorGetCommentAuditList{handler: handler})
-	self.AddToProcessorMap("AuditComment", &adminAuditServiceProcessorAuditComment{handler: handler})
+	self.AddToProcessorMap("GetCourseCommentAuditList", &adminAuditServiceProcessorGetCourseCommentAuditList{handler: handler})
+	self.AddToProcessorMap("GetResourceCommentAuditList", &adminAuditServiceProcessorGetResourceCommentAuditList{handler: handler})
+	self.AddToProcessorMap("AuditCourseComment", &adminAuditServiceProcessorAuditCourseComment{handler: handler})
+	self.AddToProcessorMap("AuditResourceComment", &adminAuditServiceProcessorAuditResourceComment{handler: handler})
 	return self
 }
 func (p *AdminAuditServiceProcessor) Process(ctx context.Context, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -2742,16 +3988,16 @@ func (p *adminAuditServiceProcessorGetCommentAuditList) Process(ctx context.Cont
 	return true, err
 }
 
-type adminAuditServiceProcessorAuditComment struct {
+type adminAuditServiceProcessorGetCourseCommentAuditList struct {
 	handler AdminAuditService
 }
 
-func (p *adminAuditServiceProcessorAuditComment) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
-	args := AdminAuditServiceAuditCommentArgs{}
+func (p *adminAuditServiceProcessorGetCourseCommentAuditList) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AdminAuditServiceGetCourseCommentAuditListArgs{}
 	if err = args.Read(iprot); err != nil {
 		iprot.ReadMessageEnd()
 		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
-		oprot.WriteMessageBegin("AuditComment", thrift.EXCEPTION, seqId)
+		oprot.WriteMessageBegin("GetCourseCommentAuditList", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
 		oprot.WriteMessageEnd()
 		oprot.Flush(ctx)
@@ -2760,11 +4006,11 @@ func (p *adminAuditServiceProcessorAuditComment) Process(ctx context.Context, se
 
 	iprot.ReadMessageEnd()
 	var err2 error
-	result := AdminAuditServiceAuditCommentResult{}
-	var retval *AuditCommentResp
-	if retval, err2 = p.handler.AuditComment(ctx, args.Req); err2 != nil {
-		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing AuditComment: "+err2.Error())
-		oprot.WriteMessageBegin("AuditComment", thrift.EXCEPTION, seqId)
+	result := AdminAuditServiceGetCourseCommentAuditListResult{}
+	var retval *GetCourseCommentAuditListResp
+	if retval, err2 = p.handler.GetCourseCommentAuditList(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetCourseCommentAuditList: "+err2.Error())
+		oprot.WriteMessageBegin("GetCourseCommentAuditList", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
 		oprot.WriteMessageEnd()
 		oprot.Flush(ctx)
@@ -2772,7 +4018,151 @@ func (p *adminAuditServiceProcessorAuditComment) Process(ctx context.Context, se
 	} else {
 		result.Success = retval
 	}
-	if err2 = oprot.WriteMessageBegin("AuditComment", thrift.REPLY, seqId); err2 != nil {
+	if err2 = oprot.WriteMessageBegin("GetCourseCommentAuditList", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type adminAuditServiceProcessorGetResourceCommentAuditList struct {
+	handler AdminAuditService
+}
+
+func (p *adminAuditServiceProcessorGetResourceCommentAuditList) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AdminAuditServiceGetResourceCommentAuditListArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("GetResourceCommentAuditList", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AdminAuditServiceGetResourceCommentAuditListResult{}
+	var retval *GetResourceCommentAuditListResp
+	if retval, err2 = p.handler.GetResourceCommentAuditList(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing GetResourceCommentAuditList: "+err2.Error())
+		oprot.WriteMessageBegin("GetResourceCommentAuditList", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("GetResourceCommentAuditList", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type adminAuditServiceProcessorAuditCourseComment struct {
+	handler AdminAuditService
+}
+
+func (p *adminAuditServiceProcessorAuditCourseComment) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AdminAuditServiceAuditCourseCommentArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("AuditCourseComment", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AdminAuditServiceAuditCourseCommentResult{}
+	var retval *AuditCourseCommentResp
+	if retval, err2 = p.handler.AuditCourseComment(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing AuditCourseComment: "+err2.Error())
+		oprot.WriteMessageBegin("AuditCourseComment", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("AuditCourseComment", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(ctx); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type adminAuditServiceProcessorAuditResourceComment struct {
+	handler AdminAuditService
+}
+
+func (p *adminAuditServiceProcessorAuditResourceComment) Process(ctx context.Context, seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := AdminAuditServiceAuditResourceCommentArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("AuditResourceComment", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	var err2 error
+	result := AdminAuditServiceAuditResourceCommentResult{}
+	var retval *AuditResourceCommentResp
+	if retval, err2 = p.handler.AuditResourceComment(ctx, args.Req); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing AuditResourceComment: "+err2.Error())
+		oprot.WriteMessageBegin("AuditResourceComment", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush(ctx)
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("AuditResourceComment", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -4260,35 +5650,35 @@ func (p *AdminAuditServiceGetCommentAuditListResult) String() string {
 
 }
 
-type AdminAuditServiceAuditCommentArgs struct {
-	Req *AuditCommentReq `thrift:"req,1"`
+type AdminAuditServiceGetCourseCommentAuditListArgs struct {
+	Req *GetCourseCommentAuditListReq `thrift:"req,1"`
 }
 
-func NewAdminAuditServiceAuditCommentArgs() *AdminAuditServiceAuditCommentArgs {
-	return &AdminAuditServiceAuditCommentArgs{}
+func NewAdminAuditServiceGetCourseCommentAuditListArgs() *AdminAuditServiceGetCourseCommentAuditListArgs {
+	return &AdminAuditServiceGetCourseCommentAuditListArgs{}
 }
 
-func (p *AdminAuditServiceAuditCommentArgs) InitDefault() {
+func (p *AdminAuditServiceGetCourseCommentAuditListArgs) InitDefault() {
 }
 
-var AdminAuditServiceAuditCommentArgs_Req_DEFAULT *AuditCommentReq
+var AdminAuditServiceGetCourseCommentAuditListArgs_Req_DEFAULT *GetCourseCommentAuditListReq
 
-func (p *AdminAuditServiceAuditCommentArgs) GetReq() (v *AuditCommentReq) {
+func (p *AdminAuditServiceGetCourseCommentAuditListArgs) GetReq() (v *GetCourseCommentAuditListReq) {
 	if !p.IsSetReq() {
-		return AdminAuditServiceAuditCommentArgs_Req_DEFAULT
+		return AdminAuditServiceGetCourseCommentAuditListArgs_Req_DEFAULT
 	}
 	return p.Req
 }
 
-var fieldIDToName_AdminAuditServiceAuditCommentArgs = map[int16]string{
+var fieldIDToName_AdminAuditServiceGetCourseCommentAuditListArgs = map[int16]string{
 	1: "req",
 }
 
-func (p *AdminAuditServiceAuditCommentArgs) IsSetReq() bool {
+func (p *AdminAuditServiceGetCourseCommentAuditListArgs) IsSetReq() bool {
 	return p.Req != nil
 }
 
-func (p *AdminAuditServiceAuditCommentArgs) Read(iprot thrift.TProtocol) (err error) {
+func (p *AdminAuditServiceGetCourseCommentAuditListArgs) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -4334,7 +5724,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceAuditCommentArgs[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceGetCourseCommentAuditListArgs[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -4344,8 +5734,8 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *AdminAuditServiceAuditCommentArgs) ReadField1(iprot thrift.TProtocol) error {
-	_field := NewAuditCommentReq()
+func (p *AdminAuditServiceGetCourseCommentAuditListArgs) ReadField1(iprot thrift.TProtocol) error {
+	_field := NewGetCourseCommentAuditListReq()
 	if err := _field.Read(iprot); err != nil {
 		return err
 	}
@@ -4353,9 +5743,9 @@ func (p *AdminAuditServiceAuditCommentArgs) ReadField1(iprot thrift.TProtocol) e
 	return nil
 }
 
-func (p *AdminAuditServiceAuditCommentArgs) Write(oprot thrift.TProtocol) (err error) {
+func (p *AdminAuditServiceGetCourseCommentAuditListArgs) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("AuditComment_args"); err != nil {
+	if err = oprot.WriteStructBegin("GetCourseCommentAuditList_args"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -4381,7 +5771,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *AdminAuditServiceAuditCommentArgs) writeField1(oprot thrift.TProtocol) (err error) {
+func (p *AdminAuditServiceGetCourseCommentAuditListArgs) writeField1(oprot thrift.TProtocol) (err error) {
 	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
 		goto WriteFieldBeginError
 	}
@@ -4398,43 +5788,43 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
 }
 
-func (p *AdminAuditServiceAuditCommentArgs) String() string {
+func (p *AdminAuditServiceGetCourseCommentAuditListArgs) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AdminAuditServiceAuditCommentArgs(%+v)", *p)
+	return fmt.Sprintf("AdminAuditServiceGetCourseCommentAuditListArgs(%+v)", *p)
 
 }
 
-type AdminAuditServiceAuditCommentResult struct {
-	Success *AuditCommentResp `thrift:"success,0,optional"`
+type AdminAuditServiceGetCourseCommentAuditListResult struct {
+	Success *GetCourseCommentAuditListResp `thrift:"success,0,optional"`
 }
 
-func NewAdminAuditServiceAuditCommentResult() *AdminAuditServiceAuditCommentResult {
-	return &AdminAuditServiceAuditCommentResult{}
+func NewAdminAuditServiceGetCourseCommentAuditListResult() *AdminAuditServiceGetCourseCommentAuditListResult {
+	return &AdminAuditServiceGetCourseCommentAuditListResult{}
 }
 
-func (p *AdminAuditServiceAuditCommentResult) InitDefault() {
+func (p *AdminAuditServiceGetCourseCommentAuditListResult) InitDefault() {
 }
 
-var AdminAuditServiceAuditCommentResult_Success_DEFAULT *AuditCommentResp
+var AdminAuditServiceGetCourseCommentAuditListResult_Success_DEFAULT *GetCourseCommentAuditListResp
 
-func (p *AdminAuditServiceAuditCommentResult) GetSuccess() (v *AuditCommentResp) {
+func (p *AdminAuditServiceGetCourseCommentAuditListResult) GetSuccess() (v *GetCourseCommentAuditListResp) {
 	if !p.IsSetSuccess() {
-		return AdminAuditServiceAuditCommentResult_Success_DEFAULT
+		return AdminAuditServiceGetCourseCommentAuditListResult_Success_DEFAULT
 	}
 	return p.Success
 }
 
-var fieldIDToName_AdminAuditServiceAuditCommentResult = map[int16]string{
+var fieldIDToName_AdminAuditServiceGetCourseCommentAuditListResult = map[int16]string{
 	0: "success",
 }
 
-func (p *AdminAuditServiceAuditCommentResult) IsSetSuccess() bool {
+func (p *AdminAuditServiceGetCourseCommentAuditListResult) IsSetSuccess() bool {
 	return p.Success != nil
 }
 
-func (p *AdminAuditServiceAuditCommentResult) Read(iprot thrift.TProtocol) (err error) {
+func (p *AdminAuditServiceGetCourseCommentAuditListResult) Read(iprot thrift.TProtocol) (err error) {
 
 	var fieldTypeId thrift.TType
 	var fieldId int16
@@ -4480,7 +5870,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceAuditCommentResult[fieldId]), err)
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceGetCourseCommentAuditListResult[fieldId]), err)
 SkipFieldError:
 	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 
@@ -4490,8 +5880,8 @@ ReadStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *AdminAuditServiceAuditCommentResult) ReadField0(iprot thrift.TProtocol) error {
-	_field := NewAuditCommentResp()
+func (p *AdminAuditServiceGetCourseCommentAuditListResult) ReadField0(iprot thrift.TProtocol) error {
+	_field := NewGetCourseCommentAuditListResp()
 	if err := _field.Read(iprot); err != nil {
 		return err
 	}
@@ -4499,9 +5889,9 @@ func (p *AdminAuditServiceAuditCommentResult) ReadField0(iprot thrift.TProtocol)
 	return nil
 }
 
-func (p *AdminAuditServiceAuditCommentResult) Write(oprot thrift.TProtocol) (err error) {
+func (p *AdminAuditServiceGetCourseCommentAuditListResult) Write(oprot thrift.TProtocol) (err error) {
 	var fieldId int16
-	if err = oprot.WriteStructBegin("AuditComment_result"); err != nil {
+	if err = oprot.WriteStructBegin("GetCourseCommentAuditList_result"); err != nil {
 		goto WriteStructBeginError
 	}
 	if p != nil {
@@ -4527,7 +5917,7 @@ WriteStructEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
 }
 
-func (p *AdminAuditServiceAuditCommentResult) writeField0(oprot thrift.TProtocol) (err error) {
+func (p *AdminAuditServiceGetCourseCommentAuditListResult) writeField0(oprot thrift.TProtocol) (err error) {
 	if p.IsSetSuccess() {
 		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
 			goto WriteFieldBeginError
@@ -4546,10 +5936,892 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
 }
 
-func (p *AdminAuditServiceAuditCommentResult) String() string {
+func (p *AdminAuditServiceGetCourseCommentAuditListResult) String() string {
 	if p == nil {
 		return "<nil>"
 	}
-	return fmt.Sprintf("AdminAuditServiceAuditCommentResult(%+v)", *p)
+	return fmt.Sprintf("AdminAuditServiceGetCourseCommentAuditListResult(%+v)", *p)
+
+}
+
+type AdminAuditServiceGetResourceCommentAuditListArgs struct {
+	Req *GetResourceCommentAuditListReq `thrift:"req,1"`
+}
+
+func NewAdminAuditServiceGetResourceCommentAuditListArgs() *AdminAuditServiceGetResourceCommentAuditListArgs {
+	return &AdminAuditServiceGetResourceCommentAuditListArgs{}
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListArgs) InitDefault() {
+}
+
+var AdminAuditServiceGetResourceCommentAuditListArgs_Req_DEFAULT *GetResourceCommentAuditListReq
+
+func (p *AdminAuditServiceGetResourceCommentAuditListArgs) GetReq() (v *GetResourceCommentAuditListReq) {
+	if !p.IsSetReq() {
+		return AdminAuditServiceGetResourceCommentAuditListArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+var fieldIDToName_AdminAuditServiceGetResourceCommentAuditListArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceGetResourceCommentAuditListArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListArgs) ReadField1(iprot thrift.TProtocol) error {
+	_field := NewGetResourceCommentAuditListReq()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Req = _field
+	return nil
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetResourceCommentAuditList_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AdminAuditServiceGetResourceCommentAuditListArgs(%+v)", *p)
+
+}
+
+type AdminAuditServiceGetResourceCommentAuditListResult struct {
+	Success *GetResourceCommentAuditListResp `thrift:"success,0,optional"`
+}
+
+func NewAdminAuditServiceGetResourceCommentAuditListResult() *AdminAuditServiceGetResourceCommentAuditListResult {
+	return &AdminAuditServiceGetResourceCommentAuditListResult{}
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListResult) InitDefault() {
+}
+
+var AdminAuditServiceGetResourceCommentAuditListResult_Success_DEFAULT *GetResourceCommentAuditListResp
+
+func (p *AdminAuditServiceGetResourceCommentAuditListResult) GetSuccess() (v *GetResourceCommentAuditListResp) {
+	if !p.IsSetSuccess() {
+		return AdminAuditServiceGetResourceCommentAuditListResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+var fieldIDToName_AdminAuditServiceGetResourceCommentAuditListResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceGetResourceCommentAuditListResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListResult) ReadField0(iprot thrift.TProtocol) error {
+	_field := NewGetResourceCommentAuditListResp()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Success = _field
+	return nil
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("GetResourceCommentAuditList_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AdminAuditServiceGetResourceCommentAuditListResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AdminAuditServiceGetResourceCommentAuditListResult(%+v)", *p)
+
+}
+
+type AdminAuditServiceAuditCourseCommentArgs struct {
+	Req *AuditCourseCommentReq `thrift:"req,1"`
+}
+
+func NewAdminAuditServiceAuditCourseCommentArgs() *AdminAuditServiceAuditCourseCommentArgs {
+	return &AdminAuditServiceAuditCourseCommentArgs{}
+}
+
+func (p *AdminAuditServiceAuditCourseCommentArgs) InitDefault() {
+}
+
+var AdminAuditServiceAuditCourseCommentArgs_Req_DEFAULT *AuditCourseCommentReq
+
+func (p *AdminAuditServiceAuditCourseCommentArgs) GetReq() (v *AuditCourseCommentReq) {
+	if !p.IsSetReq() {
+		return AdminAuditServiceAuditCourseCommentArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+var fieldIDToName_AdminAuditServiceAuditCourseCommentArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AdminAuditServiceAuditCourseCommentArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AdminAuditServiceAuditCourseCommentArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceAuditCourseCommentArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditCourseCommentArgs) ReadField1(iprot thrift.TProtocol) error {
+	_field := NewAuditCourseCommentReq()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Req = _field
+	return nil
+}
+
+func (p *AdminAuditServiceAuditCourseCommentArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AuditCourseComment_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditCourseCommentArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditCourseCommentArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AdminAuditServiceAuditCourseCommentArgs(%+v)", *p)
+
+}
+
+type AdminAuditServiceAuditCourseCommentResult struct {
+	Success *AuditCourseCommentResp `thrift:"success,0,optional"`
+}
+
+func NewAdminAuditServiceAuditCourseCommentResult() *AdminAuditServiceAuditCourseCommentResult {
+	return &AdminAuditServiceAuditCourseCommentResult{}
+}
+
+func (p *AdminAuditServiceAuditCourseCommentResult) InitDefault() {
+}
+
+var AdminAuditServiceAuditCourseCommentResult_Success_DEFAULT *AuditCourseCommentResp
+
+func (p *AdminAuditServiceAuditCourseCommentResult) GetSuccess() (v *AuditCourseCommentResp) {
+	if !p.IsSetSuccess() {
+		return AdminAuditServiceAuditCourseCommentResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+var fieldIDToName_AdminAuditServiceAuditCourseCommentResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AdminAuditServiceAuditCourseCommentResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AdminAuditServiceAuditCourseCommentResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceAuditCourseCommentResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditCourseCommentResult) ReadField0(iprot thrift.TProtocol) error {
+	_field := NewAuditCourseCommentResp()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Success = _field
+	return nil
+}
+
+func (p *AdminAuditServiceAuditCourseCommentResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AuditCourseComment_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditCourseCommentResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditCourseCommentResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AdminAuditServiceAuditCourseCommentResult(%+v)", *p)
+
+}
+
+type AdminAuditServiceAuditResourceCommentArgs struct {
+	Req *AuditResourceCommentReq `thrift:"req,1"`
+}
+
+func NewAdminAuditServiceAuditResourceCommentArgs() *AdminAuditServiceAuditResourceCommentArgs {
+	return &AdminAuditServiceAuditResourceCommentArgs{}
+}
+
+func (p *AdminAuditServiceAuditResourceCommentArgs) InitDefault() {
+}
+
+var AdminAuditServiceAuditResourceCommentArgs_Req_DEFAULT *AuditResourceCommentReq
+
+func (p *AdminAuditServiceAuditResourceCommentArgs) GetReq() (v *AuditResourceCommentReq) {
+	if !p.IsSetReq() {
+		return AdminAuditServiceAuditResourceCommentArgs_Req_DEFAULT
+	}
+	return p.Req
+}
+
+var fieldIDToName_AdminAuditServiceAuditResourceCommentArgs = map[int16]string{
+	1: "req",
+}
+
+func (p *AdminAuditServiceAuditResourceCommentArgs) IsSetReq() bool {
+	return p.Req != nil
+}
+
+func (p *AdminAuditServiceAuditResourceCommentArgs) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 1:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField1(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceAuditResourceCommentArgs[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditResourceCommentArgs) ReadField1(iprot thrift.TProtocol) error {
+	_field := NewAuditResourceCommentReq()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Req = _field
+	return nil
+}
+
+func (p *AdminAuditServiceAuditResourceCommentArgs) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AuditResourceComment_args"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField1(oprot); err != nil {
+			fieldId = 1
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditResourceCommentArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("req", thrift.STRUCT, 1); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := p.Req.Write(oprot); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 1 end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditResourceCommentArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AdminAuditServiceAuditResourceCommentArgs(%+v)", *p)
+
+}
+
+type AdminAuditServiceAuditResourceCommentResult struct {
+	Success *AuditResourceCommentResp `thrift:"success,0,optional"`
+}
+
+func NewAdminAuditServiceAuditResourceCommentResult() *AdminAuditServiceAuditResourceCommentResult {
+	return &AdminAuditServiceAuditResourceCommentResult{}
+}
+
+func (p *AdminAuditServiceAuditResourceCommentResult) InitDefault() {
+}
+
+var AdminAuditServiceAuditResourceCommentResult_Success_DEFAULT *AuditResourceCommentResp
+
+func (p *AdminAuditServiceAuditResourceCommentResult) GetSuccess() (v *AuditResourceCommentResp) {
+	if !p.IsSetSuccess() {
+		return AdminAuditServiceAuditResourceCommentResult_Success_DEFAULT
+	}
+	return p.Success
+}
+
+var fieldIDToName_AdminAuditServiceAuditResourceCommentResult = map[int16]string{
+	0: "success",
+}
+
+func (p *AdminAuditServiceAuditResourceCommentResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *AdminAuditServiceAuditResourceCommentResult) Read(iprot thrift.TProtocol) (err error) {
+
+	var fieldTypeId thrift.TType
+	var fieldId int16
+
+	if _, err = iprot.ReadStructBegin(); err != nil {
+		goto ReadStructBeginError
+	}
+
+	for {
+		_, fieldTypeId, fieldId, err = iprot.ReadFieldBegin()
+		if err != nil {
+			goto ReadFieldBeginError
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+
+		switch fieldId {
+		case 0:
+			if fieldTypeId == thrift.STRUCT {
+				if err = p.ReadField0(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		default:
+			if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		}
+		if err = iprot.ReadFieldEnd(); err != nil {
+			goto ReadFieldEndError
+		}
+	}
+	if err = iprot.ReadStructEnd(); err != nil {
+		goto ReadStructEndError
+	}
+
+	return nil
+ReadStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct begin error: ", p), err)
+ReadFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
+ReadFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_AdminAuditServiceAuditResourceCommentResult[fieldId]), err)
+SkipFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
+
+ReadFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read field end error", p), err)
+ReadStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditResourceCommentResult) ReadField0(iprot thrift.TProtocol) error {
+	_field := NewAuditResourceCommentResp()
+	if err := _field.Read(iprot); err != nil {
+		return err
+	}
+	p.Success = _field
+	return nil
+}
+
+func (p *AdminAuditServiceAuditResourceCommentResult) Write(oprot thrift.TProtocol) (err error) {
+	var fieldId int16
+	if err = oprot.WriteStructBegin("AuditResourceComment_result"); err != nil {
+		goto WriteStructBeginError
+	}
+	if p != nil {
+		if err = p.writeField0(oprot); err != nil {
+			fieldId = 0
+			goto WriteFieldError
+		}
+	}
+	if err = oprot.WriteFieldStop(); err != nil {
+		goto WriteFieldStopError
+	}
+	if err = oprot.WriteStructEnd(); err != nil {
+		goto WriteStructEndError
+	}
+	return nil
+WriteStructBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct begin error: ", p), err)
+WriteFieldError:
+	return thrift.PrependError(fmt.Sprintf("%T write field %d error: ", p, fieldId), err)
+WriteFieldStopError:
+	return thrift.PrependError(fmt.Sprintf("%T write field stop error: ", p), err)
+WriteStructEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write struct end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditResourceCommentResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err = oprot.WriteFieldBegin("success", thrift.STRUCT, 0); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := p.Success.Write(oprot); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 0 end error: ", p), err)
+}
+
+func (p *AdminAuditServiceAuditResourceCommentResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("AdminAuditServiceAuditResourceCommentResult(%+v)", *p)
 
 }

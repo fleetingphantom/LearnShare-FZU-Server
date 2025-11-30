@@ -24,14 +24,18 @@ func Register(r *server.Hertz) {
 			{
 				_audit := _admin.Group("/audit", _auditMw()...)
 				_audit.GET("/comments", append(_getcommentauditlistMw(), audit.GetCommentAuditList)...)
-				_comments := _audit.Group("/comments", _commentsMw()...)
-				_comments.POST("/:review_id", append(_auditcommentMw(), audit.AuditComment)...)
+				_audit.GET("/course_comments", append(_getcoursecommentauditlistMw(), audit.GetCourseCommentAuditList)...)
+				_course_comments := _audit.Group("/course_comments", _course_commentsMw()...)
+				_course_comments.POST("/:review_id", append(_auditcoursecommentMw(), audit.AuditCourseComment)...)
 				_audit.GET("/courses", append(_getcourseauditlistMw(), audit.GetCourseAuditList)...)
 				_courses := _audit.Group("/courses", _coursesMw()...)
 				_courses.POST("/:review_id", append(_auditcourseMw(), audit.AuditCourse)...)
+				_audit.GET("/resource_comments", append(_getresourcecommentauditlistMw(), audit.GetResourceCommentAuditList)...)
+				_resource_comments := _audit.Group("/resource_comments", _resource_commentsMw()...)
+				_resource_comments.POST("/:review_id", append(_auditresourcecommentMw(), audit.AuditResourceComment)...)
 				_audit.GET("/resources", append(_getresourceauditlistMw(), audit.GetResourceAuditList)...)
 				_resources := _audit.Group("/resources", _resourcesMw()...)
-				_resources.PUT("/:review_id", append(_auditresourceMw(), audit.AuditResource)...)
+				_resources.POST("/:review_id", append(_auditresourceMw(), audit.AuditResource)...)
 			}
 		}
 	}

@@ -75,3 +75,35 @@ func _auditresourceMw() []app.HandlerFunc {
 		auth.RequirePermission("review.handle"),
 	}
 }
+
+func _course_commentsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _auditcoursecommentMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _resource_commentsMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _auditresourcecommentMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		auth.RequirePermission("review.handle"),
+	}
+}
+
+func _getcoursecommentauditlistMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
+func _getresourcecommentauditlistMw() []app.HandlerFunc {
+	return []app.HandlerFunc{
+		auth.RequirePermission("review.handle"),
+	}
+}
