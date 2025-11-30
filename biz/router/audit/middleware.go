@@ -19,9 +19,9 @@ func _apiMw() []app.HandlerFunc {
 }
 
 func _adminMw() []app.HandlerFunc {
-    return []app.HandlerFunc{
-        auth.AccessTokenAuth(),
-    }
+	return []app.HandlerFunc{
+		auth.AccessTokenAuth(),
+	}
 }
 
 func _auditMw() []app.HandlerFunc {
@@ -65,13 +65,13 @@ func _resourcesMw() []app.HandlerFunc {
 }
 
 func _getresourceauditlistMw() []app.HandlerFunc {
-    return []app.HandlerFunc{
-        auth.RequirePermission("review.handle"),
-    }
+	return []app.HandlerFunc{
+		auth.RequirePermission("review.handle"),
+	}
 }
 
 func _auditresourceMw() []app.HandlerFunc {
-    return []app.HandlerFunc{
-        auth.RequirePermission("review.handle"),
-    }
+	return []app.HandlerFunc{
+		auth.RequirePermission("review.handle"),
+	}
 }

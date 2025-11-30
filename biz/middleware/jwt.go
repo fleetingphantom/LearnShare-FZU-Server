@@ -54,9 +54,11 @@ func AccessTokenJwt() {
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
 			resp := &JwtCustomClaims{
-				UserId: int64(claims[RefreshTokenJwtMiddleware.IdentityKey].(float64)),
+				UserId: int64(claims[AccessTokenJwtMiddleware.IdentityKey].(float64)),
 				UUID:   claims[constants.UUID].(string),
+				RoleId: int64(claims[constants.RoleID].(float64)),
 			}
+
 			return resp
 		},
 

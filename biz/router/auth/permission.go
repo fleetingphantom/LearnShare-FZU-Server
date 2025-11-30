@@ -16,13 +16,11 @@ func RequirePermission(permissionName string) app.HandlerFunc {
 		roleId := service.GetRoleIdFormContext(c)
 
 		// 2. 获取该角色的所有权限
-
 		permissions, err := service.NewRoleAdminService(ctx, c).GetRolePermissions(roleId)
 		if err != nil {
 			fail(c, errno.NewErrNo(errno.InternalDatabaseErrorCode, "查询角色权限失败"))
 			return
 		}
-
 		// 3. 检查是否拥有所需权限
 		hasPermission := false
 		for _, perm := range permissions {
