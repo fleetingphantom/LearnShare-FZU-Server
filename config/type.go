@@ -52,6 +52,7 @@ type turnstile struct {
 type logger struct {
 	Level string
 	Dir   string
+	Env   string // development, testing, production
 }
 
 type config struct {

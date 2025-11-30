@@ -17,11 +17,11 @@ import (
 func Init() {
 	config.Init()
 
-	//初始化日志系统
-	if err := logger.Init(config.Logger.Dir, config.Logger.Level); err != nil {
+	// 初始化日志系统（传递环境参数）
+	if err := logger.Init(config.Logger.Dir, config.Logger.Level, config.Logger.Env); err != nil {
 		logger.Fatalf("日志系统初始化失败: %v", err)
 	}
-	logger.Info("日志系统初始化成功")
+	logger.Infof("日志系统初始化成功 | env=%s level=%s", config.Logger.Env, config.Logger.Level)
 
 	err := dal.Init()
 	if err != nil {
@@ -37,6 +37,9 @@ func main() {
 	// 添加请求日志中间件
 	h.Use(middleware.RequestLogger())
 
+	// 添加慢查询监控中间件（阈值 1000ms）
+	h.Use(middleware.SlowQueryLogger(1000))
+
 	h.Use(cors.New(cors.Config{
 		AllowOrigins:  []string{"https://*.yourang.top", "http://localhost:3000"},
 		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
@@ -50,6 +53,6 @@ func main() {
 	pprof.Register(h)
 
 	register(h)
-	logger.Infof("服务器启动成功，监听地址: %s", utils.GetServerAddress())
+	logger.Infof("服务器启动成功 | 监听地址=%s", utils.GetServerAddress())
 	h.Spin()
 }

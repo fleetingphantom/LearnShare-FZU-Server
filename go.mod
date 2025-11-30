@@ -7,9 +7,9 @@ replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 require (
 	github.com/alicebob/miniredis/v2 v2.35.0
 	github.com/apache/thrift v0.22.0
-	github.com/bytedance/gopkg v0.1.3
 	github.com/cloudwego/hertz v0.10.3
 	github.com/fsnotify/fsnotify v1.9.0
+	github.com/google/uuid v1.6.0
 	github.com/h2non/filetype v1.1.3
 	github.com/hertz-contrib/cors v0.1.0
 	github.com/hertz-contrib/jwt v1.0.4
@@ -32,6 +32,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/alex-ant/gomath v0.0.0-20160516115720-89013a210a82 // indirect
+	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic v1.14.2 // indirect
 	github.com/bytedance/sonic/loader v0.4.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
