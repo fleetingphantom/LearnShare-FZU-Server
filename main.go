@@ -3,6 +3,8 @@
 package main
 
 import (
+	"time"
+
 	"LearnShare/biz/dal"
 	"LearnShare/biz/middleware"
 	"LearnShare/config"
@@ -40,14 +42,18 @@ func main() {
 	// 添加慢查询监控中间件（阈值 1000ms）
 	h.Use(middleware.SlowQueryLogger(1000))
 
-	h.Use(cors.New(cors.Config{
-		AllowOrigins:  []string{"https://*.yourang.top", "http://localhost:3000"},
-		AllowMethods:  []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:  []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
-		ExposeHeaders: []string{"Access-Token", "Refresh-Token"},
-		MaxAge:        86400,
-		AllowWildcard: true,
-	}))
+	if config.Cors == nil {
+		logger.Warnf("CORS 配置缺失，跳过跨域拦截器注册")
+	} else {
+		h.Use(cors.New(cors.Config{
+			AllowOrigins:  config.Cors.AllowOrigins,
+			AllowMethods:  config.Cors.AllowMethods,
+			AllowHeaders:  config.Cors.AllowHeaders,
+			ExposeHeaders: config.Cors.ExposeHeaders,
+			MaxAge:        time.Duration(config.Cors.MaxAge) * time.Second,
+			AllowWildcard: config.Cors.AllowWildcard,
+		}))
+	}
 
 	// 注册 pprof 性能分析路由
 	pprof.Register(h)

@@ -55,6 +55,15 @@ type logger struct {
 	Env   string // development, testing, production
 }
 
+type cors struct {
+	AllowOrigins  []string `mapstructure:"allow_origins"`
+	AllowMethods  []string `mapstructure:"allow_methods"`
+	AllowHeaders  []string `mapstructure:"allow_headers"`
+	ExposeHeaders []string `mapstructure:"expose_headers"`
+	MaxAge        int      `mapstructure:"max_age"`
+	AllowWildcard bool     `mapstructure:"allow_wildcard"`
+}
+
 type config struct {
 	MySQL     mySQL
 	Redis     redis
@@ -64,4 +73,5 @@ type config struct {
 	Server    server
 	Turnstile turnstile `mapstructure:"turnstile"`
 	Logger    logger    `mapstructure:"logger"`
+	Cors      cors      `mapstructure:"cors"`
 }
