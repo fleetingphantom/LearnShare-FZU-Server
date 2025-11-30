@@ -1,12 +1,12 @@
 mysql:
-  addr: "127.0.0.1::3306"
+  addr: "LearnShare-mysql:3306"
   database: "LearnShare"
   username: "root"
   password: "LearnShare"
   charset: "utf8mb4"
 
 redis:
-  addr: "127.0.0.1::6379"
+  addr: "LearnShare-redis:6379"
   password: ""
   db: 1
 
@@ -16,7 +16,6 @@ oss:
   accessKey-secret: "your-access-key-secret"
   BucketName: "learnshare-bucket"
   zone: "files"
-  use_cdn_domains: false
 
 smtp:
   host: "smtp.mailtrap.io"
@@ -29,14 +28,14 @@ smtp:
 verify:
   code_length: 6
   ttl_seconds: 600
-  
+
 server:
   addr: "0.0.0.0"
   port: 8888
 
 turnstile:
   secret_key: ""
-  enabled: true
+  enabled: false
 
 logger:
   level: "info"  # 可选: debug, info, warn, error, fatal
