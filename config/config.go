@@ -16,10 +16,11 @@ var (
 	Server       *server
 	Turnstile    *turnstile
 	Logger       *logger
+	Cors         *cors
 	runtimeViper = viper.New()
 )
 
-// Init 目的是初始化并读入配置
+// Init 目的是初始化配置管理器
 func Init() {
 	configPath := "./config/config.yaml"
 
@@ -32,9 +33,9 @@ func Init() {
 
 	configMapping()
 
-	// 设置持续监听
+	// 监听配置热更新
 	runtimeViper.OnConfigChange(func(e fsnotify.Event) {
-		// 我们无法确定监听到配置变更时是否已经初始化完毕，所以此处需要做一个判断
+		// 一些场景无法确定在配置变更回调时是否已经初始化，所以此处还要再判断一次
 		log.Infof("config: notice config changed: %v\n", e.String())
 		configMapping() // 重新映射配置
 	})
@@ -45,7 +46,7 @@ func Init() {
 func configMapping() {
 	c := new(config)
 	if err := runtimeViper.Unmarshal(&c); err != nil {
-		// 由于这个函数会在配置重载时被再次触发，所以需要判断日志记录方式
+		// 如果配置文件损坏，或者热更新时再次失败，此处需要及时记录日志
 		log.Fatalf("config.configMapping: 配置反序列化失败: %v", err)
 	}
 	Mysql = &c.MySQL
@@ -56,4 +57,5 @@ func configMapping() {
 	Server = &c.Server
 	Turnstile = &c.Turnstile
 	Logger = &c.Logger
+	Cors = &c.Cors
 }

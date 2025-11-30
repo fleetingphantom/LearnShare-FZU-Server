@@ -41,3 +41,26 @@ turnstile:
 logger:
   level: "info"  # 可选: debug, info, warn, error, fatal
   dir: "logs"    # 日志文件存储目录
+  env: "development"
+
+cors:
+  allow_origins:
+    - "http://*.yourang.top"
+    - "http://localhost:8081"
+    - "https://*.yourang.top"
+  allow_methods:
+    - "GET"
+    - "POST"
+    - "PUT"
+    - "DELETE"
+    - "OPTIONS"
+  allow_headers:
+    - "Origin"
+    - "Content-Length"
+    - "Content-Type"
+    - "Authorization"
+  expose_headers:
+    - "Access-Token"
+    - "Refresh-Token"
+  max_age: 86400
+  allow_wildcard: true
