@@ -1,6 +1,7 @@
 services:
   # LearnShare 主应用服务
   LearnShare-app:
+    container_name: LearnShare-app
     image: ghcr.io/2451965602/learnshare:latest
     build:
       context: ..
