@@ -6,6 +6,7 @@ import (
 	"LearnShare/biz/model/module"
 	"LearnShare/biz/model/user"
 	"LearnShare/pkg/errno"
+	"LearnShare/pkg/logger"
 	"LearnShare/pkg/oss"
 	"LearnShare/pkg/utils"
 	"context"
@@ -14,6 +15,7 @@ import (
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"go.uber.org/zap"
 )
 
 type UserService struct {
@@ -28,6 +30,10 @@ func NewUserService(ctx context.Context, c *app.RequestContext) *UserService {
 func (s *UserService) Register(req *user.RegisterReq) error {
 
 	if valid, err := utils.VerifyUsername(req.Username); !valid {
+		logger.WithFields(
+			zap.String("username", req.Username),
+			zap.Error(err),
+		).Warn("用户名验证失败")
 		return err
 	}
 
@@ -36,11 +42,19 @@ func (s *UserService) Register(req *user.RegisterReq) error {
 	}
 
 	if valid, err := utils.VerifyEmail(req.Email); !valid {
+		logger.WithFields(
+			zap.String("email", logger.MaskEmail(req.Email)),
+			zap.Error(err),
+		).Warn("邮箱验证失败")
 		return err
 	}
 
 	passwordHash, err := utils.EncryptPassword(req.Password)
 	if err != nil {
+		logger.WithFields(
+			zap.String("username", req.Username),
+			zap.Error(err),
+		).Error("密码加密失败")
 		return err
 	}
 
@@ -48,8 +62,14 @@ func (s *UserService) Register(req *user.RegisterReq) error {
 
 	err = db.CreateUser(s.ctx, req.Username, req.Password, req.Email)
 	if err != nil {
+		logger.WithFields(
+			zap.String("username", req.Username),
+			zap.String("email", logger.MaskEmail(req.Email)),
+			zap.Error(err),
+		).Error("创建用户失败")
 		return err
 	}
+
 	return nil
 }
 
@@ -60,6 +80,10 @@ func (s *UserService) LoginIn(req *user.LoginInReq) (*module.User, error) {
 	}
 
 	if err := utils.ComparePassword(userInfo.PasswordHash, req.Password); err != nil {
+		logger.WithFields(
+			zap.String("email", logger.MaskEmail(req.Email)),
+			zap.Int64("user_id", userInfo.UserID),
+		).Warn("登录失败：密码错误")
 		return nil, err
 	}
 
@@ -68,18 +92,21 @@ func (s *UserService) LoginIn(req *user.LoginInReq) (*module.User, error) {
 }
 
 func (s *UserService) LoginOut() error {
-	// 获取当前用户ID用于日志记录
+	userId := GetUidFormContext(s.c)
 
 	var errors []error
 
 	uuidStr := GetUuidFormContext(s.c)
 	if err := redis.SetBlacklistToken(s.ctx, uuidStr); err != nil {
+		logger.WithFields(
+			zap.Int64("user_id", userId),
+			zap.Error(err),
+		).Error("设置黑名单 token 失败")
 		errors = append(errors, err)
 	}
 
 	// 如果有错误发生，记录日志但不阻止登出
 	if len(errors) > 0 {
-		// 这里可以添加日志记录
 		return errors[0] // 返回第一个错误
 	}
 
@@ -155,22 +182,38 @@ func (s *UserService) UpdatePassword(req *user.UpdatePasswordReq) error {
 	userId := GetUidFormContext(s.c)
 	userInfo, err := db.GetUserByID(s.ctx, userId)
 	if err != nil {
+		logger.WithFields(
+			zap.Int64("user_id", userId),
+			zap.Error(err),
+		).Error("获取用户信息失败")
 		return err
 	}
 
 	if err := utils.ComparePassword(userInfo.PasswordHash, req.OldPassword); err != nil {
+		logger.WithFields(
+			zap.Int64("user_id", userId),
+		).Warn("修改密码失败：旧密码错误")
 		return errno.UserPasswordIncorrectError
 	}
 	newPasswordHash, err := utils.EncryptPassword(req.NewPassword)
 	if err != nil {
+		logger.WithFields(
+			zap.Int64("user_id", userId),
+			zap.Error(err),
+		).Error("新密码加密失败")
 		return err
 	}
 
 	// 使用异步更新用户密码
 	errChan := db.UpdateUserPasswordAsync(s.ctx, userInfo.UserID, newPasswordHash)
 	if err := <-errChan; err != nil {
+		logger.WithFields(
+			zap.Int64("user_id", userId),
+			zap.Error(err),
+		).Error("更新用户密码失败")
 		return err
 	}
+
 	return nil
 }
 
@@ -228,24 +271,41 @@ func (s *UserService) ResetPassword(req *user.ResetPasswordReq) error {
 	}
 
 	if storeCode != req.Code {
+		logger.WithFields(
+			zap.String("email", logger.MaskEmail(req.Email)),
+		).Warn("重置密码失败：验证码错误")
 		return errno.UserVerificationCodeInvalidError
 	}
 
 	newPasswordHash, err := utils.EncryptPassword(req.NewPassword)
 	if err != nil {
+		logger.WithFields(
+			zap.String("email", logger.MaskEmail(req.Email)),
+			zap.Error(err),
+		).Error("新密码加密失败")
 		return err
 	}
 
 	userInfo, err := db.GetUserByEmail(s.ctx, req.Email)
 	if err != nil {
+		logger.WithFields(
+			zap.String("email", logger.MaskEmail(req.Email)),
+			zap.Error(err),
+		).Error("获取用户信息失败")
 		return err
 	}
 
 	// 使用异步更新用户密码
 	errChan := db.UpdateUserPasswordAsync(s.ctx, userInfo.UserID, newPasswordHash)
 	if err := <-errChan; err != nil {
+		logger.WithFields(
+			zap.String("email", logger.MaskEmail(req.Email)),
+			zap.Int64("user_id", userInfo.UserID),
+			zap.Error(err),
+		).Error("重置密码失败")
 		return err
 	}
+
 	return nil
 }
 

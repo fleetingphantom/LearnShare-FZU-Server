@@ -1,7 +1,10 @@
 package db
 
 import (
+	"LearnShare/pkg/logger"
 	"context"
+	"fmt"
+	"runtime/debug"
 	"sync"
 )
 
@@ -51,13 +54,36 @@ func (p *AsyncWorkerPool) Start() {
 
 // worker 工作协程
 func (p *AsyncWorkerPool) worker() {
-	defer p.wg.Done()
-	for task := range p.taskChan {
-		err := task.Fn()
-		if task.Err != nil {
-			task.Err <- err
-			close(task.Err)
+	defer func() {
+		if r := recover(); r != nil {
+			logger.Errorf("异步工作池 worker panic: %v\nstack: %s", r, string(debug.Stack()))
 		}
+		p.wg.Done()
+	}()
+
+	for task := range p.taskChan {
+		func() {
+			defer func() {
+				if r := recover(); r != nil {
+					err := fmt.Errorf("异步任务 panic: %v", r)
+					logger.Errorf("%v\nstack: %s", err, string(debug.Stack()))
+					if task.Err != nil {
+						task.Err <- err
+						close(task.Err)
+					}
+				}
+			}()
+
+			err := task.Fn()
+			// 如果是 SubmitNoWait 提交的任务且发生错误，记录日志
+			if err != nil && task.Err == nil {
+				logger.Errorf("异步任务执行失败（SubmitNoWait）: %v", err)
+			}
+			if task.Err != nil {
+				task.Err <- err
+				close(task.Err)
+			}
+		}()
 	}
 }
 
@@ -95,7 +121,14 @@ func AsyncBatch(ctx context.Context, fns []func() error) []error {
 	for i, fn := range fns {
 		wg.Add(1)
 		go func(idx int, f func() error) {
-			defer wg.Done()
+			defer func() {
+				if r := recover(); r != nil {
+					err := fmt.Errorf("批量异步任务 [%d] panic: %v", idx, r)
+					logger.Errorf("%v\nstack: %s", err, string(debug.Stack()))
+					results[idx] = err
+				}
+				wg.Done()
+			}()
 			results[idx] = f()
 		}(i, fn)
 	}

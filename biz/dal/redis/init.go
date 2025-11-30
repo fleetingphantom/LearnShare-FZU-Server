@@ -8,6 +8,7 @@ import (
 	"fmt"
 
 	"github.com/redis/go-redis/v9"
+	"github.com/redis/go-redis/v9/maintnotifications"
 )
 
 var RDB *redis.Client
@@ -18,10 +19,15 @@ func Init() error {
 		logger.Error("Redis配置为空")
 		return errno.NewErrNo(errno.InternalServiceErrorCode, "Redis配置为空")
 	}
+
 	RDB = redis.NewClient(&redis.Options{
 		Addr:     config.Redis.Addr,
 		Password: config.Redis.Password,
 		DB:       config.Redis.DB,
+
+		MaintNotificationsConfig: &maintnotifications.Config{
+			Mode: maintnotifications.ModeDisabled,
+		},
 	})
 
 	_, err := RDB.Ping(context.TODO()).Result()

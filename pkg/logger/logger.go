@@ -3,6 +3,8 @@ package logger
 import (
 	"os"
 	"path/filepath"
+	"strings"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	hertzzap "github.com/hertz-contrib/logger/zap"
@@ -11,8 +13,54 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+var (
+	zapLogger *zap.Logger
+)
+
+// filterCore 过滤特定日志消息的 Core
+type filterCore struct {
+	zapcore.Core
+	ignoreMessages []string
+}
+
+// newFilterCore 创建过滤 Core
+func newFilterCore(core zapcore.Core, ignoreMessages []string) zapcore.Core {
+	return &filterCore{
+		Core:           core,
+		ignoreMessages: ignoreMessages,
+	}
+}
+
+// Check 检查是否应该记录日志
+func (c *filterCore) Check(entry zapcore.Entry, ce *zapcore.CheckedEntry) *zapcore.CheckedEntry {
+	// 检查消息是否应该被过滤
+	for _, ignoreMsg := range c.ignoreMessages {
+		msgLen := len(entry.Message)
+		ignoreLen := len(ignoreMsg)
+		if entry.Message == ignoreMsg || (msgLen >= ignoreLen && entry.Message[:ignoreLen] == ignoreMsg) {
+			// 过滤掉该日志，不记录
+			return ce
+		}
+	}
+	// 不过滤，正常记录
+	return c.Core.Check(entry, ce)
+}
+
+// With 添加字段
+func (c *filterCore) With(fields []zapcore.Field) zapcore.Core {
+	return &filterCore{
+		Core:           c.Core.With(fields),
+		ignoreMessages: c.ignoreMessages,
+	}
+}
+
 // Init 初始化日志系统，使用 zap 作为 hlog 的底层实现
-func Init(logDir string, logLevel string) error {
+// env 参数可选值: development, testing, production
+func Init(logDir string, logLevel string, env ...string) error {
+	environment := "production"
+	if len(env) > 0 && env[0] != "" {
+		environment = env[0]
+	}
 	// 确保日志目录存在
 	if err := os.MkdirAll(logDir, 0755); err != nil {
 		return err
@@ -49,6 +97,16 @@ func Init(logDir string, logLevel string) error {
 		EncodeTime:     zapcore.ISO8601TimeEncoder,
 		EncodeDuration: zapcore.SecondsDurationEncoder,
 		EncodeCaller:   zapcore.ShortCallerEncoder,
+	}
+
+	// 生产环境优化：禁用调用者信息以提升性能
+	if environment == "production" {
+		encoderConfig.CallerKey = zapcore.OmitKey
+	}
+
+	// 开发环境使用彩色输出
+	if environment == "development" {
+		encoderConfig.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	}
 
 	// 配置日志文件输出 - 普通日志
@@ -98,12 +156,33 @@ func Init(logDir string, logLevel string) error {
 	// 组合多个 Core
 	core := zapcore.NewTee(consoleCore, allFileCore, errorFileCore)
 
-	// 设置 hlog 使用 zap logger
-	logger := hertzzap.NewLogger(hertzzap.WithZapOptions(zap.WrapCore(func(c zapcore.Core) zapcore.Core {
-		return core
-	})))
+	// 添加过滤器，过滤掉不需要的错误消息
+	filteredCore := newFilterCore(core, []string{
+		"HERTZ: Error=accept tcp", // 过滤服务器关闭时的错误
+	})
 
-	hlog.SetLogger(logger)
+	// 添加日志采样：每秒相同消息最多记录 5 条，之后每 100 条记录 1 条
+	sampledCore := zapcore.NewSamplerWithOptions(
+		filteredCore,
+		time.Second,
+		5,   // Initial: 每秒最初的 5 条相同消息都记录
+		100, // Thereafter: 之后每 100 条记录 1 条
+	)
+
+	// 创建 zap logger（添加调用者信息跳过层级）
+	zapLogger = zap.New(sampledCore, zap.AddCaller(), zap.AddCallerSkip(1))
+
+	// 使用 hertzzap 库设置 hlog
+	// 直接使用自定义的 core 和配置
+	hlog.SetLogger(hertzzap.NewLogger(
+		hertzzap.WithZapOptions(
+			zap.WrapCore(func(c zapcore.Core) zapcore.Core {
+				return sampledCore
+			}),
+			zap.AddCaller(),
+			zap.AddCallerSkip(2), // hertzzap 需要跳过额外的层级
+		),
+	))
 	hlog.SetLevel(convertToHlogLevel(level))
 
 	return nil
@@ -192,4 +271,51 @@ func CtxErrorf(format string, v ...interface{}) {
 // CtxWarnf 带上下文的格式化警告日志
 func CtxWarnf(format string, v ...interface{}) {
 	hlog.CtxWarnf(nil, format, v...)
+}
+
+// WithFields 创建带结构化字段的日志记录器
+func WithFields(fields ...zap.Field) *zap.Logger {
+	if zapLogger == nil {
+		// 如果未初始化，返回一个 nop logger
+		return zap.NewNop()
+	}
+	return zapLogger.With(fields...)
+}
+
+// MaskSensitive 脱敏敏感信息
+// 对于长度 <= 4 的字符串，完全脱敏
+// 对于长度 > 4 的字符串，保留首尾各 2 个字符
+func MaskSensitive(s string) string {
+	if s == "" {
+		return ""
+	}
+	if len(s) <= 4 {
+		return "****"
+	}
+	return s[:2] + "****" + s[len(s)-2:]
+}
+
+// MaskEmail 脱敏邮箱地址
+// 示例: user@example.com -> us****@ex****
+func MaskEmail(email string) string {
+	if email == "" {
+		return ""
+	}
+	parts := strings.Split(email, "@")
+	if len(parts) != 2 {
+		return MaskSensitive(email)
+	}
+	return MaskSensitive(parts[0]) + "@" + MaskSensitive(parts[1])
+}
+
+// MaskPhone 脱敏手机号
+// 示例: 13812345678 -> 138****5678
+func MaskPhone(phone string) string {
+	if phone == "" {
+		return ""
+	}
+	if len(phone) != 11 {
+		return MaskSensitive(phone)
+	}
+	return phone[:3] + "****" + phone[7:]
 }

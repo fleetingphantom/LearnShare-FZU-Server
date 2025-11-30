@@ -18,8 +18,8 @@ import (
 
 	"LearnShare/config"
 	"LearnShare/pkg/errno"
+	"LearnShare/pkg/logger"
 
-	"github.com/bytedance/gopkg/util/logger"
 	"github.com/h2non/filetype"
 	"github.com/qiniu/go-sdk/v7/auth"
 	"github.com/qiniu/go-sdk/v7/storage"
