@@ -168,12 +168,17 @@ func (s *ResourceService) SubmitResourceComment(req *resource.SubmitResourceComm
 	}
 
 	// 调用数据库层提交评论
-	comment, err := db.SubmitResourceComment(s.ctx, userID, req.ResourceID, req.Content, parentID)
-	if err != nil {
-		return nil, err
+	resultChan := db.SubmitResourceCommentAsync(s.ctx, userID, req.ResourceID, req.Content, parentID)
+	result := <-resultChan
+	if result.Err != nil {
+		return nil, result.Err
 	}
 
-	return comment.ToResourceCommentModule(), nil
+	if result.Comment == nil {
+		return nil, errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交资源评论失败: 未返回评论数据")
+	}
+
+	return result.Comment.ToResourceCommentModule(), nil
 }
 
 // DeleteResourceRating 执行删除资源评分
