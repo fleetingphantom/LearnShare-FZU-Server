@@ -175,29 +175,21 @@ type ResourceCommentrow struct {
 
 // CourseRating 课程评分
 type CourseRating struct {
-	RatingID       int64     `json:"rating_id" db:"rating_id"`
-	UserID         int64     `json:"user_id" db:"user_id"`
-	CourseID       int64     `json:"course_id" db:"course_id"`
-	Recommendation float64   `json:"recommendation" db:"recommendation"` // DECIMAL(2,1)
-	Difficulty     uint8     `json:"difficulty" db:"difficulty"`         // TINYINT UNSIGNED
-	Workload       uint8     `json:"workload" db:"workload"`
-	Usefulness     uint8     `json:"usefulness" db:"usefulness"`
-	IsVisible      bool      `json:"is_visible" db:"is_visible"`
-	CreatedAt      time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
+	RatingID  int64     `json:"rating_id" db:"rating_id"`
+	UserID    int64     `json:"user_id" db:"user_id"`
+	CourseID  int64     `json:"course_id" db:"course_id"`
+	IsVisible bool      `json:"is_visible" db:"is_visible"`
+	CreatedAt time.Time `json:"created_at" db:"created_at"`
+	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
 
 func (r CourseRating) ToCourseRatingModule() *module.CourseRating {
 	return &module.CourseRating{
-		RatingId:       r.RatingID,
-		UserId:         r.UserID,
-		CourseId:       r.CourseID,
-		Recommendation: r.Recommendation,    // float64 → double ✅
-		Difficulty:     int32(r.Difficulty), // uint8 → i32 ✅
-		Workload:       int32(r.Workload),
-		Usefulness:     int32(r.Usefulness),
-		IsVisible:      r.IsVisible,
-		CreatedAt:      r.CreatedAt.Unix(), // time.Time → i64
+		RatingId:  r.RatingID,
+		UserId:    r.UserID,
+		CourseId:  r.CourseID,
+		IsVisible: r.IsVisible,
+		CreatedAt: r.CreatedAt.Unix(), // time.Time → i64
 	}
 }
 
