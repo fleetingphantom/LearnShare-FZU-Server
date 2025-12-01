@@ -135,9 +135,8 @@ func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) er
 	}
 
 	rating := &db.CourseRating{
-		UserID:         userID,
-		CourseID:       req.CourseID,
-		Recommendation: req.Rating,
+		UserID:   userID,
+		CourseID: req.CourseID,
 	}
 
 	if err := db.SubmitCourseRating(s.ctx, rating); err != nil {

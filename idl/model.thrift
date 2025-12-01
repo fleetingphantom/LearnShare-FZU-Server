@@ -36,9 +36,6 @@ struct CourseRating {
     required i64 ratingId,
     required i64 userId,
     required i64 courseId,
-    required double recommendation,   // ✅ DECIMAL(2,1) → double (e.g., 4.5)
-    required i32 difficulty,          
-    required i32 workload,            
     required i32 usefulness,          
     required bool isVisible,
     required i64 createdAt,

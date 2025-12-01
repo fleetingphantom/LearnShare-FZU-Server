@@ -1565,16 +1565,12 @@ func (p *Course) String() string {
 }
 
 type CourseRating struct {
-	RatingId int64 `thrift:"ratingId,1,required" form:"ratingId,required" json:"ratingId,required" query:"ratingId,required"`
-	UserId   int64 `thrift:"userId,2,required" form:"userId,required" json:"userId,required" query:"userId,required"`
-	CourseId int64 `thrift:"courseId,3,required" form:"courseId,required" json:"courseId,required" query:"courseId,required"`
-	// ✅ DECIMAL(2,1) → double (e.g., 4.5)
-	Recommendation float64 `thrift:"recommendation,4,required" form:"recommendation,required" json:"recommendation,required" query:"recommendation,required"`
-	Difficulty     int32   `thrift:"difficulty,5,required" form:"difficulty,required" json:"difficulty,required" query:"difficulty,required"`
-	Workload       int32   `thrift:"workload,6,required" form:"workload,required" json:"workload,required" query:"workload,required"`
-	Usefulness     int32   `thrift:"usefulness,7,required" form:"usefulness,required" json:"usefulness,required" query:"usefulness,required"`
-	IsVisible      bool    `thrift:"isVisible,8,required" form:"isVisible,required" json:"isVisible,required" query:"isVisible,required"`
-	CreatedAt      int64   `thrift:"createdAt,9,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
+	RatingId   int64 `thrift:"ratingId,1,required" form:"ratingId,required" json:"ratingId,required" query:"ratingId,required"`
+	UserId     int64 `thrift:"userId,2,required" form:"userId,required" json:"userId,required" query:"userId,required"`
+	CourseId   int64 `thrift:"courseId,3,required" form:"courseId,required" json:"courseId,required" query:"courseId,required"`
+	Usefulness int32 `thrift:"usefulness,4,required" form:"usefulness,required" json:"usefulness,required" query:"usefulness,required"`
+	IsVisible  bool  `thrift:"isVisible,5,required" form:"isVisible,required" json:"isVisible,required" query:"isVisible,required"`
+	CreatedAt  int64 `thrift:"createdAt,6,required" form:"createdAt,required" json:"createdAt,required" query:"createdAt,required"`
 }
 
 func NewCourseRating() *CourseRating {
@@ -1596,18 +1592,6 @@ func (p *CourseRating) GetCourseId() (v int64) {
 	return p.CourseId
 }
 
-func (p *CourseRating) GetRecommendation() (v float64) {
-	return p.Recommendation
-}
-
-func (p *CourseRating) GetDifficulty() (v int32) {
-	return p.Difficulty
-}
-
-func (p *CourseRating) GetWorkload() (v int32) {
-	return p.Workload
-}
-
 func (p *CourseRating) GetUsefulness() (v int32) {
 	return p.Usefulness
 }
@@ -1624,12 +1608,9 @@ var fieldIDToName_CourseRating = map[int16]string{
 	1: "ratingId",
 	2: "userId",
 	3: "courseId",
-	4: "recommendation",
-	5: "difficulty",
-	6: "workload",
-	7: "usefulness",
-	8: "isVisible",
-	9: "createdAt",
+	4: "usefulness",
+	5: "isVisible",
+	6: "createdAt",
 }
 
 func (p *CourseRating) Read(iprot thrift.TProtocol) (err error) {
@@ -1639,9 +1620,6 @@ func (p *CourseRating) Read(iprot thrift.TProtocol) (err error) {
 	var issetRatingId bool = false
 	var issetUserId bool = false
 	var issetCourseId bool = false
-	var issetRecommendation bool = false
-	var issetDifficulty bool = false
-	var issetWorkload bool = false
 	var issetUsefulness bool = false
 	var issetIsVisible bool = false
 	var issetCreatedAt bool = false
@@ -1688,53 +1666,26 @@ func (p *CourseRating) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 4:
-			if fieldTypeId == thrift.DOUBLE {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField4(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetRecommendation = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 5:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField5(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetDifficulty = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 6:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField6(iprot); err != nil {
-					goto ReadFieldError
-				}
-				issetWorkload = true
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 7:
-			if fieldTypeId == thrift.I32 {
-				if err = p.ReadField7(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetUsefulness = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 8:
+		case 5:
 			if fieldTypeId == thrift.BOOL {
-				if err = p.ReadField8(iprot); err != nil {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetIsVisible = true
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
 				goto SkipFieldError
 			}
-		case 9:
+		case 6:
 			if fieldTypeId == thrift.I64 {
-				if err = p.ReadField9(iprot); err != nil {
+				if err = p.ReadField6(iprot); err != nil {
 					goto ReadFieldError
 				}
 				issetCreatedAt = true
@@ -1769,33 +1720,18 @@ func (p *CourseRating) Read(iprot thrift.TProtocol) (err error) {
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetRecommendation {
+	if !issetUsefulness {
 		fieldId = 4
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetDifficulty {
+	if !issetIsVisible {
 		fieldId = 5
 		goto RequiredFieldNotSetError
 	}
 
-	if !issetWorkload {
-		fieldId = 6
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetUsefulness {
-		fieldId = 7
-		goto RequiredFieldNotSetError
-	}
-
-	if !issetIsVisible {
-		fieldId = 8
-		goto RequiredFieldNotSetError
-	}
-
 	if !issetCreatedAt {
-		fieldId = 9
+		fieldId = 6
 		goto RequiredFieldNotSetError
 	}
 	return nil
@@ -1851,39 +1787,6 @@ func (p *CourseRating) ReadField3(iprot thrift.TProtocol) error {
 }
 func (p *CourseRating) ReadField4(iprot thrift.TProtocol) error {
 
-	var _field float64
-	if v, err := iprot.ReadDouble(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Recommendation = _field
-	return nil
-}
-func (p *CourseRating) ReadField5(iprot thrift.TProtocol) error {
-
-	var _field int32
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Difficulty = _field
-	return nil
-}
-func (p *CourseRating) ReadField6(iprot thrift.TProtocol) error {
-
-	var _field int32
-	if v, err := iprot.ReadI32(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Workload = _field
-	return nil
-}
-func (p *CourseRating) ReadField7(iprot thrift.TProtocol) error {
-
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
@@ -1893,7 +1796,7 @@ func (p *CourseRating) ReadField7(iprot thrift.TProtocol) error {
 	p.Usefulness = _field
 	return nil
 }
-func (p *CourseRating) ReadField8(iprot thrift.TProtocol) error {
+func (p *CourseRating) ReadField5(iprot thrift.TProtocol) error {
 
 	var _field bool
 	if v, err := iprot.ReadBool(); err != nil {
@@ -1904,7 +1807,7 @@ func (p *CourseRating) ReadField8(iprot thrift.TProtocol) error {
 	p.IsVisible = _field
 	return nil
 }
-func (p *CourseRating) ReadField9(iprot thrift.TProtocol) error {
+func (p *CourseRating) ReadField6(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -1944,18 +1847,6 @@ func (p *CourseRating) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField6(oprot); err != nil {
 			fieldId = 6
-			goto WriteFieldError
-		}
-		if err = p.writeField7(oprot); err != nil {
-			fieldId = 7
-			goto WriteFieldError
-		}
-		if err = p.writeField8(oprot); err != nil {
-			fieldId = 8
-			goto WriteFieldError
-		}
-		if err = p.writeField9(oprot); err != nil {
-			fieldId = 9
 			goto WriteFieldError
 		}
 	}
@@ -2028,10 +1919,10 @@ WriteFieldEndError:
 }
 
 func (p *CourseRating) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("recommendation", thrift.DOUBLE, 4); err != nil {
+	if err = oprot.WriteFieldBegin("usefulness", thrift.I32, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteDouble(p.Recommendation); err != nil {
+	if err := oprot.WriteI32(p.Usefulness); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2045,10 +1936,10 @@ WriteFieldEndError:
 }
 
 func (p *CourseRating) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("difficulty", thrift.I32, 5); err != nil {
+	if err = oprot.WriteFieldBegin("isVisible", thrift.BOOL, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Difficulty); err != nil {
+	if err := oprot.WriteBool(p.IsVisible); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2062,58 +1953,7 @@ WriteFieldEndError:
 }
 
 func (p *CourseRating) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("workload", thrift.I32, 6); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.Workload); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
-}
-
-func (p *CourseRating) writeField7(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("usefulness", thrift.I32, 7); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.Usefulness); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 7 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 7 end error: ", p), err)
-}
-
-func (p *CourseRating) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("isVisible", thrift.BOOL, 8); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteBool(p.IsVisible); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 8 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 8 end error: ", p), err)
-}
-
-func (p *CourseRating) writeField9(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("createdAt", thrift.I64, 9); err != nil {
+	if err = oprot.WriteFieldBegin("createdAt", thrift.I64, 6); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI64(p.CreatedAt); err != nil {
@@ -2124,9 +1964,9 @@ func (p *CourseRating) writeField9(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 9 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 9 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 6 end error: ", p), err)
 }
 
 func (p *CourseRating) String() string {
