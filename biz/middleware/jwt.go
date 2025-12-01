@@ -169,33 +169,37 @@ func GenerateAccessToken(c *app.RequestContext) {
 
 }
 
-func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
+func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) error {
 	claims, err := AccessTokenJwtMiddleware.GetClaimsFromJWT(ctx, c)
 	if err != nil {
-		return false
+		token := c.Request.Header.Get("Authorization")
+		if token == "" {
+			return errno.AuthNoToken
+		}
+		return errno.AuthInvalid
 	}
 	// 验证token类型是否为access
 	if tokenType, ok := claims[constants.TokenType].(string); !ok || tokenType != "access" {
-		return false
+		return errno.AuthInvalid
 	}
 
 	switch v := claims["exp"].(type) {
 	case nil:
-		return false
+		return errno.AuthInvalid
 	case float64:
 		if int64(v) < AccessTokenJwtMiddleware.TimeFunc().Unix() {
-			return false
+			return errno.AuthAccessExpired
 		}
 	case json.Number:
 		n, err := v.Int64()
 		if err != nil {
-			return false
+			return errno.AuthInvalid
 		}
 		if n < AccessTokenJwtMiddleware.TimeFunc().Unix() {
-			return false
+			return errno.AuthAccessExpired
 		}
 	default:
-		return false
+		return errno.AuthInvalid
 	}
 	c.Set("JWT_PAYLOAD", claims)
 	identity := AccessTokenJwtMiddleware.IdentityHandler(ctx, c)
@@ -205,10 +209,10 @@ func IsAccessTokenAvailable(ctx context.Context, c *app.RequestContext) bool {
 		c.Set(constants.RoleID, identity.(*JwtCustomClaims).RoleId)
 	}
 	if !AccessTokenJwtMiddleware.Authorizator(identity, ctx, c) {
-		return false
+		return errno.AuthInvalid
 	}
 
-	return true
+	return nil
 
 }
 
