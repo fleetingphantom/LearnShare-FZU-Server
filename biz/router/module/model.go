@@ -3,7 +3,6 @@
 package module
 
 import (
-	module "LearnShare/biz/handler/module"
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
