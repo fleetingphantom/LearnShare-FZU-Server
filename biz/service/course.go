@@ -128,24 +128,20 @@ func (s *CourseService) GetCourseComments(req *course.GetCourseCommentsReq) ([]*
 }
 
 func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) error {
-	// 获取用户ID
 	userID := GetUidFormContext(s.c)
 
-	// 创建评分对象
+	if req.Rating < 0 || req.Rating > 5 {
+		return errno.ValidationRatingRangeInvalidError
+	}
+
 	rating := &db.CourseRating{
 		UserID:         userID,
 		CourseID:       req.CourseID,
-		Recommendation: req.Rating, // 直接使用传入的评分
-		Difficulty:     1,          // 默认值
-		Workload:       3,          // 默认值
-		Usefulness:     4,          // 默认值
-		IsVisible:      true,
+		Recommendation: req.Rating,
 	}
 
-	// 使用异步提交评分
-	errChan := db.SubmitCourseRatingAsync(s.ctx, rating)
-	if err := <-errChan; err != nil {
-		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交评分失败: "+err.Error())
+	if err := db.SubmitCourseRating(s.ctx, rating); err != nil {
+		return errno.NewErrNo(errno.InternalDatabaseErrorCode, "提交课程评分失败: "+err.Error())
 	}
 
 	return nil
@@ -155,11 +151,7 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 	// 获取用户ID
 	userID := GetUidFormContext(s.c)
 
-	// 处理 IsVisible 默认值
 	isVisible := req.IsVisible
-	if !isVisible {
-		isVisible = true // 使用默认值
-	}
 
 	// 创建评论对象
 	var parentIDPtr *int64
