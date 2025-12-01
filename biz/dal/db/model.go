@@ -178,10 +178,10 @@ type CourseRating struct {
 	RatingID       int64     `json:"rating_id" db:"rating_id"`
 	UserID         int64     `json:"user_id" db:"user_id"`
 	CourseID       int64     `json:"course_id" db:"course_id"`
-	Recommendation int64     `json:"recommendation" db:"recommendation"`
-	Difficulty     string    `json:"difficulty" db:"difficulty"`
-	Workload       int64     `json:"workload" db:"workload"`
-	Usefulness     int64     `json:"usefulness" db:"usefulness"`
+	Recommendation float64   `json:"recommendation" db:"recommendation"` // DECIMAL(2,1)
+	Difficulty     uint8     `json:"difficulty" db:"difficulty"`         // TINYINT UNSIGNED
+	Workload       uint8     `json:"workload" db:"workload"`
+	Usefulness     uint8     `json:"usefulness" db:"usefulness"`
 	IsVisible      bool      `json:"is_visible" db:"is_visible"`
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
@@ -192,22 +192,22 @@ func (r CourseRating) ToCourseRatingModule() *module.CourseRating {
 		RatingId:       r.RatingID,
 		UserId:         r.UserID,
 		CourseId:       r.CourseID,
-		Recommendation: r.Recommendation,
-		Difficulty:     r.Difficulty,
-		Workload:       r.Workload,
-		Usefulness:     r.Usefulness,
+		Recommendation: r.Recommendation,    // float64 → double ✅
+		Difficulty:     int32(r.Difficulty), // uint8 → i32 ✅
+		Workload:       int32(r.Workload),
+		Usefulness:     int32(r.Usefulness),
 		IsVisible:      r.IsVisible,
+		CreatedAt:      r.CreatedAt.Unix(), // time.Time → i64
 	}
 }
 
-// CourseComment 课程评论
 type CourseComment struct {
 	CommentID int64     `json:"comment_id" db:"comment_id"`
 	CourseID  int64     `json:"course_id" db:"course_id"`
 	UserID    int64     `json:"user_id" db:"user_id"`
 	Content   string    `json:"content" db:"content"`
 	Likes     int64     `json:"likes" db:"likes"`
-	ParentID  int64     `json:"parent_id" db:"parent_id"`
+	ParentID  *int64    `json:"parent_id,omitempty" db:"parent_id"` // 允许 NULL
 	IsVisible bool      `json:"is_visible" db:"is_visible"`
 	Status    string    `json:"status" db:"status"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
@@ -220,11 +220,11 @@ func (c CourseComment) ToCourseCommentModule() *module.CourseComment {
 		UserId:    c.UserID,
 		CourseId:  c.CourseID,
 		Content:   c.Content,
-		ParentId:  c.ParentID,
-		Likes:     c.Likes, // 必须：Thrift required字段
+		ParentId:  c.ParentID, // *int64 → optional i64 ✅
+		Likes:     c.Likes,
 		IsVisible: c.IsVisible,
-		Status:    c.Status,           // 必须：Thrift required字段
-		CreatedAt: c.CreatedAt.Unix(), // 必须：时间戳转换
+		Status:    c.Status,
+		CreatedAt: c.CreatedAt.Unix(),
 	}
 }
 
@@ -243,7 +243,7 @@ type CommentUserRow struct {
 	Content   string    `gorm:"column:content"`
 	Likes     int64     `json:"likes" db:"likes"`
 	Status    string    `json:"status" db:"status"`
-	ParentID  int64     `gorm:"column:parent_id"`
+	ParentID  *int64    `gorm:"column:parent_id"`
 	IsVisible bool      `gorm:"column:is_visible"`
 	CreatedAt time.Time `gorm:"column:created_at"`
 	UpdatedAt time.Time `gorm:"column:updated_at"`
@@ -265,7 +265,7 @@ type CourseCommentWithuser struct {
 	User      User      `json:"user" db:"-"`
 	Likes     int64     `json:"likes" db:"likes"`
 	Content   string    `json:"content" db:"content"`
-	ParentID  int64     `json:"parent_id" db:"parent_id"`
+	ParentID  *int64    `json:"parent_id,omitempty" db:"parent_id"` // ← 关键修改！
 	IsVisible bool      `json:"is_visible" db:"is_visible"`
 	Status    string    `json:"status" db:"status"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
@@ -404,36 +404,36 @@ func (r ResourceRating) ToResourceRatingModule() *module.ResourceRating {
 }
 
 type Review struct {
-    ReviewID   int64      `gorm:"primaryKey;autoIncrement;column:review_id"`
-    TargetID   int64      `gorm:"not null;column:target_id"`
-    TargetType string     `gorm:"size:50;not null;column:target_type"`
-    Reason     string     `gorm:"type:text;not null;column:reason"`
-    Status     string     `gorm:"type:enum('pending','approved','rejected');default:'pending';column:status"`
-    Priority   int        `gorm:"default:3;column:priority"`
-    ReporterID int64      `gorm:"column:reporter_id"`
-    ReviewerID *int64     `gorm:"column:reviewer_id"`
-    ReviewedAt *time.Time `gorm:"column:reviewed_at"`
-    CreatedAt  time.Time  `gorm:"autoCreateTime;column:created_at"`
+	ReviewID   int64      `gorm:"primaryKey;autoIncrement;column:review_id"`
+	TargetID   int64      `gorm:"not null;column:target_id"`
+	TargetType string     `gorm:"size:50;not null;column:target_type"`
+	Reason     string     `gorm:"type:text;not null;column:reason"`
+	Status     string     `gorm:"type:enum('pending','approved','rejected');default:'pending';column:status"`
+	Priority   int        `gorm:"default:3;column:priority"`
+	ReporterID int64      `gorm:"column:reporter_id"`
+	ReviewerID *int64     `gorm:"column:reviewer_id"`
+	ReviewedAt *time.Time `gorm:"column:reviewed_at"`
+	CreatedAt  time.Time  `gorm:"autoCreateTime;column:created_at"`
 }
 
 // ToReviewModule 将db.Review转换为model.Review
 func (r Review) ToReviewModule() *module.Review {
-    var reviewerId int64
-    if r.ReviewedAt != nil && r.ReviewerID != nil {
-        reviewerId = *r.ReviewerID
-    } else {
-        reviewerId = 0
-    }
+	var reviewerId int64
+	if r.ReviewedAt != nil && r.ReviewerID != nil {
+		reviewerId = *r.ReviewerID
+	} else {
+		reviewerId = 0
+	}
 
-    reporterId := r.ReporterID
+	reporterId := r.ReporterID
 
 	return &module.Review{
 		ReviewId:   r.ReviewID,
-        ReviewerId: reviewerId,
-        ReporterId: reporterId,
-        TargetId:   r.TargetID,
-        TargetType: r.TargetType,
-        Reason:     r.Reason,
+		ReviewerId: reviewerId,
+		ReporterId: reporterId,
+		TargetId:   r.TargetID,
+		TargetType: r.TargetType,
+		Reason:     r.Reason,
 		Status:     r.Status,
 		Priority:   int64(r.Priority),
 		CreatedAt:  r.CreatedAt.Unix(),

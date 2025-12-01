@@ -32,43 +32,42 @@ struct Course{
     required i64 updatedAt,
 }
 
-struct CourseRating{
+struct CourseRating {
     required i64 ratingId,
     required i64 userId,
     required i64 courseId,
-    required i64 recommendation,
-    required string difficulty,
-    required i64 workload,
-    required i64 usefulness,
+    required double recommendation,   // ✅ DECIMAL(2,1) → double (e.g., 4.5)
+    required i32 difficulty,          
+    required i32 workload,            
+    required i32 usefulness,          
     required bool isVisible,
     required i64 createdAt,
 }
 
-
-struct CourseComment{
+struct CourseComment {
     required i64 commentId,
     required i64 userId,
     required i64 courseId,
     required string content,
-    required i64 parentId,
+    optional i64 parentId,            // ✅ 允许 NULL → optional
     required i64 likes,
     required bool isVisible,
     required string status,
     required i64 createdAt,
 }
 
-struct CourseCommentWithUser{
+// 如果有嵌套结构，也同步更新
+struct CourseCommentWithUser {
     required i64 commentId,
     required User user,
     required i64 courseId,
     required string content,
-    required i64 parentId,
+    optional i64 parentId,            // ✅ 保持一致
     required i64 likes,
     required bool isVisible,
     required string status,
     required i64 createdAt,
 }
-
 struct ResourceTag {
     required i64 tagId,
     required string tagName,

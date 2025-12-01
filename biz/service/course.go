@@ -135,10 +135,10 @@ func (s *CourseService) SubmitCourseRating(req *course.SubmitCourseRatingReq) er
 	rating := &db.CourseRating{
 		UserID:         userID,
 		CourseID:       req.CourseID,
-		Recommendation: int64(req.Rating), // 直接使用传入的评分
-		Difficulty:     "medium",          // 默认值
-		Workload:       3,                 // 默认值
-		Usefulness:     4,                 // 默认值
+		Recommendation: req.Rating, // 直接使用传入的评分
+		Difficulty:     1,          // 默认值
+		Workload:       3,          // 默认值
+		Usefulness:     4,          // 默认值
 		IsVisible:      true,
 	}
 
@@ -155,9 +155,6 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 	// 获取用户ID
 	userID := GetUidFormContext(s.c)
 
-	// 处理 ParentID 默认值
-	parentID := req.ParentID
-
 	// 处理 IsVisible 默认值
 	isVisible := req.IsVisible
 	if !isVisible {
@@ -165,11 +162,16 @@ func (s *CourseService) SubmitCourseComment(req *course.SubmitCourseCommentReq) 
 	}
 
 	// 创建评论对象
+	var parentIDPtr *int64
+	if req.ParentID != 0 {
+		parentIDPtr = &req.ParentID
+	}
+
 	comment := &db.CourseComment{
 		CourseID:  req.CourseID,
 		UserID:    userID,
 		Content:   req.Contents,
-		ParentID:  parentID,
+		ParentID:  parentIDPtr, // ✅ *int64
 		IsVisible: isVisible,
 	}
 
