@@ -13,8 +13,8 @@ import (
 func AccessTokenAuth() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
 		// 1. 验证 access-token 是否有效
-		if !middleware.IsAccessTokenAvailable(ctx, c) {
-			fail(c, errno.AuthAccessExpired)
+		if err := middleware.IsAccessTokenAvailable(ctx, c); err != nil {
+			fail(c, err)
 			return
 		}
 
